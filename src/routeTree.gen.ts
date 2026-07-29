@@ -9,12 +9,42 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as TasksRouteImport } from './routes/tasks'
+import { Route as StaffRouteImport } from './routes/staff'
+import { Route as PaymentsRouteImport } from './routes/payments'
+import { Route as ExpensesRouteImport } from './routes/expenses'
+import { Route as DeliveryRouteImport } from './routes/delivery'
 import { Route as ClientsRouteImport } from './routes/clients'
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as ProjectsIndexRouteImport } from './routes/projects/index'
 import { Route as ProjectsIdRouteImport } from './routes/projects/$id'
 
+const TasksRoute = TasksRouteImport.update({
+  id: '/tasks',
+  path: '/tasks',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const StaffRoute = StaffRouteImport.update({
+  id: '/staff',
+  path: '/staff',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PaymentsRoute = PaymentsRouteImport.update({
+  id: '/payments',
+  path: '/payments',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ExpensesRoute = ExpensesRouteImport.update({
+  id: '/expenses',
+  path: '/expenses',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const DeliveryRoute = DeliveryRouteImport.update({
+  id: '/delivery',
+  path: '/delivery',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ClientsRoute = ClientsRouteImport.update({
   id: '/clients',
   path: '/clients',
@@ -45,6 +75,11 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
   '/clients': typeof ClientsRoute
+  '/delivery': typeof DeliveryRoute
+  '/expenses': typeof ExpensesRoute
+  '/payments': typeof PaymentsRoute
+  '/staff': typeof StaffRoute
+  '/tasks': typeof TasksRoute
   '/projects/$id': typeof ProjectsIdRoute
   '/projects/': typeof ProjectsIndexRoute
 }
@@ -52,6 +87,11 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
   '/clients': typeof ClientsRoute
+  '/delivery': typeof DeliveryRoute
+  '/expenses': typeof ExpensesRoute
+  '/payments': typeof PaymentsRoute
+  '/staff': typeof StaffRoute
+  '/tasks': typeof TasksRoute
   '/projects/$id': typeof ProjectsIdRoute
   '/projects': typeof ProjectsIndexRoute
 }
@@ -60,27 +100,103 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
   '/clients': typeof ClientsRoute
+  '/delivery': typeof DeliveryRoute
+  '/expenses': typeof ExpensesRoute
+  '/payments': typeof PaymentsRoute
+  '/staff': typeof StaffRoute
+  '/tasks': typeof TasksRoute
   '/projects/$id': typeof ProjectsIdRoute
   '/projects/': typeof ProjectsIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/auth' | '/clients' | '/projects/$id' | '/projects/'
+  fullPaths:
+    | '/'
+    | '/auth'
+    | '/clients'
+    | '/delivery'
+    | '/expenses'
+    | '/payments'
+    | '/staff'
+    | '/tasks'
+    | '/projects/$id'
+    | '/projects/'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/auth' | '/clients' | '/projects/$id' | '/projects'
-  id: '__root__' | '/' | '/auth' | '/clients' | '/projects/$id' | '/projects/'
+  to:
+    | '/'
+    | '/auth'
+    | '/clients'
+    | '/delivery'
+    | '/expenses'
+    | '/payments'
+    | '/staff'
+    | '/tasks'
+    | '/projects/$id'
+    | '/projects'
+  id:
+    | '__root__'
+    | '/'
+    | '/auth'
+    | '/clients'
+    | '/delivery'
+    | '/expenses'
+    | '/payments'
+    | '/staff'
+    | '/tasks'
+    | '/projects/$id'
+    | '/projects/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AuthRoute: typeof AuthRoute
   ClientsRoute: typeof ClientsRoute
+  DeliveryRoute: typeof DeliveryRoute
+  ExpensesRoute: typeof ExpensesRoute
+  PaymentsRoute: typeof PaymentsRoute
+  StaffRoute: typeof StaffRoute
+  TasksRoute: typeof TasksRoute
   ProjectsIdRoute: typeof ProjectsIdRoute
   ProjectsIndexRoute: typeof ProjectsIndexRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/tasks': {
+      id: '/tasks'
+      path: '/tasks'
+      fullPath: '/tasks'
+      preLoaderRoute: typeof TasksRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/staff': {
+      id: '/staff'
+      path: '/staff'
+      fullPath: '/staff'
+      preLoaderRoute: typeof StaffRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/payments': {
+      id: '/payments'
+      path: '/payments'
+      fullPath: '/payments'
+      preLoaderRoute: typeof PaymentsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/expenses': {
+      id: '/expenses'
+      path: '/expenses'
+      fullPath: '/expenses'
+      preLoaderRoute: typeof ExpensesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/delivery': {
+      id: '/delivery'
+      path: '/delivery'
+      fullPath: '/delivery'
+      preLoaderRoute: typeof DeliveryRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/clients': {
       id: '/clients'
       path: '/clients'
@@ -123,6 +239,11 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AuthRoute: AuthRoute,
   ClientsRoute: ClientsRoute,
+  DeliveryRoute: DeliveryRoute,
+  ExpensesRoute: ExpensesRoute,
+  PaymentsRoute: PaymentsRoute,
+  StaffRoute: StaffRoute,
+  TasksRoute: TasksRoute,
   ProjectsIdRoute: ProjectsIdRoute,
   ProjectsIndexRoute: ProjectsIndexRoute,
 }

@@ -11,11 +11,14 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as TasksRouteImport } from './routes/tasks'
 import { Route as StaffRouteImport } from './routes/staff'
+import { Route as SettingsRouteImport } from './routes/settings'
+import { Route as ReportsRouteImport } from './routes/reports'
 import { Route as PaymentsRouteImport } from './routes/payments'
 import { Route as ExpensesRouteImport } from './routes/expenses'
 import { Route as DeliveryRouteImport } from './routes/delivery'
 import { Route as ClientsRouteImport } from './routes/clients'
 import { Route as AuthRouteImport } from './routes/auth'
+import { Route as AccountsRouteImport } from './routes/accounts'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as ProjectsIndexRouteImport } from './routes/projects/index'
 import { Route as ProjectsIdRouteImport } from './routes/projects/$id'
@@ -28,6 +31,16 @@ const TasksRoute = TasksRouteImport.update({
 const StaffRoute = StaffRouteImport.update({
   id: '/staff',
   path: '/staff',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SettingsRoute = SettingsRouteImport.update({
+  id: '/settings',
+  path: '/settings',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ReportsRoute = ReportsRouteImport.update({
+  id: '/reports',
+  path: '/reports',
   getParentRoute: () => rootRouteImport,
 } as any)
 const PaymentsRoute = PaymentsRouteImport.update({
@@ -55,6 +68,11 @@ const AuthRoute = AuthRouteImport.update({
   path: '/auth',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AccountsRoute = AccountsRouteImport.update({
+  id: '/accounts',
+  path: '/accounts',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
@@ -73,11 +91,14 @@ const ProjectsIdRoute = ProjectsIdRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/accounts': typeof AccountsRoute
   '/auth': typeof AuthRoute
   '/clients': typeof ClientsRoute
   '/delivery': typeof DeliveryRoute
   '/expenses': typeof ExpensesRoute
   '/payments': typeof PaymentsRoute
+  '/reports': typeof ReportsRoute
+  '/settings': typeof SettingsRoute
   '/staff': typeof StaffRoute
   '/tasks': typeof TasksRoute
   '/projects/$id': typeof ProjectsIdRoute
@@ -85,11 +106,14 @@ export interface FileRoutesByFullPath {
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/accounts': typeof AccountsRoute
   '/auth': typeof AuthRoute
   '/clients': typeof ClientsRoute
   '/delivery': typeof DeliveryRoute
   '/expenses': typeof ExpensesRoute
   '/payments': typeof PaymentsRoute
+  '/reports': typeof ReportsRoute
+  '/settings': typeof SettingsRoute
   '/staff': typeof StaffRoute
   '/tasks': typeof TasksRoute
   '/projects/$id': typeof ProjectsIdRoute
@@ -98,11 +122,14 @@ export interface FileRoutesByTo {
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/accounts': typeof AccountsRoute
   '/auth': typeof AuthRoute
   '/clients': typeof ClientsRoute
   '/delivery': typeof DeliveryRoute
   '/expenses': typeof ExpensesRoute
   '/payments': typeof PaymentsRoute
+  '/reports': typeof ReportsRoute
+  '/settings': typeof SettingsRoute
   '/staff': typeof StaffRoute
   '/tasks': typeof TasksRoute
   '/projects/$id': typeof ProjectsIdRoute
@@ -112,11 +139,14 @@ export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
+    | '/accounts'
     | '/auth'
     | '/clients'
     | '/delivery'
     | '/expenses'
     | '/payments'
+    | '/reports'
+    | '/settings'
     | '/staff'
     | '/tasks'
     | '/projects/$id'
@@ -124,11 +154,14 @@ export interface FileRouteTypes {
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
+    | '/accounts'
     | '/auth'
     | '/clients'
     | '/delivery'
     | '/expenses'
     | '/payments'
+    | '/reports'
+    | '/settings'
     | '/staff'
     | '/tasks'
     | '/projects/$id'
@@ -136,11 +169,14 @@ export interface FileRouteTypes {
   id:
     | '__root__'
     | '/'
+    | '/accounts'
     | '/auth'
     | '/clients'
     | '/delivery'
     | '/expenses'
     | '/payments'
+    | '/reports'
+    | '/settings'
     | '/staff'
     | '/tasks'
     | '/projects/$id'
@@ -149,11 +185,14 @@ export interface FileRouteTypes {
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  AccountsRoute: typeof AccountsRoute
   AuthRoute: typeof AuthRoute
   ClientsRoute: typeof ClientsRoute
   DeliveryRoute: typeof DeliveryRoute
   ExpensesRoute: typeof ExpensesRoute
   PaymentsRoute: typeof PaymentsRoute
+  ReportsRoute: typeof ReportsRoute
+  SettingsRoute: typeof SettingsRoute
   StaffRoute: typeof StaffRoute
   TasksRoute: typeof TasksRoute
   ProjectsIdRoute: typeof ProjectsIdRoute
@@ -174,6 +213,20 @@ declare module '@tanstack/react-router' {
       path: '/staff'
       fullPath: '/staff'
       preLoaderRoute: typeof StaffRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/settings': {
+      id: '/settings'
+      path: '/settings'
+      fullPath: '/settings'
+      preLoaderRoute: typeof SettingsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/reports': {
+      id: '/reports'
+      path: '/reports'
+      fullPath: '/reports'
+      preLoaderRoute: typeof ReportsRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/payments': {
@@ -211,6 +264,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/accounts': {
+      id: '/accounts'
+      path: '/accounts'
+      fullPath: '/accounts'
+      preLoaderRoute: typeof AccountsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/': {
       id: '/'
       path: '/'
@@ -237,11 +297,14 @@ declare module '@tanstack/react-router' {
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  AccountsRoute: AccountsRoute,
   AuthRoute: AuthRoute,
   ClientsRoute: ClientsRoute,
   DeliveryRoute: DeliveryRoute,
   ExpensesRoute: ExpensesRoute,
   PaymentsRoute: PaymentsRoute,
+  ReportsRoute: ReportsRoute,
+  SettingsRoute: SettingsRoute,
   StaffRoute: StaffRoute,
   TasksRoute: TasksRoute,
   ProjectsIdRoute: ProjectsIdRoute,

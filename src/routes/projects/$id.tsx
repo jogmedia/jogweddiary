@@ -139,7 +139,7 @@ function ProjectDetail() {
         }
       />
 
-      <div className="mb-4 grid grid-cols-2 gap-3 lg:grid-cols-4">
+      <div className="mb-6 grid grid-cols-2 gap-4 lg:grid-cols-4">
         <StatCard label="Agreed amount" value={inr(project.total_amount)} />
         <StatCard label="Received" value={inr(totals.received)} tone="success" />
         <StatCard label="Balance due" value={inr(project.balance_due)} tone={Number(project.balance_due) > 0 ? "destructive" : "success"} />
@@ -147,7 +147,7 @@ function ProjectDetail() {
       </div>
 
       {/* Quick actions */}
-      <div className="mb-6 flex flex-wrap gap-2">
+      <div className="mb-8 grid grid-cols-2 gap-2 sm:flex sm:flex-wrap [&_button]:w-full [&_button]:h-11 sm:[&_button]:w-auto sm:[&_button]:h-9">
         <Button size="sm" variant="outline" asChild>
           <a href={`tel:${phone}`}>
             <Phone className="mr-1.5 h-4 w-4" /> Call

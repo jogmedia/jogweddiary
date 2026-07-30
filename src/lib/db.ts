@@ -388,11 +388,24 @@ function useInvalidate() {
   };
 }
 
+/** Removes joined relation objects and read-only columns before writing. */
+function sanitize(values: Record<string, unknown>) {
+  const out: Record<string, unknown> = {};
+  for (const [k, v] of Object.entries(values)) {
+    if (k === "created_at" || k === "updated_at") continue;
+    // nested relation payloads (e.g. `clients`, `projects`, `staff`) are not columns
+    if (v !== null && typeof v === "object") continue;
+    out[k] = v;
+  }
+  return out;
+}
+
 export function useUpsert(table: string, label: string) {
   const invalidate = useInvalidate();
   return useMutation({
     mutationFn: async (values: Record<string, unknown>) => {
-      const { id, ...rest } = values as { id?: string };
+      const { id, ...raw } = values as { id?: string };
+      const rest = sanitize(raw);
       if (id) {
         const { error } = await anyDb.from(table).update(rest).eq("id", id);
         if (error) throw error;
@@ -404,6 +417,7 @@ export function useUpsert(table: string, label: string) {
       logActivity("created", table, data?.id, label);
       return data?.id as string;
     },
+
     onSuccess: () => {
       invalidate(table);
       toast.success(`${label} saved`);

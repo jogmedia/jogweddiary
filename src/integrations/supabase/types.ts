@@ -510,6 +510,30 @@ export type Database = {
           },
         ]
       }
+      permissions: {
+        Row: {
+          action: string
+          created_at: string
+          description: string | null
+          id: string
+          resource: string
+        }
+        Insert: {
+          action: string
+          created_at?: string
+          description?: string | null
+          id?: string
+          resource: string
+        }
+        Update: {
+          action?: string
+          created_at?: string
+          description?: string | null
+          id?: string
+          resource?: string
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           created_at: string
@@ -576,6 +600,109 @@ export type Database = {
           },
         ]
       }
+      project_checklist_items: {
+        Row: {
+          created_at: string
+          event_type: string | null
+          id: string
+          item_name: string
+          item_status: string
+          item_type: string | null
+          notes: string | null
+          project_id: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          event_type?: string | null
+          id?: string
+          item_name: string
+          item_status?: string
+          item_type?: string | null
+          notes?: string | null
+          project_id: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          event_type?: string | null
+          id?: string
+          item_name?: string
+          item_status?: string
+          item_type?: string | null
+          notes?: string | null
+          project_id?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "project_checklist_items_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "projects"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      project_events: {
+        Row: {
+          arrival_time: string | null
+          contact_name: string | null
+          contact_phone: string | null
+          created_at: string
+          event_date: string
+          event_time: string | null
+          event_type: string
+          google_maps_link: string | null
+          id: string
+          location: string | null
+          notes: string | null
+          project_id: string
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          arrival_time?: string | null
+          contact_name?: string | null
+          contact_phone?: string | null
+          created_at?: string
+          event_date: string
+          event_time?: string | null
+          event_type: string
+          google_maps_link?: string | null
+          id?: string
+          location?: string | null
+          notes?: string | null
+          project_id: string
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          arrival_time?: string | null
+          contact_name?: string | null
+          contact_phone?: string | null
+          created_at?: string
+          event_date?: string
+          event_time?: string | null
+          event_type?: string
+          google_maps_link?: string | null
+          id?: string
+          location?: string | null
+          notes?: string | null
+          project_id?: string
+          status?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "project_events_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "projects"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       project_expenses: {
         Row: {
           amount: number
@@ -613,6 +740,104 @@ export type Database = {
         Relationships: [
           {
             foreignKeyName: "project_expenses_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "projects"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      project_exports: {
+        Row: {
+          created_by: string | null
+          export_type: string
+          exported_at: string
+          file_name: string | null
+          file_url: string | null
+          id: string
+          project_id: string
+          sent_to_whatsapp: boolean
+        }
+        Insert: {
+          created_by?: string | null
+          export_type: string
+          exported_at?: string
+          file_name?: string | null
+          file_url?: string | null
+          id?: string
+          project_id: string
+          sent_to_whatsapp?: boolean
+        }
+        Update: {
+          created_by?: string | null
+          export_type?: string
+          exported_at?: string
+          file_name?: string | null
+          file_url?: string | null
+          id?: string
+          project_id?: string
+          sent_to_whatsapp?: boolean
+        }
+        Relationships: [
+          {
+            foreignKeyName: "project_exports_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "staff"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "project_exports_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "projects"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      project_logistics: {
+        Row: {
+          accommodation_notes: string | null
+          client_contact_name: string | null
+          client_contact_phone: string | null
+          created_at: string
+          equipment_notes: string | null
+          id: string
+          project_id: string
+          team_arrival_time: string | null
+          travel_required: boolean
+          updated_at: string
+          vehicle_details: string | null
+        }
+        Insert: {
+          accommodation_notes?: string | null
+          client_contact_name?: string | null
+          client_contact_phone?: string | null
+          created_at?: string
+          equipment_notes?: string | null
+          id?: string
+          project_id: string
+          team_arrival_time?: string | null
+          travel_required?: boolean
+          updated_at?: string
+          vehicle_details?: string | null
+        }
+        Update: {
+          accommodation_notes?: string | null
+          client_contact_name?: string | null
+          client_contact_phone?: string | null
+          created_at?: string
+          equipment_notes?: string | null
+          id?: string
+          project_id?: string
+          team_arrival_time?: string | null
+          travel_required?: boolean
+          updated_at?: string
+          vehicle_details?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "project_logistics_project_id_fkey"
             columns: ["project_id"]
             isOneToOne: false
             referencedRelation: "projects"
@@ -665,6 +890,48 @@ export type Database = {
           {
             foreignKeyName: "project_payments_received_by_fkey"
             columns: ["received_by"]
+            isOneToOne: false
+            referencedRelation: "staff"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      project_permissions_log: {
+        Row: {
+          action: string
+          created_at: string
+          details: Json | null
+          id: string
+          project_id: string
+          staff_id: string
+        }
+        Insert: {
+          action: string
+          created_at?: string
+          details?: Json | null
+          id?: string
+          project_id: string
+          staff_id: string
+        }
+        Update: {
+          action?: string
+          created_at?: string
+          details?: Json | null
+          id?: string
+          project_id?: string
+          staff_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "project_permissions_log_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "projects"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "project_permissions_log_staff_id_fkey"
+            columns: ["staff_id"]
             isOneToOne: false
             referencedRelation: "staff"
             referencedColumns: ["id"]
@@ -790,6 +1057,66 @@ export type Database = {
           },
         ]
       }
+      role_permissions: {
+        Row: {
+          created_at: string
+          id: string
+          permission_id: string
+          role_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          permission_id: string
+          role_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          permission_id?: string
+          role_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "role_permissions_permission_id_fkey"
+            columns: ["permission_id"]
+            isOneToOne: false
+            referencedRelation: "permissions"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "role_permissions_role_id_fkey"
+            columns: ["role_id"]
+            isOneToOne: false
+            referencedRelation: "roles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      roles: {
+        Row: {
+          created_at: string
+          description: string | null
+          id: string
+          name: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          description?: string | null
+          id?: string
+          name: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          description?: string | null
+          id?: string
+          name?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       staff: {
         Row: {
           active_status: boolean
@@ -823,6 +1150,52 @@ export type Database = {
         }
         Relationships: []
       }
+      staff_roles: {
+        Row: {
+          assigned_at: string
+          assigned_by: string | null
+          id: string
+          role_id: string
+          staff_id: string
+        }
+        Insert: {
+          assigned_at?: string
+          assigned_by?: string | null
+          id?: string
+          role_id: string
+          staff_id: string
+        }
+        Update: {
+          assigned_at?: string
+          assigned_by?: string | null
+          id?: string
+          role_id?: string
+          staff_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "staff_roles_assigned_by_fkey"
+            columns: ["assigned_by"]
+            isOneToOne: false
+            referencedRelation: "staff"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "staff_roles_role_id_fkey"
+            columns: ["role_id"]
+            isOneToOne: false
+            referencedRelation: "roles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "staff_roles_staff_id_fkey"
+            columns: ["staff_id"]
+            isOneToOne: false
+            referencedRelation: "staff"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       user_roles: {
         Row: {
           id: string
@@ -846,6 +1219,56 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      get_balance_sheet: {
+        Args: { as_of_date: string }
+        Returns: {
+          liabilities_plus_equity: number
+          total_assets: number
+          total_equity: number
+          total_liabilities: number
+        }[]
+      }
+      get_cash_flow_report: {
+        Args: { end_date: string; start_date: string }
+        Returns: {
+          cash_in: number
+          cash_out: number
+          closing_cash: number
+          opening_cash: number
+        }[]
+      }
+      get_pending_dues_report: {
+        Args: never
+        Returns: {
+          event_date: string
+          pending_due: number
+          project_id: string
+          project_name: string
+          received_amount: number
+          total_amount: number
+        }[]
+      }
+      get_profit_and_loss: {
+        Args: { end_date: string; start_date: string }
+        Returns: {
+          net_profit: number
+          total_direct_costs: number
+          total_income: number
+          total_operating_expenses: number
+        }[]
+      }
+      get_project_profit_report: {
+        Args: never
+        Returns: {
+          balance_due: number
+          project_id: string
+          project_name: string
+          project_profit: number
+          total_amount: number
+          total_expenses: number
+          total_received: number
+        }[]
+      }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]

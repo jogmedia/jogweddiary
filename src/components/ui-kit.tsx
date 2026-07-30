@@ -18,11 +18,12 @@ const TONE: Record<string, string> = {
 };
 
 export function StatusBadge({ value, className }: { value?: string | null; className?: string }) {
-  const key = (value ?? "pending").toLowerCase();
+  const raw = (value ?? "pending").toLowerCase();
+  const key = raw.includes(":") ? raw.split(":").pop()!.trim() : raw;
   return (
     <span
       className={cn(
-        "inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-medium capitalize",
+        "inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-medium capitalize leading-5",
         TONE[key] ?? "bg-secondary text-secondary-foreground border-border",
         className,
       )}
@@ -69,18 +70,20 @@ export function StatCard({
     tone === "success"
       ? "text-success"
       : tone === "warning"
-        ? "text-warning-foreground"
+        ? "text-warning"
         : tone === "destructive"
           ? "text-destructive"
           : "text-foreground";
   return (
-    <div className="surface p-4">
-      <div className="flex items-center justify-between gap-2">
+    <div className="surface flex h-full min-h-[112px] flex-col justify-between p-4 sm:p-5">
+      <div className="flex items-start justify-between gap-2">
         <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">{label}</p>
         {icon && <span className="text-muted-foreground">{icon}</span>}
       </div>
-      <p className={cn("stat-value mt-2", toneClass)}>{value}</p>
-      {hint && <p className="mt-1 text-xs text-muted-foreground">{hint}</p>}
+      <div className="mt-3">
+        <p className={cn("stat-value", toneClass)}>{value}</p>
+        {hint && <p className="mt-1 text-xs text-muted-foreground">{hint}</p>}
+      </div>
     </div>
   );
 }

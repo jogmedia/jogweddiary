@@ -129,7 +129,7 @@ function Dashboard() {
         subtitle={`Overview for ${new Date().toLocaleDateString("en-IN", { month: "long", year: "numeric" })}`}
       />
 
-      <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
+      <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
         <StatCard label="Total Projects" value={String(stats.total)} icon={<FolderKanban className="h-4 w-4" />} />
         <StatCard label="Active" value={String(stats.active)} hint="in progress" />
         <StatCard label="Completed" value={String(stats.completed)} tone="success" />

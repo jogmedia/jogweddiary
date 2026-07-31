@@ -81,9 +81,27 @@ export type Staff = {
   active_status: boolean;
 };
 
+export type ProjectEvent = {
+  id: string;
+  project_id: string;
+  event_type: string;
+  event_date: string;
+  event_time: string | null;
+  arrival_time: string | null;
+  muhurtham_time: string | null;
+  location: string | null;
+  google_maps_link: string | null;
+  contact_name: string | null;
+  contact_phone: string | null;
+  status: string;
+  notes: string | null;
+  projects?: { project_name: string; clients?: Client | null } | null;
+};
+
 export type Assignment = {
   id: string;
   project_id: string;
+  event_id?: string | null;
   staff_id: string;
   role_in_project: string | null;
   staff?: Staff | null;
@@ -277,6 +295,21 @@ export const useAssignments = (projectId?: string) =>
     },
   });
 
+export const useProjectEvents = (projectId?: string) =>
+  useQuery({
+    queryKey: ["project_events", projectId ?? "all"],
+    queryFn: async () => {
+      let q = anyDb
+        .from("project_events")
+        .select("*, projects(project_name, clients(*))")
+        .order("event_date", { ascending: true });
+      if (projectId) q = q.eq("project_id", projectId);
+      const { data, error } = await q;
+      if (error) throw error;
+      return (data ?? []) as ProjectEvent[];
+    },
+  });
+
 export const useDeliveries = (projectId?: string) =>
   useQuery({
     queryKey: ["deliveries", projectId ?? "all"],
@@ -370,6 +403,7 @@ const RELATED: Record<string, string[]> = {
   project_tasks: ["tasks", "activity_log"],
   staff: ["staff", "assignments", "activity_log"],
   project_assignments: ["assignments", "activity_log"],
+  project_events: ["project_events", "activity_log"],
   delivery_records: ["deliveries", "projects", "project", "activity_log"],
   chart_of_accounts: ["accounts", "activity_log"],
   journal_entries: ["journal_entries", "activity_log"],

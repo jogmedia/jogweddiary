@@ -9,6 +9,8 @@ import {
   Trash2,
   CheckCircle2,
   Pencil,
+  FileDown,
+  Send,
 } from "lucide-react";
 import { AppShell } from "@/components/AppShell";
 import { EmptyState, PageHeader, StatCard, StatusBadge } from "@/components/ui-kit";
@@ -22,6 +24,7 @@ import {
   useExpenses,
   usePayments,
   useProject,
+  useProjectEvents,
   useRemove,
   useSettings,
   useStaff,
@@ -30,6 +33,10 @@ import {
 } from "@/lib/db";
 import { digitsOnly, fmtDate, inr, todayISO } from "@/lib/format";
 import { exportPdf } from "@/lib/exporters";
+import { downloadElementPdf } from "@/lib/pdf";
+import { EventSchedule } from "@/components/EventSchedule";
+import { WorkBrief } from "@/components/WorkBrief";
+import { buildScheduleMessage, openWhatsApp } from "@/lib/whatsapp";
 import { projectFields } from "./index";
 
 export const Route = createFileRoute("/projects/$id")({
@@ -62,6 +69,15 @@ const EXPENSE_CATEGORIES = [
   "Other",
 ].map((v) => ({ value: v, label: v }));
 
+const WORKFLOW = [
+  { key: "raw_backup_done", label: "Raw data backed up" },
+  { key: "photo_selection_done", label: "Photo selection done" },
+  { key: "album_editing_done", label: "Album editing" },
+  { key: "video_editing_done", label: "Video editing" },
+  { key: "album_printed", label: "Album printed" },
+  { key: "final_delivery_done", label: "Final delivery" },
+];
+
 function ProjectDetail() {
   const { id } = useParams({ from: "/projects/$id" });
   const { data: project, isLoading } = useProject(id);
@@ -72,6 +88,7 @@ function ProjectDetail() {
   const { data: staff = [] } = useStaff();
   const { data: assignments = [] } = useAssignments(id);
   const { data: deliveries = [] } = useDeliveries(id);
+  const { data: events = [] } = useProjectEvents(id);
   const { data: settings } = useSettings();
 
   const saveProject = useUpsert("projects", "Project");
@@ -80,6 +97,8 @@ function ProjectDetail() {
   const saveTask = useUpsert("project_tasks", "Task");
   const saveAssignment = useUpsert("project_assignments", "Crew assignment");
   const saveDelivery = useUpsert("delivery_records", "Delivery");
+  const saveEvent = useUpsert("project_events", "Event");
+  const delEvent = useRemove("project_events", "Event");
   const delPayment = useRemove("project_payments", "Payment");
   const delExpense = useRemove("project_expenses", "Expense");
   const delTask = useRemove("project_tasks", "Task");
@@ -134,6 +153,31 @@ function ProjectDetail() {
             </Button>
             <Button variant="outline" size="sm" onClick={() => exportPdf("invoice-print", "Invoice")}>
               <Printer className="mr-1.5 h-4 w-4" /> Invoice
+            </Button>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() =>
+                downloadElementPdf("work-brief", `Jog Media Event Brief - ${project.project_name}`)
+              }
+            >
+              <FileDown className="mr-1.5 h-4 w-4" /> Work Brief PDF
+            </Button>
+            <Button
+              size="sm"
+              onClick={() =>
+                openWhatsApp(
+                  project.clients?.whatsapp ?? project.clients?.phone,
+                  buildScheduleMessage(
+                    project.clients?.name ?? "Client",
+                    events,
+                    settings?.business_name ?? "JOG MEDIA",
+                    settings?.phone,
+                  ),
+                )
+              }
+            >
+              <Send className="mr-1.5 h-4 w-4" /> Share Schedule
             </Button>
           </>
         }
@@ -224,8 +268,38 @@ function ProjectDetail() {
         </div>
       </div>
 
-      <Tabs defaultValue="payments">
+      {/* Post-production workflow */}
+      <div className="surface mb-6 p-4">
+        <div className="mb-3 flex flex-wrap items-center justify-between gap-2">
+          <p className="text-sm font-semibold">Post-production workflow</p>
+          <p className="text-xs text-muted-foreground">
+            Balance {inr(project.balance_due)}
+            {project.payment_due_date ? ` · due ${fmtDate(project.payment_due_date)}` : ""}
+          </p>
+        </div>
+        <div className="grid grid-cols-2 gap-2 lg:grid-cols-3">
+          {WORKFLOW.map((w) => {
+            const done = Boolean((project as any)[w.key]);
+            return (
+              <button
+                key={w.key}
+                type="button"
+                onClick={() => saveProject.mutate({ id, [w.key]: !done })}
+                className={`flex items-center justify-between gap-2 rounded-lg border p-3 text-left text-xs transition-colors ${
+                  done ? "border-success/40 bg-success/10 text-success" : "border-border hover:bg-muted/60"
+                }`}
+              >
+                <span className="font-medium">{w.label}</span>
+                <CheckCircle2 className={`h-4 w-4 ${done ? "" : "text-muted-foreground/40"}`} />
+              </button>
+            );
+          })}
+        </div>
+      </div>
+
+      <Tabs defaultValue="schedule">
         <TabsList className="mb-4 flex w-full flex-wrap justify-start">
+          <TabsTrigger value="schedule">Schedule</TabsTrigger>
           <TabsTrigger value="payments">Payments</TabsTrigger>
           <TabsTrigger value="expenses">Expenses</TabsTrigger>
           <TabsTrigger value="tasks">Tasks</TabsTrigger>
@@ -233,6 +307,20 @@ function ProjectDetail() {
           <TabsTrigger value="delivery">Delivery</TabsTrigger>
           <TabsTrigger value="timeline">Timeline</TabsTrigger>
         </TabsList>
+
+        <TabsContent value="schedule">
+          <EventSchedule
+            project={project}
+            events={events}
+            staff={staff}
+            assignments={assignments}
+            settings={settings}
+            onSaveEvent={(v) => saveEvent.mutateAsync({ ...v, project_id: id })}
+            onDeleteEvent={(eid) => delEvent.mutate(eid)}
+            onAssign={(v) => saveAssignment.mutateAsync({ ...v, project_id: id })}
+            onUnassign={(aid) => delAssignment.mutate(aid)}
+          />
+        </TabsContent>
 
         <TabsContent value="payments">
           <div className="surface divide-y divide-border">
@@ -436,6 +524,19 @@ function ProjectDetail() {
           </div>
         </TabsContent>
       </Tabs>
+
+      <div id="work-brief" className="hidden">
+        <WorkBrief
+          settings={settings}
+          project={project}
+          events={events}
+          crew={assignments.map((a) => ({
+            name: a.staff?.name ?? "—",
+            role: a.role_in_project,
+            eventId: a.event_id ?? null,
+          }))}
+        />
+      </div>
 
       {/* Printable invoice */}
       <div id="invoice-print" className="hidden">

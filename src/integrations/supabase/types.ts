@@ -564,6 +564,7 @@ export type Database = {
       project_assignments: {
         Row: {
           assigned_at: string
+          event_id: string | null
           id: string
           project_id: string
           role_in_project: string | null
@@ -571,6 +572,7 @@ export type Database = {
         }
         Insert: {
           assigned_at?: string
+          event_id?: string | null
           id?: string
           project_id: string
           role_in_project?: string | null
@@ -578,12 +580,20 @@ export type Database = {
         }
         Update: {
           assigned_at?: string
+          event_id?: string | null
           id?: string
           project_id?: string
           role_in_project?: string | null
           staff_id?: string
         }
         Relationships: [
+          {
+            foreignKeyName: "project_assignments_event_id_fkey"
+            columns: ["event_id"]
+            isOneToOne: false
+            referencedRelation: "project_events"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "project_assignments_project_id_fkey"
             columns: ["project_id"]
@@ -656,8 +666,10 @@ export type Database = {
           google_maps_link: string | null
           id: string
           location: string | null
+          muhurtham_time: string | null
           notes: string | null
           project_id: string
+          sort_order: number
           status: string
           updated_at: string
         }
@@ -672,8 +684,10 @@ export type Database = {
           google_maps_link?: string | null
           id?: string
           location?: string | null
+          muhurtham_time?: string | null
           notes?: string | null
           project_id: string
+          sort_order?: number
           status?: string
           updated_at?: string
         }
@@ -688,8 +702,10 @@ export type Database = {
           google_maps_link?: string | null
           id?: string
           location?: string | null
+          muhurtham_time?: string | null
           notes?: string | null
           project_id?: string
+          sort_order?: number
           status?: string
           updated_at?: string
         }
@@ -989,6 +1005,8 @@ export type Database = {
       projects: {
         Row: {
           advance_amount: number
+          album_editing_done: boolean
+          album_printed: boolean
           album_status: string
           balance_due: number
           client_id: string
@@ -996,19 +1014,26 @@ export type Database = {
           delivery_status: string
           editing_status: string
           event_date: string
+          final_delivery_done: boolean
           id: string
           notes: string | null
           package_name: string | null
+          payment_due_date: string | null
           payment_status: string
+          photo_selection_done: boolean
           project_name: string
           project_status: string
+          raw_backup_done: boolean
           shoot_status: string
           total_amount: number
           updated_at: string
           venue: string | null
+          video_editing_done: boolean
         }
         Insert: {
           advance_amount?: number
+          album_editing_done?: boolean
+          album_printed?: boolean
           album_status?: string
           balance_due?: number
           client_id: string
@@ -1016,19 +1041,26 @@ export type Database = {
           delivery_status?: string
           editing_status?: string
           event_date: string
+          final_delivery_done?: boolean
           id?: string
           notes?: string | null
           package_name?: string | null
+          payment_due_date?: string | null
           payment_status?: string
+          photo_selection_done?: boolean
           project_name: string
           project_status?: string
+          raw_backup_done?: boolean
           shoot_status?: string
           total_amount?: number
           updated_at?: string
           venue?: string | null
+          video_editing_done?: boolean
         }
         Update: {
           advance_amount?: number
+          album_editing_done?: boolean
+          album_printed?: boolean
           album_status?: string
           balance_due?: number
           client_id?: string
@@ -1036,16 +1068,21 @@ export type Database = {
           delivery_status?: string
           editing_status?: string
           event_date?: string
+          final_delivery_done?: boolean
           id?: string
           notes?: string | null
           package_name?: string | null
+          payment_due_date?: string | null
           payment_status?: string
+          photo_selection_done?: boolean
           project_name?: string
           project_status?: string
+          raw_backup_done?: boolean
           shoot_status?: string
           total_amount?: number
           updated_at?: string
           venue?: string | null
+          video_editing_done?: boolean
         }
         Relationships: [
           {

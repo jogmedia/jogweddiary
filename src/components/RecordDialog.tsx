@@ -22,7 +22,7 @@ import {
 export type Field = {
   name: string;
   label: string;
-  type?: "text" | "number" | "date" | "textarea" | "select" | "email" | "tel";
+  type?: "text" | "number" | "date" | "textarea" | "select" | "email" | "tel" | "time";
   options?: { value: string; label: string }[];
   required?: boolean;
   placeholder?: string;

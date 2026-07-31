@@ -1,0 +1,279 @@
+import { useMemo, useState } from "react";
+import { MapPin, MessageCircle, Pencil, Plus, Send, Trash2, UserPlus } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { RecordDialog, type Field } from "@/components/RecordDialog";
+import { StatusBadge } from "@/components/ui-kit";
+import { fmtDate } from "@/lib/format";
+import {
+  EVENT_TYPES,
+  buildCrewMessage,
+  buildScheduleMessage,
+  eventMeta,
+  fmtTime,
+  openWhatsApp,
+} from "@/lib/whatsapp";
+import type { Assignment, ProjectEvent, Staff } from "@/lib/db";
+
+const eventFields: Field[] = [
+  {
+    name: "event_type",
+    label: "Event",
+    type: "select",
+    required: true,
+    options: EVENT_TYPES.map((t) => ({ value: t.value, label: t.label })),
+  },
+  { name: "event_date", label: "Date", type: "date", required: true },
+  { name: "arrival_time", label: "Team arrival time", type: "time" },
+  { name: "event_time", label: "Event time", type: "time" },
+  { name: "muhurtham_time", label: "Muhurtham time (wedding day)", type: "time" },
+  { name: "location", label: "Venue name", full: true },
+  { name: "google_maps_link", label: "Google Map link", full: true, placeholder: "https://maps.app.goo.gl/…" },
+  { name: "contact_name", label: "Venue contact name" },
+  { name: "contact_phone", label: "Venue contact phone", type: "tel" },
+  {
+    name: "status",
+    label: "Status",
+    type: "select",
+    options: ["pending", "confirmed", "completed", "cancelled"].map((v) => ({ value: v, label: v })),
+  },
+  { name: "notes", label: "Notes", type: "textarea" },
+];
+
+export function EventSchedule({
+  project,
+  events,
+  staff,
+  assignments,
+  settings,
+  onSaveEvent,
+  onDeleteEvent,
+  onAssign,
+  onUnassign,
+}: {
+  project: any;
+  events: ProjectEvent[];
+  staff: Staff[];
+  assignments: Assignment[];
+  settings: any;
+  onSaveEvent: (values: Record<string, any>) => Promise<unknown>;
+  onDeleteEvent: (id: string) => void;
+  onAssign: (values: Record<string, any>) => Promise<unknown>;
+  onUnassign: (id: string) => void;
+}) {
+  const [editing, setEditing] = useState<ProjectEvent | null>(null);
+  const clientName = project.clients?.name ?? "Client";
+  const clientPhone = project.clients?.whatsapp ?? project.clients?.phone;
+  const business = settings?.business_name ?? "JOG MEDIA";
+
+  const sorted = useMemo(
+    () => [...events].sort((a, b) => (a.event_date < b.event_date ? -1 : 1)),
+    [events],
+  );
+
+  const crewFor = (eventId: string) =>
+    assignments.filter((a) => a.event_id === eventId || !a.event_id);
+
+  return (
+    <div className="space-y-4">
+      <div className="flex flex-wrap gap-2">
+        <RecordDialog
+          title="Add event"
+          fields={eventFields}
+          initial={{ event_type: "wedding_day", status: "pending" }}
+          onSubmit={(v) => onSaveEvent(v)}
+          trigger={
+            <Button size="sm">
+              <Plus className="mr-1.5 h-4 w-4" /> Add event
+            </Button>
+          }
+        />
+        <Button
+          size="sm"
+          variant="secondary"
+          disabled={sorted.length === 0}
+          onClick={() =>
+            openWhatsApp(
+              clientPhone,
+              buildScheduleMessage(clientName, sorted, business, settings?.phone),
+            )
+          }
+        >
+          <Send className="mr-1.5 h-4 w-4" /> Send Schedule to Client (WhatsApp)
+        </Button>
+      </div>
+
+      {sorted.length === 0 && (
+        <div className="surface p-6 text-center text-sm text-muted-foreground">
+          No events scheduled yet. Add Save the Date, Pre-wedding, Wedding Day and Reception here.
+        </div>
+      )}
+
+      <div className="grid gap-4 lg:grid-cols-2">
+        {sorted.map((e) => {
+          const meta = eventMeta(e.event_type);
+          const crew = crewFor(e.id);
+          return (
+            <div key={e.id} className="surface flex h-full flex-col p-4">
+              <div className="flex items-start justify-between gap-2">
+                <div>
+                  <p className="text-sm font-semibold">
+                    <span className="mr-1.5">{meta.emoji}</span>
+                    {meta.label}
+                  </p>
+                  <p className="text-xs text-muted-foreground">{fmtDate(e.event_date)}</p>
+                </div>
+                <StatusBadge value={e.status} />
+              </div>
+
+              <div className="mt-3 grid grid-cols-2 gap-2 text-xs">
+                <div className="rounded-lg border border-border p-2">
+                  <p className="text-muted-foreground">Team arrival</p>
+                  <p className="font-medium">{fmtTime(e.arrival_time)}</p>
+                </div>
+                <div className="rounded-lg border border-border p-2">
+                  <p className="text-muted-foreground">
+                    {e.event_type === "wedding_day" ? "Muhurtham" : "Event time"}
+                  </p>
+                  <p className="font-medium">{fmtTime(e.muhurtham_time ?? e.event_time)}</p>
+                </div>
+              </div>
+
+              <p className="mt-3 flex items-start gap-1.5 text-xs text-muted-foreground">
+                <MapPin className="mt-0.5 h-3.5 w-3.5 shrink-0" />
+                <span>
+                  {e.location ?? "Venue TBD"}
+                  {e.google_maps_link && (
+                    <>
+                      {" · "}
+                      <a
+                        className="text-primary underline"
+                        href={e.google_maps_link}
+                        target="_blank"
+                        rel="noreferrer"
+                      >
+                        Map
+                      </a>
+                    </>
+                  )}
+                </span>
+              </p>
+
+              {/* Crew */}
+              <div className="mt-3 rounded-lg border border-border p-2">
+                <div className="mb-2 flex items-center justify-between">
+                  <p className="text-xs font-medium">Crew on duty</p>
+                  <RecordDialog
+                    title="Assign crew to event"
+                    fields={[
+                      {
+                        name: "staff_id",
+                        label: "Team member",
+                        type: "select",
+                        required: true,
+                        options: staff.map((s) => ({ value: s.id, label: `${s.name} (${s.role})` })),
+                      },
+                      {
+                        name: "role_in_project",
+                        label: "Duty / role",
+                        type: "select",
+                        options: [
+                          "Lead Photographer",
+                          "Photographer",
+                          "Cinematographer",
+                          "Videographer",
+                          "Drone Operator",
+                          "Assistant",
+                          "Candid Photographer",
+                          "Light Assistant",
+                        ].map((v) => ({ value: v, label: v })),
+                      },
+                    ]}
+                    onSubmit={(v) => onAssign({ ...v, event_id: e.id })}
+                    trigger={
+                      <Button size="sm" variant="ghost" className="h-7 px-2 text-xs">
+                        <UserPlus className="mr-1 h-3.5 w-3.5" /> Assign
+                      </Button>
+                    }
+                  />
+                </div>
+                {crew.length === 0 && <p className="text-xs text-muted-foreground">Nobody assigned.</p>}
+                <div className="space-y-1.5">
+                  {crew.map((a) => (
+                    <div key={a.id} className="flex items-center justify-between gap-2 text-xs">
+                      <span>
+                        {a.staff?.name}
+                        <span className="text-muted-foreground"> · {a.role_in_project ?? "Crew"}</span>
+                        {!a.event_id && <span className="text-muted-foreground"> (all events)</span>}
+                      </span>
+                      <div className="flex items-center gap-1">
+                        <Button
+                          size="sm"
+                          variant="ghost"
+                          className="h-7 px-2"
+                          title="Notify crew via WhatsApp"
+                          onClick={() =>
+                            openWhatsApp(
+                              a.staff?.phone,
+                              buildCrewMessage(e, clientName, a.role_in_project, business),
+                            )
+                          }
+                        >
+                          <MessageCircle className="h-3.5 w-3.5" />
+                        </Button>
+                        {a.event_id && (
+                          <Button
+                            size="sm"
+                            variant="ghost"
+                            className="h-7 px-2"
+                            onClick={() => onUnassign(a.id)}
+                          >
+                            <Trash2 className="h-3.5 w-3.5 text-destructive" />
+                          </Button>
+                        )}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              <div className="mt-3 flex flex-wrap gap-2">
+                <Button
+                  size="sm"
+                  variant="outline"
+                  onClick={() =>
+                    openWhatsApp(
+                      clientPhone,
+                      buildScheduleMessage(clientName, [e], business, settings?.phone),
+                    )
+                  }
+                >
+                  <Send className="mr-1.5 h-4 w-4" /> Share event
+                </Button>
+                <Button size="sm" variant="ghost" onClick={() => setEditing(e)}>
+                  <Pencil className="mr-1.5 h-4 w-4" /> Edit
+                </Button>
+                <Button size="sm" variant="ghost" onClick={() => onDeleteEvent(e.id)}>
+                  <Trash2 className="mr-1.5 h-4 w-4 text-destructive" /> Delete
+                </Button>
+              </div>
+            </div>
+          );
+        })}
+      </div>
+
+      {editing && (
+        <RecordDialog
+          title="Edit event"
+          fields={eventFields}
+          initial={editing as any}
+          open={!!editing}
+          onOpenChange={(v) => !v && setEditing(null)}
+          onSubmit={async (v) => {
+            await onSaveEvent({ ...v, id: editing.id });
+            setEditing(null);
+          }}
+        />
+      )}
+    </div>
+  );
+}

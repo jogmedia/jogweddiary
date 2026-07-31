@@ -15,6 +15,7 @@ import {
   LogOut,
   Menu,
   Camera,
+  CalendarDays,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useAuth } from "@/lib/auth";
@@ -25,6 +26,7 @@ export const NAV = [
   { to: "/", label: "Dashboard", icon: LayoutDashboard, adminOnly: false },
   { to: "/clients", label: "Clients", icon: Users, adminOnly: true },
   { to: "/projects", label: "Projects", icon: FolderKanban, adminOnly: false },
+  { to: "/calendar", label: "Calendar", icon: CalendarDays, adminOnly: false },
   { to: "/payments", label: "Payments", icon: Wallet, adminOnly: true },
   { to: "/expenses", label: "Expenses", icon: Receipt, adminOnly: true },
   { to: "/tasks", label: "Tasks", icon: ListChecks, adminOnly: false },

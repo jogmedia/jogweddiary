@@ -17,6 +17,7 @@ import { Route as PaymentsRouteImport } from './routes/payments'
 import { Route as ExpensesRouteImport } from './routes/expenses'
 import { Route as DeliveryRouteImport } from './routes/delivery'
 import { Route as ClientsRouteImport } from './routes/clients'
+import { Route as CalendarRouteImport } from './routes/calendar'
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as AccountsRouteImport } from './routes/accounts'
 import { Route as IndexRouteImport } from './routes/index'
@@ -63,6 +64,11 @@ const ClientsRoute = ClientsRouteImport.update({
   path: '/clients',
   getParentRoute: () => rootRouteImport,
 } as any)
+const CalendarRoute = CalendarRouteImport.update({
+  id: '/calendar',
+  path: '/calendar',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AuthRoute = AuthRouteImport.update({
   id: '/auth',
   path: '/auth',
@@ -93,6 +99,7 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/accounts': typeof AccountsRoute
   '/auth': typeof AuthRoute
+  '/calendar': typeof CalendarRoute
   '/clients': typeof ClientsRoute
   '/delivery': typeof DeliveryRoute
   '/expenses': typeof ExpensesRoute
@@ -108,6 +115,7 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/accounts': typeof AccountsRoute
   '/auth': typeof AuthRoute
+  '/calendar': typeof CalendarRoute
   '/clients': typeof ClientsRoute
   '/delivery': typeof DeliveryRoute
   '/expenses': typeof ExpensesRoute
@@ -124,6 +132,7 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/accounts': typeof AccountsRoute
   '/auth': typeof AuthRoute
+  '/calendar': typeof CalendarRoute
   '/clients': typeof ClientsRoute
   '/delivery': typeof DeliveryRoute
   '/expenses': typeof ExpensesRoute
@@ -141,6 +150,7 @@ export interface FileRouteTypes {
     | '/'
     | '/accounts'
     | '/auth'
+    | '/calendar'
     | '/clients'
     | '/delivery'
     | '/expenses'
@@ -156,6 +166,7 @@ export interface FileRouteTypes {
     | '/'
     | '/accounts'
     | '/auth'
+    | '/calendar'
     | '/clients'
     | '/delivery'
     | '/expenses'
@@ -171,6 +182,7 @@ export interface FileRouteTypes {
     | '/'
     | '/accounts'
     | '/auth'
+    | '/calendar'
     | '/clients'
     | '/delivery'
     | '/expenses'
@@ -187,6 +199,7 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AccountsRoute: typeof AccountsRoute
   AuthRoute: typeof AuthRoute
+  CalendarRoute: typeof CalendarRoute
   ClientsRoute: typeof ClientsRoute
   DeliveryRoute: typeof DeliveryRoute
   ExpensesRoute: typeof ExpensesRoute
@@ -257,6 +270,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ClientsRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/calendar': {
+      id: '/calendar'
+      path: '/calendar'
+      fullPath: '/calendar'
+      preLoaderRoute: typeof CalendarRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/auth': {
       id: '/auth'
       path: '/auth'
@@ -299,6 +319,7 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AccountsRoute: AccountsRoute,
   AuthRoute: AuthRoute,
+  CalendarRoute: CalendarRoute,
   ClientsRoute: ClientsRoute,
   DeliveryRoute: DeliveryRoute,
   ExpensesRoute: ExpensesRoute,

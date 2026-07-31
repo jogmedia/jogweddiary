@@ -57,6 +57,7 @@ export function projectFields(clients: { id: string; name: string }[]): Field[] 
     { name: "package_name", label: "Package" },
     { name: "total_amount", label: "Total agreed amount", type: "number" },
     { name: "advance_amount", label: "Advance amount", type: "number" },
+    { name: "payment_due_date", label: "Balance due date", type: "date" },
     { name: "project_status", label: "Project status", type: "select", options: opts(STATUS_OPTIONS.project) },
     { name: "shoot_status", label: "Shoot status", type: "select", options: opts(STATUS_OPTIONS.shoot) },
     { name: "editing_status", label: "Editing status", type: "select", options: opts(STATUS_OPTIONS.editing) },

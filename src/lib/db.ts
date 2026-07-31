@@ -26,7 +26,14 @@ export type Project = {
   total_amount: number;
   advance_amount: number;
   balance_due: number;
+  payment_due_date: string | null;
   payment_status: string;
+  raw_backup_done?: boolean;
+  photo_selection_done?: boolean;
+  album_editing_done?: boolean;
+  video_editing_done?: boolean;
+  album_printed?: boolean;
+  final_delivery_done?: boolean;
   project_status: string;
   shoot_status: string;
   editing_status: string;

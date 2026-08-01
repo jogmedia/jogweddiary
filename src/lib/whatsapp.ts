@@ -91,8 +91,10 @@ export function buildCrewMessage(
     `Event: ${meta.label} for ${clientName}`,
     `🗓 Date: ${fmtDate(event.event_date)}`,
     `⏰ Team Reporting Time: ${fmtTime(event.arrival_time ?? event.event_time)}`,
-    `📍 Venue: ${event.location ?? "TBD"}${event.google_maps_link ? ` (${event.google_maps_link})` : ""}`,
+    `📍 Venue: ${event.location ?? "TBD"}`,
+    ...(event.google_maps_link ? [`🗺 Google Map: ${event.google_maps_link}`] : []),
     `🎥 Your Role: ${role || "Crew"}`,
+
   ].join("\n");
 }
 

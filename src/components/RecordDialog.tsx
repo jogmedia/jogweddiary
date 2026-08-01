@@ -22,12 +22,18 @@ import {
 export type Field = {
   name: string;
   label: string;
-  type?: "text" | "number" | "date" | "textarea" | "select" | "email" | "tel" | "time";
+  type?: "text" | "number" | "date" | "textarea" | "select" | "email" | "tel" | "time" | "url";
   options?: { value: string; label: string }[];
   required?: boolean;
   placeholder?: string;
   full?: boolean;
+  hint?: string;
+  /** Return an error message string when invalid, otherwise null/undefined. */
+  validate?: (value: any, values: Record<string, any>) => string | null | undefined;
+  /** Transform the value right before submit (e.g. phone normalisation). */
+  transform?: (value: any) => any;
 };
+
 
 export function RecordDialog({
   title,
@@ -53,25 +59,42 @@ export function RecordDialog({
   const setOpen = onOpenChange ?? setUncontrolled;
   const [values, setValues] = useState<Record<string, any>>(initial ?? {});
   const [busy, setBusy] = useState(false);
+  const [errors, setErrors] = useState<Record<string, string>>({});
 
   useEffect(() => {
-    if (open) setValues(initial ?? {});
+    if (open) {
+      setValues(initial ?? {});
+      setErrors({});
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [open]);
 
-  const set = (name: string, v: any) => setValues((p) => ({ ...p, [name]: v }));
+  const set = (name: string, v: any) => {
+    setValues((p) => ({ ...p, [name]: v }));
+    setErrors((p) => (p[name] ? { ...p, [name]: "" } : p));
+  };
 
   const submit = async () => {
+    const next: Record<string, string> = {};
     for (const f of fields) {
-      if (f.required && (values[f.name] === undefined || values[f.name] === "" || values[f.name] === null)) {
-        return;
+      const v = values[f.name];
+      if (f.required && (v === undefined || v === "" || v === null)) {
+        next[f.name] = `${f.label} is required`;
+        continue;
       }
+      const msg = f.validate?.(v, values);
+      if (msg) next[f.name] = msg;
     }
+    setErrors(next);
+    if (Object.keys(next).some((k) => next[k])) return;
+
     setBusy(true);
     try {
       const cleaned: Record<string, any> = { ...values };
       fields.forEach((f) => {
+        if (f.transform) cleaned[f.name] = f.transform(cleaned[f.name]);
         if (f.type === "number") cleaned[f.name] = Number(cleaned[f.name] ?? 0);
+        if (typeof cleaned[f.name] === "string") cleaned[f.name] = cleaned[f.name].trim();
         if (cleaned[f.name] === "") cleaned[f.name] = null;
       });
       await onSubmit(cleaned);
@@ -80,6 +103,7 @@ export function RecordDialog({
       setBusy(false);
     }
   };
+
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
@@ -118,14 +142,22 @@ export function RecordDialog({
               ) : (
                 <Input
                   id={f.name}
-                  type={f.type ?? "text"}
+                  type={f.type === "url" ? "url" : (f.type ?? "text")}
                   step={f.type === "number" ? "0.01" : undefined}
                   value={values[f.name] ?? ""}
                   placeholder={f.placeholder}
+                  aria-invalid={!!errors[f.name]}
+                  className={errors[f.name] ? "border-destructive" : undefined}
                   onChange={(e) => set(f.name, e.target.value)}
                 />
               )}
+              {errors[f.name] ? (
+                <p className="mt-1 text-xs text-destructive">{errors[f.name]}</p>
+              ) : f.hint ? (
+                <p className="mt-1 text-xs text-muted-foreground">{f.hint}</p>
+              ) : null}
             </div>
+
           ))}
         </div>
         <DialogFooter>

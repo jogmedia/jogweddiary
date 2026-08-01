@@ -6,7 +6,7 @@ import { EmptyState, PageHeader, StatusBadge } from "@/components/ui-kit";
 import { RecordDialog, type Field } from "@/components/RecordDialog";
 import { Button } from "@/components/ui/button";
 import { useAssignments, useRemove, useStaff, useUpsert, type Staff } from "@/lib/db";
-import { digitsOnly } from "@/lib/format";
+import { digitsOnly, isValidPhone, waNumber } from "@/lib/format";
 
 export const Route = createFileRoute("/staff")({
   head: () => ({
@@ -22,7 +22,15 @@ export const Route = createFileRoute("/staff")({
 
 const FIELDS: Field[] = [
   { name: "name", label: "Name", required: true },
-  { name: "phone", label: "Phone", type: "tel" },
+  {
+    name: "phone",
+    label: "Phone",
+    type: "tel",
+    placeholder: "98765 43210",
+    hint: "Saved with +91 country code.",
+    validate: (v: any) => (!v || isValidPhone(v) ? null : "Enter a valid phone number"),
+    transform: (v: any) => (v ? `+${waNumber(v)}` : v),
+  },
   {
     name: "role",
     label: "Role",

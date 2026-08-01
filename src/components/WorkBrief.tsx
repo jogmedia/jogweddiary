@@ -153,9 +153,18 @@ export function WorkBrief({
               <td style={td}>
                 {e.location ?? "—"}
                 {e.google_maps_link ? (
-                  <div style={{ color: BRAND, fontSize: 10, wordBreak: "break-all" }}>{e.google_maps_link}</div>
+                  <div style={{ fontSize: 10, wordBreak: "break-all" }}>
+                    <a
+                      href={e.google_maps_link}
+                      style={{ color: BRAND, textDecoration: "underline" }}
+                    >
+                      📍 Open in Google Maps
+                    </a>
+                    <div style={{ color: MUTED, fontSize: 9 }}>{e.google_maps_link}</div>
+                  </div>
                 ) : null}
               </td>
+
             </tr>
           ))}
         </tbody>

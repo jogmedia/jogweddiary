@@ -1,4 +1,4 @@
-import { digitsOnly, fmtDate } from "@/lib/format";
+import { fmtDate, waNumber } from "@/lib/format";
 
 export type EventLike = {
   event_type: string;
@@ -62,12 +62,9 @@ export function buildScheduleMessage(
         );
       }
       rows.unshift(line("• Date", fmtDate(e.event_date)));
-      rows.push(
-        line(
-          "• Location",
-          e.location ? `${e.location}${e.google_maps_link ? ` (${e.google_maps_link})` : ""}` : e.google_maps_link,
-        ),
-      );
+      rows.push(line("• Location", e.location));
+      if (e.google_maps_link) rows.push(`• 📍 Google Map: ${e.google_maps_link}`);
+
       if (e.notes) rows.push(`• Note: ${e.notes}`);
       return `${meta.emoji} *${meta.label}*\n${rows.filter(Boolean).join("\n")}`;
     });
@@ -94,15 +91,18 @@ export function buildCrewMessage(
     `Event: ${meta.label} for ${clientName}`,
     `🗓 Date: ${fmtDate(event.event_date)}`,
     `⏰ Team Reporting Time: ${fmtTime(event.arrival_time ?? event.event_time)}`,
-    `📍 Venue: ${event.location ?? "TBD"}${event.google_maps_link ? ` (${event.google_maps_link})` : ""}`,
+    `📍 Venue: ${event.location ?? "TBD"}`,
+    ...(event.google_maps_link ? [`🗺 Google Map: ${event.google_maps_link}`] : []),
     `🎥 Your Role: ${role || "Crew"}`,
+
   ].join("\n");
 }
 
 export function openWhatsApp(phone: string | null | undefined, message: string) {
-  const num = digitsOnly(phone).replace(/^\+/, "");
+  const num = waNumber(phone);
   const url = num
     ? `https://wa.me/${num}?text=${encodeURIComponent(message)}`
     : `https://wa.me/?text=${encodeURIComponent(message)}`;
   window.open(url, "_blank", "noopener");
 }
+

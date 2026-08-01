@@ -46,3 +46,41 @@ export const sum = <T,>(rows: T[], pick: (r: T) => number | null | undefined) =>
   rows.reduce((acc, r) => acc + Number(pick(r) ?? 0), 0);
 
 export const digitsOnly = (v: string | null | undefined) => (v ?? "").replace(/[^\d+]/g, "");
+
+/** Normalises an Indian/international phone number into a wa.me-ready number (no +, with country code). */
+export const waNumber = (v: string | null | undefined) => {
+  let s = (v ?? "").replace(/[^\d+]/g, "");
+  if (!s) return "";
+  if (s.startsWith("00")) s = `+${s.slice(2)}`;
+  if (s.startsWith("+")) return s.slice(1).replace(/\D/g, "");
+  s = s.replace(/\D/g, "");
+  if (s.length === 10) return `91${s}`; // bare Indian mobile
+  if (s.length === 11 && s.startsWith("0")) return `91${s.slice(1)}`;
+  if (s.length === 12 && s.startsWith("91")) return s;
+  return s;
+};
+
+/** Pretty display form: +91 98765 43210 */
+export const fmtPhone = (v: string | null | undefined) => {
+  const n = waNumber(v);
+  if (!n) return "—";
+  if (n.startsWith("91") && n.length === 12) return `+91 ${n.slice(2, 7)} ${n.slice(7)}`;
+  return `+${n}`;
+};
+
+export const isValidPhone = (v: string | null | undefined) => {
+  const n = waNumber(v);
+  return n.length >= 10 && n.length <= 15;
+};
+
+export const isMapsUrl = (v: string | null | undefined) => {
+  const s = (v ?? "").trim();
+  if (!s) return true;
+  try {
+    const u = new URL(s);
+    return u.protocol === "https:" || u.protocol === "http:";
+  } catch {
+    return false;
+  }
+};
+

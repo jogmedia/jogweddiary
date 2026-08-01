@@ -3,7 +3,7 @@ import { MapPin, MessageCircle, Pencil, Plus, Send, Trash2, UserPlus } from "luc
 import { Button } from "@/components/ui/button";
 import { RecordDialog, type Field } from "@/components/RecordDialog";
 import { StatusBadge } from "@/components/ui-kit";
-import { fmtDate } from "@/lib/format";
+import { fmtDate, isMapsUrl, isValidPhone, waNumber } from "@/lib/format";
 import {
   EVENT_TYPES,
   buildCrewMessage,
@@ -26,10 +26,28 @@ const eventFields: Field[] = [
   { name: "arrival_time", label: "Team arrival time", type: "time" },
   { name: "event_time", label: "Event time", type: "time" },
   { name: "muhurtham_time", label: "Muhurtham time (wedding day)", type: "time" },
-  { name: "location", label: "Venue name", full: true },
-  { name: "google_maps_link", label: "Google Map link", full: true, placeholder: "https://maps.app.goo.gl/…" },
+  { name: "location", label: "Venue name", full: true, placeholder: "e.g. Kadavu Resort, Kozhikode" },
+  {
+    name: "google_maps_link",
+    label: "Google Maps URL",
+    type: "url",
+    full: true,
+    placeholder: "https://maps.app.goo.gl/…",
+    hint: "Paste the venue's Google Maps share link — it's added to WhatsApp messages and the Work Brief PDF.",
+    validate: (v) => (isMapsUrl(v) ? null : "Enter a valid link starting with https://"),
+    transform: (v) => (typeof v === "string" ? v.trim() : v),
+  },
   { name: "contact_name", label: "Venue contact name" },
-  { name: "contact_phone", label: "Venue contact phone", type: "tel" },
+  {
+    name: "contact_phone",
+    label: "Venue contact phone",
+    type: "tel",
+    placeholder: "98765 43210",
+    hint: "10-digit number is auto-saved with +91.",
+    validate: (v) => (!v || isValidPhone(v) ? null : "Enter a valid phone number"),
+    transform: (v) => (v ? `+${waNumber(v)}` : v),
+  },
+
   {
     name: "status",
     label: "Status",

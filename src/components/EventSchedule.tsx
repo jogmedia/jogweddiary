@@ -3,7 +3,7 @@ import { MapPin, MessageCircle, Pencil, Plus, Send, Trash2, UserPlus } from "luc
 import { Button } from "@/components/ui/button";
 import { RecordDialog, type Field } from "@/components/RecordDialog";
 import { StatusBadge } from "@/components/ui-kit";
-import { fmtDate } from "@/lib/format";
+import { fmtDate, isMapsUrl, isValidPhone, waNumber } from "@/lib/format";
 import {
   EVENT_TYPES,
   buildCrewMessage,

@@ -62,12 +62,9 @@ export function buildScheduleMessage(
         );
       }
       rows.unshift(line("• Date", fmtDate(e.event_date)));
-      rows.push(
-        line(
-          "• Location",
-          e.location ? `${e.location}${e.google_maps_link ? ` (${e.google_maps_link})` : ""}` : e.google_maps_link,
-        ),
-      );
+      rows.push(line("• Location", e.location));
+      if (e.google_maps_link) rows.push(`• 📍 Google Map: ${e.google_maps_link}`);
+
       if (e.notes) rows.push(`• Note: ${e.notes}`);
       return `${meta.emoji} *${meta.label}*\n${rows.filter(Boolean).join("\n")}`;
     });

@@ -129,7 +129,63 @@ function Dashboard() {
         subtitle={`Overview for ${new Date().toLocaleDateString("en-IN", { month: "long", year: "numeric" })}`}
       />
 
-      <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
+      {/* 1. Today's shoots */}
+      <div className="grid gap-4">
+        <ListCard
+          title="Today's shoots"
+          icon={<CalendarDays className="h-4 w-4" />}
+          empty="No shoots scheduled today"
+          rows={todaysShoots.map((p) => ({
+            id: p.id,
+            primary: p.project_name,
+            secondary: `${p.clients?.name ?? "—"} · ${p.venue ?? "Venue TBD"}`,
+            badge: p.shoot_status,
+          }))}
+        />
+      </div>
+
+      {/* 2. Upcoming events */}
+      <div className="mt-4 grid gap-4">
+        <ListCard
+          title="Upcoming events"
+          icon={<CalendarDays className="h-4 w-4" />}
+          empty="No upcoming events"
+          rows={upcoming.map((p) => ({
+            id: p.id,
+            primary: p.project_name,
+            secondary: `${fmtDate(p.event_date)} · ${p.venue ?? "Venue TBD"}`,
+            badge: p.project_status,
+          }))}
+        />
+      </div>
+
+      <div className="mt-4 grid gap-4 lg:grid-cols-2">
+        <ListCard
+          title="Overdue balances"
+          icon={<AlertTriangle className="h-4 w-4" />}
+          empty="No overdue balances"
+          rows={overdue.map((p) => ({
+            id: p.id,
+            primary: p.project_name,
+            secondary: `${inr(p.balance_due)} due · event ${fmtDate(p.event_date)}`,
+            badge: "overdue",
+          }))}
+        />
+        <ListCard
+          title="Completed deliveries"
+          icon={<PackageCheck className="h-4 w-4" />}
+          empty="No deliveries recorded"
+          rows={doneDeliveries.map((d) => ({
+            id: d.project_id,
+            primary: d.projects?.project_name ?? "Project",
+            secondary: `${d.delivery_type} · ${fmtDate(d.delivery_date)}`,
+            badge: "delivered",
+          }))}
+        />
+      </div>
+
+      {/* 3. Stat cards */}
+      <div className="mt-6 grid grid-cols-2 gap-4 lg:grid-cols-4">
         <StatCard label="Total Projects" value={String(stats.total)} icon={<FolderKanban className="h-4 w-4" />} />
         <StatCard label="Active" value={String(stats.active)} hint="in progress" />
         <StatCard label="Completed" value={String(stats.completed)} tone="success" />
@@ -158,6 +214,7 @@ function Dashboard() {
         <StatCard label="Deliveries Done" value={String(deliveries.length)} icon={<PackageCheck className="h-4 w-4" />} />
       </div>
 
+      {/* 4. Financial trends */}
       <div className="mt-6 grid gap-4 lg:grid-cols-3">
         <ChartCard title="Revenue trend (12 months)">
           <AreaChart data={series}>
@@ -188,52 +245,6 @@ function Dashboard() {
         </ChartCard>
       </div>
 
-      <div className="mt-6 grid gap-4 lg:grid-cols-2">
-        <ListCard
-          title="Today's shoots"
-          icon={<CalendarDays className="h-4 w-4" />}
-          empty="No shoots scheduled today"
-          rows={todaysShoots.map((p) => ({
-            id: p.id,
-            primary: p.project_name,
-            secondary: `${p.clients?.name ?? "—"} · ${p.venue ?? "Venue TBD"}`,
-            badge: p.shoot_status,
-          }))}
-        />
-        <ListCard
-          title="Upcoming events"
-          icon={<CalendarDays className="h-4 w-4" />}
-          empty="No upcoming events"
-          rows={upcoming.map((p) => ({
-            id: p.id,
-            primary: p.project_name,
-            secondary: `${fmtDate(p.event_date)} · ${p.venue ?? "Venue TBD"}`,
-            badge: p.project_status,
-          }))}
-        />
-        <ListCard
-          title="Overdue balances"
-          icon={<AlertTriangle className="h-4 w-4" />}
-          empty="No overdue balances"
-          rows={overdue.map((p) => ({
-            id: p.id,
-            primary: p.project_name,
-            secondary: `${inr(p.balance_due)} due · event ${fmtDate(p.event_date)}`,
-            badge: "overdue",
-          }))}
-        />
-        <ListCard
-          title="Completed deliveries"
-          icon={<PackageCheck className="h-4 w-4" />}
-          empty="No deliveries recorded"
-          rows={doneDeliveries.map((d) => ({
-            id: d.project_id,
-            primary: d.projects?.project_name ?? "Project",
-            secondary: `${d.delivery_type} · ${fmtDate(d.delivery_date)}`,
-            badge: "delivered",
-          }))}
-        />
-      </div>
     </AppShell>
   );
 }

@@ -59,25 +59,42 @@ export function RecordDialog({
   const setOpen = onOpenChange ?? setUncontrolled;
   const [values, setValues] = useState<Record<string, any>>(initial ?? {});
   const [busy, setBusy] = useState(false);
+  const [errors, setErrors] = useState<Record<string, string>>({});
 
   useEffect(() => {
-    if (open) setValues(initial ?? {});
+    if (open) {
+      setValues(initial ?? {});
+      setErrors({});
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [open]);
 
-  const set = (name: string, v: any) => setValues((p) => ({ ...p, [name]: v }));
+  const set = (name: string, v: any) => {
+    setValues((p) => ({ ...p, [name]: v }));
+    setErrors((p) => (p[name] ? { ...p, [name]: "" } : p));
+  };
 
   const submit = async () => {
+    const next: Record<string, string> = {};
     for (const f of fields) {
-      if (f.required && (values[f.name] === undefined || values[f.name] === "" || values[f.name] === null)) {
-        return;
+      const v = values[f.name];
+      if (f.required && (v === undefined || v === "" || v === null)) {
+        next[f.name] = `${f.label} is required`;
+        continue;
       }
+      const msg = f.validate?.(v, values);
+      if (msg) next[f.name] = msg;
     }
+    setErrors(next);
+    if (Object.keys(next).some((k) => next[k])) return;
+
     setBusy(true);
     try {
       const cleaned: Record<string, any> = { ...values };
       fields.forEach((f) => {
+        if (f.transform) cleaned[f.name] = f.transform(cleaned[f.name]);
         if (f.type === "number") cleaned[f.name] = Number(cleaned[f.name] ?? 0);
+        if (typeof cleaned[f.name] === "string") cleaned[f.name] = cleaned[f.name].trim();
         if (cleaned[f.name] === "") cleaned[f.name] = null;
       });
       await onSubmit(cleaned);
@@ -86,6 +103,7 @@ export function RecordDialog({
       setBusy(false);
     }
   };
+
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>

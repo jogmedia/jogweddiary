@@ -26,8 +26,23 @@ export const Route = createFileRoute("/clients")({
 
 const FIELDS: Field[] = [
   { name: "name", label: "Client name", required: true, full: true },
-  { name: "phone", label: "Phone", type: "tel" },
-  { name: "whatsapp", label: "WhatsApp", type: "tel" },
+  {
+    name: "phone",
+    label: "Phone",
+    type: "tel",
+    placeholder: "98765 43210",
+    hint: "Saved with +91 country code.",
+    validate: (v: any) => (!v || isValidPhone(v) ? null : "Enter a valid phone number"),
+    transform: (v: any) => (v ? `+${waNumber(v)}` : v),
+  },
+  {
+    name: "whatsapp",
+    label: "WhatsApp",
+    type: "tel",
+    placeholder: "98765 43210",
+    validate: (v: any) => (!v || isValidPhone(v) ? null : "Enter a valid WhatsApp number"),
+    transform: (v: any) => (v ? `+${waNumber(v)}` : v),
+  },
   { name: "email", label: "Email", type: "email" },
   { name: "address", label: "Address", type: "textarea" },
 ];
@@ -127,7 +142,7 @@ function ClientsPage() {
                   </Button>
                   <Button size="sm" variant="outline" className="flex-1" asChild>
                     <a
-                      href={`https://wa.me/${digitsOnly(c.whatsapp ?? c.phone)}`}
+                      href={`https://wa.me/${waNumber(c.whatsapp ?? c.phone)}`}
                       target="_blank"
                       rel="noreferrer"
                     >

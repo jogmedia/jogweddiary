@@ -22,7 +22,15 @@ export const Route = createFileRoute("/staff")({
 
 const FIELDS: Field[] = [
   { name: "name", label: "Name", required: true },
-  { name: "phone", label: "Phone", type: "tel" },
+  {
+    name: "phone",
+    label: "Phone",
+    type: "tel",
+    placeholder: "98765 43210",
+    hint: "Saved with +91 country code.",
+    validate: (v: any) => (!v || isValidPhone(v) ? null : "Enter a valid phone number"),
+    transform: (v: any) => (v ? `+${waNumber(v)}` : v),
+  },
   {
     name: "role",
     label: "Role",

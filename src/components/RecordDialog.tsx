@@ -22,12 +22,18 @@ import {
 export type Field = {
   name: string;
   label: string;
-  type?: "text" | "number" | "date" | "textarea" | "select" | "email" | "tel" | "time";
+  type?: "text" | "number" | "date" | "textarea" | "select" | "email" | "tel" | "time" | "url";
   options?: { value: string; label: string }[];
   required?: boolean;
   placeholder?: string;
   full?: boolean;
+  hint?: string;
+  /** Return an error message string when invalid, otherwise null/undefined. */
+  validate?: (value: any, values: Record<string, any>) => string | null | undefined;
+  /** Transform the value right before submit (e.g. phone normalisation). */
+  transform?: (value: any) => any;
 };
+
 
 export function RecordDialog({
   title,

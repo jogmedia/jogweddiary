@@ -142,14 +142,22 @@ export function RecordDialog({
               ) : (
                 <Input
                   id={f.name}
-                  type={f.type ?? "text"}
+                  type={f.type === "url" ? "url" : (f.type ?? "text")}
                   step={f.type === "number" ? "0.01" : undefined}
                   value={values[f.name] ?? ""}
                   placeholder={f.placeholder}
+                  aria-invalid={!!errors[f.name]}
+                  className={errors[f.name] ? "border-destructive" : undefined}
                   onChange={(e) => set(f.name, e.target.value)}
                 />
               )}
+              {errors[f.name] ? (
+                <p className="mt-1 text-xs text-destructive">{errors[f.name]}</p>
+              ) : f.hint ? (
+                <p className="mt-1 text-xs text-muted-foreground">{f.hint}</p>
+              ) : null}
             </div>
+
           ))}
         </div>
         <DialogFooter>

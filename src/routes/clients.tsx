@@ -7,7 +7,7 @@ import { RecordDialog, type Field } from "@/components/RecordDialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useClients, useProjects, useRemove, useUpsert, type Client } from "@/lib/db";
-import { digitsOnly, inr } from "@/lib/format";
+import { digitsOnly, inr, isValidPhone, waNumber } from "@/lib/format";
 
 export const Route = createFileRoute("/clients")({
   head: () => ({

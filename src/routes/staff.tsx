@@ -6,7 +6,7 @@ import { EmptyState, PageHeader, StatusBadge } from "@/components/ui-kit";
 import { RecordDialog, type Field } from "@/components/RecordDialog";
 import { Button } from "@/components/ui/button";
 import { useAssignments, useRemove, useStaff, useUpsert, type Staff } from "@/lib/db";
-import { digitsOnly } from "@/lib/format";
+import { digitsOnly, isValidPhone, waNumber } from "@/lib/format";
 
 export const Route = createFileRoute("/staff")({
   head: () => ({

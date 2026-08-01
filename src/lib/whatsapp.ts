@@ -100,9 +100,10 @@ export function buildCrewMessage(
 }
 
 export function openWhatsApp(phone: string | null | undefined, message: string) {
-  const num = digitsOnly(phone).replace(/^\+/, "");
+  const num = waNumber(phone);
   const url = num
     ? `https://wa.me/${num}?text=${encodeURIComponent(message)}`
     : `https://wa.me/?text=${encodeURIComponent(message)}`;
   window.open(url, "_blank", "noopener");
 }
+

@@ -121,12 +121,19 @@ export function CrewPicker({
               <div className="space-y-1 p-1">
                 {available.map((s) => {
                   const active = ids.includes(s.id);
+                  const blocked = !active && clashes(s.id).length > 0;
                   return (
                     <div key={s.id} className="rounded-md px-1 py-1">
                       <button
                         type="button"
                         onClick={() => toggle(s)}
-                        className="flex w-full items-center gap-2 rounded-md px-1.5 py-2 text-left text-sm hover:bg-muted"
+                        disabled={blocked}
+                        title={
+                          blocked
+                            ? `Already booked on this date & time slot (${clashes(s.id)[0]?.projectName})`
+                            : undefined
+                        }
+                        className="flex w-full items-center gap-2 rounded-md px-1.5 py-2 text-left text-sm hover:bg-muted disabled:cursor-not-allowed disabled:opacity-60"
                       >
                         <span
                           className={`flex h-4 w-4 shrink-0 items-center justify-center rounded border ${
@@ -139,12 +146,13 @@ export function CrewPicker({
                           <span className="font-medium">{s.name}</span>
                           <span className="text-muted-foreground"> — {prettyRole(s.role)}</span>
                         </span>
-                        {conflictsFor(s.id, date, projectId).length > 0 && (
+                        {clashes(s.id).length > 0 && (
                           <span className="shrink-0 rounded bg-destructive/12 px-1.5 py-0.5 text-[10px] font-medium text-destructive">
                             ⚠️ Booked
                           </span>
                         )}
                       </button>
+
                       {active && (
                         <div className="mt-1 pl-7 pr-1.5">
                           <Select

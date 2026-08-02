@@ -284,6 +284,73 @@ export function ProjectDialog({
       }}
       onSubmit={submit}
       extra={
+        <>
+        <div className="mb-3 rounded-xl border border-border bg-muted/30 p-3">
+          <div className="mb-2 flex items-center gap-2">
+            <Plane className="h-4 w-4 text-primary" />
+            <p className="text-sm font-semibold">Travel &amp; Booking Details</p>
+          </div>
+          <div className="space-y-3">
+            <div className="flex items-center justify-between gap-2 rounded-lg border border-border bg-card p-2.5">
+              <Label htmlFor="travel-required" className="text-xs font-medium">
+                Travel required?
+              </Label>
+              <Switch
+                id="travel-required"
+                checked={travel.travel_required}
+                onCheckedChange={(v) => setTravel((p) => ({ ...p, travel_required: v }))}
+              />
+            </div>
+            {travel.travel_required && (
+              <div className="grid gap-3 sm:grid-cols-2">
+                <div>
+                  <Label className="mb-1.5 block text-xs font-medium">Booking status</Label>
+                  <Select
+                    value={travel.travel_booking_status}
+                    onValueChange={(v) => setTravel((p) => ({ ...p, travel_booking_status: v }))}
+                  >
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select status" />
+                    </SelectTrigger>
+                    <SelectContent className="z-50">
+                      {BOOKING_STATUS.map((o) => (
+                        <SelectItem key={o.value} value={o.value}>
+                          {o.label}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div>
+                  <Label className="mb-1.5 block text-xs font-medium">Mode of travel</Label>
+                  <Select
+                    value={travel.travel_mode}
+                    onValueChange={(v) => setTravel((p) => ({ ...p, travel_mode: v }))}
+                  >
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select mode" />
+                    </SelectTrigger>
+                    <SelectContent className="z-50">
+                      {TRAVEL_MODES.map((o) => (
+                        <SelectItem key={o.value} value={o.value}>
+                          {o.label}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div className="sm:col-span-2">
+                  <Label className="mb-1.5 block text-xs font-medium">Ticket notes / PNR details</Label>
+                  <Textarea
+                    placeholder="Train name / number, PNR, departure & arrival time, seat details…"
+                    value={travel.travel_notes}
+                    onChange={(e) => setTravel((p) => ({ ...p, travel_notes: e.target.value }))}
+                  />
+                </div>
+              </div>
+            )}
+          </div>
+        </div>
         <div className="rounded-xl border border-border bg-muted/30 p-3">
           <div className="mb-2 flex items-center gap-2">
             <CalendarDays className="h-4 w-4 text-primary" />

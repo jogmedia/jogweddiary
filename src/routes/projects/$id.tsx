@@ -17,8 +17,8 @@ import { AppShell } from "@/components/AppShell";
 import { EmptyState, PageHeader, StatCard, StatusBadge } from "@/components/ui-kit";
 import { RecordDialog, type Field } from "@/components/RecordDialog";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { DRIVE_OPTIONS } from "@/lib/drives";
+
+import { DrivePicker } from "@/components/DrivePicker";
 
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
@@ -309,23 +309,8 @@ function ProjectDetail() {
               <HardDrive className="h-3.5 w-3.5" /> Storage Location: {project.backup_drive}
             </p>
           ) : null}
-          <label className="text-xs font-medium" htmlFor="backup-drive">
-            Storage Device / Hard Disk Name
-          </label>
-          <div className="mt-1 flex flex-col gap-2 sm:flex-row">
-            <Input
-              id="backup-drive"
-              list="backup-drive-options"
-              className="h-9 text-sm"
-              placeholder="e.g. HDD-2 (8TB) or Cloud Server"
-              value={drive}
-              onChange={(e) => setDrive(e.target.value)}
-            />
-            <datalist id="backup-drive-options">
-              {DRIVE_OPTIONS.map((o) => (
-                <option key={o} value={o} />
-              ))}
-            </datalist>
+          <div className="flex flex-col gap-2 sm:flex-row sm:items-end">
+            <DrivePicker className="flex-1" value={drive} onChange={setDrive} />
             <Button
               variant="outline"
               className="h-9 shrink-0"
@@ -335,6 +320,7 @@ function ProjectDetail() {
               Save drive
             </Button>
           </div>
+
         </div>
       </div>
 

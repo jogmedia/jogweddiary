@@ -1,10 +1,7 @@
-/** Common storage devices used for raw data backups. Free text is also allowed. */
+/** Numbered studio hard disks used for raw data backups, plus an "other" option for free text. */
+export const OTHER_DRIVE = "Other / Cloud Backup";
+
 export const DRIVE_OPTIONS = [
-  "HDD-1 (4TB)",
-  "HDD-2 (8TB)",
-  "HDD-3 (8TB)",
-  "SanDisk SSD",
-  "Samsung T7 SSD",
-  "NAS / Studio Server",
-  "Cloud Server",
+  ...Array.from({ length: 10 }, (_, i) => `Hard Disk ${i + 1}`),
+  OTHER_DRIVE,
 ];

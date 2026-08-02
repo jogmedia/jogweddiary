@@ -2,11 +2,10 @@ import { useState } from "react";
 import { AlertTriangle, FileDown, HardDrive, HardDriveDownload, MessageCircle } from "lucide-react";
 import { exportPdf } from "@/lib/exporters";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { Switch } from "@/components/ui/switch";
 import { fmtDate, todayISO } from "@/lib/format";
 import { openWhatsApp } from "@/lib/whatsapp";
-import { DRIVE_OPTIONS } from "@/lib/drives";
+import { DrivePicker } from "@/components/DrivePicker";
 import { useAssignments, useProjects, useUpsert } from "@/lib/db";
 import type { Assignment, Project } from "@/lib/db";
 
@@ -174,24 +173,12 @@ export function BackupAlert() {
                     </div>
                   )}
 
-                  <div className="mt-3 border-t border-border pt-2.5">
-                    <label className="text-xs font-medium" htmlFor={`drive-${p.id}`}>
-                      Storage Device / Hard Disk Name
-                    </label>
-                    <Input
-                      id={`drive-${p.id}`}
-                      list={`drive-options-${p.id}`}
-                      className="mt-1 h-9 text-xs"
-                      placeholder="e.g. HDD-2 (8TB) or Cloud Server"
-                      value={drives[p.id] ?? p.backup_drive ?? ""}
-                      onChange={(e) => setDrives((d) => ({ ...d, [p.id]: e.target.value }))}
-                    />
-                    <datalist id={`drive-options-${p.id}`}>
-                      {DRIVE_OPTIONS.map((o) => (
-                        <option key={o} value={o} />
-                      ))}
-                    </datalist>
-                  </div>
+                  <DrivePicker
+                    className="mt-3 border-t border-border pt-2.5"
+                    value={drives[p.id] ?? p.backup_drive ?? ""}
+                    onChange={(v) => setDrives((d) => ({ ...d, [p.id]: v }))}
+                  />
+
 
                   <label className="mt-3 flex items-center gap-2 border-t border-border pt-2.5 text-xs">
                     <Switch

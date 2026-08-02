@@ -30,6 +30,7 @@ export type Project = {
   payment_status: string;
   raw_backup_done?: boolean;
   backup_drive?: string | null;
+  backup_folder?: string | null;
 
   photo_selection_done?: boolean;
   album_editing_done?: boolean;

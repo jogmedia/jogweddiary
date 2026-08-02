@@ -81,6 +81,8 @@ export function EventSchedule({
   onUnassign: (id: string) => void;
 }) {
   const [editing, setEditing] = useState<ProjectEvent | null>(null);
+  const [newCrew, setNewCrew] = useState<CrewMember[]>([]);
+  const [newDate, setNewDate] = useState<string | undefined>(undefined);
   const clientName = project.clients?.name ?? "Client";
   const clientPhone = project.clients?.whatsapp ?? project.clients?.phone;
   const business = settings?.business_name ?? "JOG MEDIA";
@@ -92,6 +94,20 @@ export function EventSchedule({
 
   const crewFor = (eventId: string) =>
     assignments.filter((a) => a.event_id === eventId || !a.event_id);
+
+  const crewSection = (
+    <div className="rounded-xl border border-border p-3">
+      <p className="mb-2 text-xs font-semibold">Assign Crew for this Event</p>
+      <CrewPicker
+        staff={staff}
+        value={newCrew}
+        onChange={setNewCrew}
+        date={newDate}
+        projectId={project.id}
+      />
+    </div>
+  );
+
 
   return (
     <div className="space-y-4">

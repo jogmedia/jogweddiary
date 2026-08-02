@@ -11,7 +11,7 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { CrewPicker, type CrewMember } from "@/components/CrewPicker";
-import { useAssignments, useRemove, useStaff, useUpsert } from "@/lib/db";
+import { useAssignments, useProjectEvents, useRemove, useStaff, useUpsert } from "@/lib/db";
 
 const prettyRole = (role?: string | null) =>
   (role ?? "").replace(/_/g, " ").replace(/\b\w/g, (c) => c.toUpperCase()) || "Crew";

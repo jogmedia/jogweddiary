@@ -71,6 +71,7 @@ export function RecordDialog({
     if (open) {
       setValues(initial ?? {});
       setErrors({});
+      onReset?.();
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [open]);

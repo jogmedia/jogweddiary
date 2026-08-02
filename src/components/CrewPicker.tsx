@@ -107,7 +107,7 @@ export function CrewPicker({
                 : "No team members yet — add crew in the Staff page first."}
             </p>
           ) : (
-            <ScrollArea className="h-auto max-h-[min(18rem,50vh)] overflow-y-auto">
+            <ScrollArea className="h-auto max-h-60 overflow-y-auto">
               <div className="space-y-1 p-1">
                 {available.map((s) => {
                   const active = ids.includes(s.id);

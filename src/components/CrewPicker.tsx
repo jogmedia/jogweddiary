@@ -38,8 +38,11 @@ export function CrewPicker({
   /** Current project — its own bookings are not treated as clashes. */
   projectId?: string;
 }) {
+  const [query, setQuery] = useState("");
   const { conflictsFor } = useCrewBookings();
-  const available = staff.filter((s) => s.active_status !== false);
+  const available = staff.filter(
+    (s) => s.active_status !== false && s.name.toLowerCase().includes(query.toLowerCase()),
+  );
   const ids = value.map((v) => v.staffId);
   const selected = available.filter((s) => ids.includes(s.id));
   const clashing = selected.filter((s) => conflictsFor(s.id, date, projectId).length > 0);

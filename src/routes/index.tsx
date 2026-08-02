@@ -1,5 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 import {
   Area,
   AreaChart,
@@ -21,10 +21,13 @@ import {
   FolderKanban,
   AlertTriangle,
   PackageCheck,
+  Plane,
 } from "lucide-react";
 import { AppShell } from "@/components/AppShell";
+import { Button } from "@/components/ui/button";
 import { BackupAlert } from "@/components/BackupAlert";
 import { ShootDay } from "@/components/ShootDay";
+import { TravelBadge, travelState } from "@/components/TravelBadge";
 
 import { PageHeader, StatCard, StatusBadge } from "@/components/ui-kit";
 import {
@@ -129,6 +132,7 @@ function Dashboard() {
       time: fmtTime(e.arrival_time ?? e.event_time ?? e.muhurtham_time),
       venue: e.location ?? project?.venue ?? "Venue TBD",
       status: e.status ?? project?.shoot_status,
+      travel: project ?? e.projects ?? null,
     };
   });
   const eventProjectDates = new Set(eventRows.map((r) => `${r.projectId}|${r.date}`));
@@ -143,6 +147,7 @@ function Dashboard() {
       time: "—",
       venue: p.venue ?? "Venue TBD",
       status: p.shoot_status,
+      travel: p,
     }));
   const allShootRows = [...eventRows, ...bareProjectRows];
 
@@ -156,6 +161,11 @@ function Dashboard() {
     .sort((a, b) => a.event_date.localeCompare(b.event_date))
     .slice(0, 6);
   const doneDeliveries = deliveries.slice(0, 6);
+
+  const [travelOnly, setTravelOnly] = useState(false);
+  const pendingTravel = allShootRows
+    .filter((r) => r.date >= today && ["pending", "urgent"].includes(travelState(r.travel as any, r.date)))
+    .sort((a, b) => a.date.localeCompare(b.date));
 
   return (
     <AppShell>
@@ -189,15 +199,29 @@ function Dashboard() {
 
       {/* 2. Upcoming events */}
       <div className="mt-4 grid gap-4">
+        <div className="flex flex-wrap items-center gap-2">
+          <Button
+            size="sm"
+            variant={travelOnly ? "default" : "outline"}
+            onClick={() => setTravelOnly((v) => !v)}
+          >
+            <Plane className="mr-1 h-4 w-4" />
+            Pending travel tickets ({pendingTravel.length})
+          </Button>
+          {travelOnly && (
+            <span className="text-xs text-muted-foreground">Showing only projects/events with unbooked tickets</span>
+          )}
+        </div>
         <ListCard
-          title="Upcoming events"
+          title={travelOnly ? "Events with pending travel tickets" : "Upcoming events"}
           icon={<CalendarDays className="h-4 w-4" />}
-          empty="No upcoming events"
-          rows={upcoming.map((r) => ({
-            id: r.id,
+          empty={travelOnly ? "All travel tickets are booked" : "No upcoming events"}
+          rows={(travelOnly ? pendingTravel : upcoming).map((r) => ({
+            id: r.projectId,
             primary: r.primary,
             secondary: `${fmtDate(r.date)} · ⏰ ${r.time} · ${r.venue}`,
             badge: r.status,
+            extra: <TravelBadge project={r.travel as any} eventDate={r.date} />,
           }))}
         />
       </div>
@@ -300,7 +324,7 @@ function ListCard({
 }: {
   title: string;
   icon: React.ReactNode;
-  rows: { id: string; primary: string; secondary: string; badge?: string }[];
+  rows: { id: string; primary: string; secondary: string; badge?: string; extra?: React.ReactNode }[];
   empty: string;
 }) {
   return (
@@ -319,7 +343,10 @@ function ListCard({
                 <p className="truncate text-sm font-medium">{r.primary}</p>
                 <p className="truncate text-xs text-muted-foreground">{r.secondary}</p>
               </Link>
-              {r.badge && <StatusBadge value={r.badge} />}
+              <div className="flex shrink-0 flex-col items-end gap-1">
+                {r.extra}
+                {r.badge && <StatusBadge value={r.badge} />}
+              </div>
             </li>
           ))}
         </ul>

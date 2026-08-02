@@ -2,6 +2,7 @@ import { CalendarClock, MapPin } from "lucide-react";
 import { Link } from "@tanstack/react-router";
 import { Button } from "@/components/ui/button";
 import { EditCrewDialog } from "@/components/EditCrewDialog";
+import { TravelBadge } from "@/components/TravelBadge";
 import { useAssignments, useProjectEvents, useProjects } from "@/lib/db";
 import { fmtDate } from "@/lib/format";
 import { prettyRole } from "@/lib/roles";
@@ -32,6 +33,7 @@ export function ShootDay({ date, title, empty = "No shoots scheduled for Today /
     venue: string | null;
     mapLink: string | null;
     reporting: string;
+    travel: any;
     crew: { id: string; name: string; phone: string | null; role: string; message: string }[];
   };
 
@@ -58,6 +60,7 @@ export function ShootDay({ date, title, empty = "No shoots scheduled for Today /
         venue: e.location,
         mapLink: e.google_maps_link,
         reporting: fmtTime(e.arrival_time ?? e.event_time ?? e.muhurtham_time),
+        travel: project ?? null,
         crew,
       };
     }),
@@ -89,6 +92,7 @@ export function ShootDay({ date, title, empty = "No shoots scheduled for Today /
         venue: p.venue,
         mapLink: null,
         reporting: "—",
+        travel: p,
         crew,
       };
     }),
@@ -112,6 +116,7 @@ export function ShootDay({ date, title, empty = "No shoots scheduled for Today /
                 <Link to="/projects/$id" params={{ id: it.projectId }} className="block min-w-0">
                   <p className="text-sm font-semibold">{it.title}</p>
                   <p className="text-xs text-muted-foreground">Client: {it.client}</p>
+                  <TravelBadge project={it.travel} eventDate={date} className="mt-1" />
                 </Link>
                 <EditCrewDialog
                   projectId={it.projectId}

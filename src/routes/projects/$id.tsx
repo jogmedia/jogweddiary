@@ -37,7 +37,7 @@ import { downloadElementPdf } from "@/lib/pdf";
 import { EventSchedule } from "@/components/EventSchedule";
 import { WorkBrief } from "@/components/WorkBrief";
 import { buildScheduleMessage, openWhatsApp } from "@/lib/whatsapp";
-import { projectFields } from "./index";
+import { ProjectDialog } from "@/components/ProjectDialog";
 
 export const Route = createFileRoute("/projects/$id")({
   head: () => ({
@@ -583,13 +583,13 @@ function ProjectDetail() {
         </div>
       )}
 
-      <RecordDialog
+      <ProjectDialog
         title="Edit project"
-        fields={projectFields(clients)}
+        clients={clients}
+        projectId={id}
         initial={project as any}
         open={editOpen}
         onOpenChange={setEditOpen}
-        onSubmit={(v) => saveProject.mutateAsync({ ...v, id })}
       />
     </AppShell>
   );

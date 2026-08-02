@@ -325,7 +325,7 @@ export function ProjectDialog({
     <RecordDialog
       title={title ?? (projectId ? "Edit project" : "New project")}
       fields={projectFields(clients)}
-      initial={{ advance_date: initial?.advance_date ?? todayISO(), ...initial }}
+      initial={{ ...initial, advance_date: initial?.advance_date ?? todayISO() }}
       trigger={trigger}
       open={open}
       onOpenChange={onOpenChange}

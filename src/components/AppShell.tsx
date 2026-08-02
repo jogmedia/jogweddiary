@@ -16,6 +16,7 @@ import {
   Menu,
   Camera,
   CalendarDays,
+  HardDrive,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useAuth } from "@/lib/auth";
@@ -31,6 +32,7 @@ export const NAV = [
   { to: "/expenses", label: "Expenses", icon: Receipt, adminOnly: true },
   { to: "/tasks", label: "Tasks", icon: ListChecks, adminOnly: false },
   { to: "/staff", label: "Staff", icon: UserCog, adminOnly: true },
+  { to: "/raw-data", label: "Raw Data", icon: HardDrive, adminOnly: false },
   { to: "/delivery", label: "Delivery", icon: PackageCheck, adminOnly: false },
   { to: "/accounts", label: "Accounts", icon: BookOpen, adminOnly: true },
   { to: "/reports", label: "Reports", icon: BarChart3, adminOnly: true },

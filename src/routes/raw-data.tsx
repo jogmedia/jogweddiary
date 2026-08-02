@@ -152,7 +152,7 @@ function RawDataPage() {
         <p className="mt-6 text-sm text-muted-foreground">Loading…</p>
       ) : rows.length === 0 ? (
         <div className="mt-6">
-          <EmptyState title="Nothing here" description="No shoots match this filter." />
+          <EmptyState message="No shoots match this filter." />
         </div>
       ) : (
         <ul className="mt-4 grid grid-cols-1 gap-4 lg:grid-cols-2">

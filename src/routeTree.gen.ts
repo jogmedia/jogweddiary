@@ -13,6 +13,7 @@ import { Route as TasksRouteImport } from './routes/tasks'
 import { Route as StaffRouteImport } from './routes/staff'
 import { Route as SettingsRouteImport } from './routes/settings'
 import { Route as ReportsRouteImport } from './routes/reports'
+import { Route as RawDataRouteImport } from './routes/raw-data'
 import { Route as PaymentsRouteImport } from './routes/payments'
 import { Route as ExpensesRouteImport } from './routes/expenses'
 import { Route as DeliveryRouteImport } from './routes/delivery'
@@ -42,6 +43,11 @@ const SettingsRoute = SettingsRouteImport.update({
 const ReportsRoute = ReportsRouteImport.update({
   id: '/reports',
   path: '/reports',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const RawDataRoute = RawDataRouteImport.update({
+  id: '/raw-data',
+  path: '/raw-data',
   getParentRoute: () => rootRouteImport,
 } as any)
 const PaymentsRoute = PaymentsRouteImport.update({
@@ -104,6 +110,7 @@ export interface FileRoutesByFullPath {
   '/delivery': typeof DeliveryRoute
   '/expenses': typeof ExpensesRoute
   '/payments': typeof PaymentsRoute
+  '/raw-data': typeof RawDataRoute
   '/reports': typeof ReportsRoute
   '/settings': typeof SettingsRoute
   '/staff': typeof StaffRoute
@@ -120,6 +127,7 @@ export interface FileRoutesByTo {
   '/delivery': typeof DeliveryRoute
   '/expenses': typeof ExpensesRoute
   '/payments': typeof PaymentsRoute
+  '/raw-data': typeof RawDataRoute
   '/reports': typeof ReportsRoute
   '/settings': typeof SettingsRoute
   '/staff': typeof StaffRoute
@@ -137,6 +145,7 @@ export interface FileRoutesById {
   '/delivery': typeof DeliveryRoute
   '/expenses': typeof ExpensesRoute
   '/payments': typeof PaymentsRoute
+  '/raw-data': typeof RawDataRoute
   '/reports': typeof ReportsRoute
   '/settings': typeof SettingsRoute
   '/staff': typeof StaffRoute
@@ -155,6 +164,7 @@ export interface FileRouteTypes {
     | '/delivery'
     | '/expenses'
     | '/payments'
+    | '/raw-data'
     | '/reports'
     | '/settings'
     | '/staff'
@@ -171,6 +181,7 @@ export interface FileRouteTypes {
     | '/delivery'
     | '/expenses'
     | '/payments'
+    | '/raw-data'
     | '/reports'
     | '/settings'
     | '/staff'
@@ -187,6 +198,7 @@ export interface FileRouteTypes {
     | '/delivery'
     | '/expenses'
     | '/payments'
+    | '/raw-data'
     | '/reports'
     | '/settings'
     | '/staff'
@@ -204,6 +216,7 @@ export interface RootRouteChildren {
   DeliveryRoute: typeof DeliveryRoute
   ExpensesRoute: typeof ExpensesRoute
   PaymentsRoute: typeof PaymentsRoute
+  RawDataRoute: typeof RawDataRoute
   ReportsRoute: typeof ReportsRoute
   SettingsRoute: typeof SettingsRoute
   StaffRoute: typeof StaffRoute
@@ -240,6 +253,13 @@ declare module '@tanstack/react-router' {
       path: '/reports'
       fullPath: '/reports'
       preLoaderRoute: typeof ReportsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/raw-data': {
+      id: '/raw-data'
+      path: '/raw-data'
+      fullPath: '/raw-data'
+      preLoaderRoute: typeof RawDataRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/payments': {
@@ -324,6 +344,7 @@ const rootRouteChildren: RootRouteChildren = {
   DeliveryRoute: DeliveryRoute,
   ExpensesRoute: ExpensesRoute,
   PaymentsRoute: PaymentsRoute,
+  RawDataRoute: RawDataRoute,
   ReportsRoute: ReportsRoute,
   SettingsRoute: SettingsRoute,
   StaffRoute: StaffRoute,
@@ -334,3 +355,13 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { startInstance } from './start.ts'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+    config: Awaited<ReturnType<typeof startInstance.getOptions>>
+  }
+}

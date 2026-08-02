@@ -14,6 +14,7 @@ export type EventLike = {
 export const EVENT_TYPES = [
   { value: "save_the_date", label: "Save The Date", emoji: "📅" },
   { value: "wedding_evening", label: "Wedding Evening / Pre-Wedding", emoji: "🌙" },
+  { value: "wedding_eve", label: "Wedding Eve / Sangeeth", emoji: "🌙" },
   { value: "wedding_day", label: "Wedding Day / Muhurtham", emoji: "💍" },
   { value: "reception", label: "Reception", emoji: "🎉" },
   { value: "haldi", label: "Haldi", emoji: "🌼" },

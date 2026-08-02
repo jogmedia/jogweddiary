@@ -70,6 +70,24 @@ function RawDataPage() {
   const crewFor = (p: Project) => assignments.filter((a) => a.project_id === p.id);
   const folderOf = (p: Project) => (folders[p.id] ?? p.backup_folder ?? "").trim();
 
+  const isEditorRole = (role?: string | null) => {
+    if (!role) return false;
+    const r = role.toLowerCase();
+    return (
+      r.includes("editor") ||
+      r.includes("designer") ||
+      r.includes("album") ||
+      r.includes("video") ||
+      r.includes("lightroom")
+    );
+  };
+  const editorsFor = (p: Project) =>
+    crewFor(p).filter(
+      (a) =>
+        isEditorRole(a.role_in_project) ||
+        isEditorRole(a.staff?.role),
+    );
+
   const shot = useMemo(
     () =>
       projects

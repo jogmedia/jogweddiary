@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Pencil } from "lucide-react";
+import { Pencil, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -12,6 +12,9 @@ import {
 } from "@/components/ui/dialog";
 import { CrewPicker, type CrewMember } from "@/components/CrewPicker";
 import { useAssignments, useRemove, useStaff, useUpsert } from "@/lib/db";
+
+const prettyRole = (role?: string | null) =>
+  (role ?? "").replace(/_/g, " ").replace(/\b\w/g, (c) => c.toUpperCase()) || "Crew";
 
 type Props = {
   projectId: string;
@@ -85,6 +88,43 @@ export function EditCrewDialog({ projectId, eventId, date, title }: Props) {
           <DialogTitle className="text-base">Manage crew</DialogTitle>
           <DialogDescription className="truncate">{title}</DialogDescription>
         </DialogHeader>
+        <div className="space-y-2">
+          <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+            Currently Assigned Crew
+          </p>
+          {crew.length === 0 ? (
+            <p className="rounded-lg border border-dashed border-border p-3 text-xs text-muted-foreground">
+              No crew assigned yet — pick members below.
+            </p>
+          ) : (
+            <ul className="divide-y divide-border rounded-lg border border-border">
+              {crew.map((c) => {
+                const s = staff.find((x) => x.id === c.staffId);
+                return (
+                  <li key={c.staffId} className="flex items-center justify-between gap-2 px-3 py-2">
+                    <div className="min-w-0">
+                      <p className="truncate text-sm font-medium">{s?.name ?? "Crew"}</p>
+                      <p className="truncate text-xs capitalize text-muted-foreground">
+                        {prettyRole(c.role ?? s?.role)}
+                      </p>
+                    </div>
+                    <Button
+                      type="button"
+                      size="icon"
+                      variant="ghost"
+                      aria-label={`Remove ${s?.name ?? "crew member"}`}
+                      className="h-8 w-8 shrink-0 text-destructive hover:bg-destructive/10 hover:text-destructive"
+                      onClick={() => setCrew(crew.filter((v) => v.staffId !== c.staffId))}
+                    >
+                      <Trash2 className="h-4 w-4" />
+                    </Button>
+                  </li>
+                );
+              })}
+            </ul>
+          )}
+        </div>
+
         <CrewPicker
           staff={staff}
           value={crew}

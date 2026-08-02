@@ -31,10 +31,12 @@ import {
   useDeliveries,
   useExpenseTxns,
   useIncomeTxns,
+  useProjectEvents,
   useProjects,
 } from "@/lib/db";
 import { fmtDate, inr, inrShort, monthLabel, todayISO } from "@/lib/format";
 import { monthlySeries } from "@/lib/reports";
+import { eventLabel, eventMeta, fmtTime } from "@/lib/whatsapp";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -73,6 +75,7 @@ function Dashboard() {
   const { data: income = [] } = useIncomeTxns();
   const { data: expenses = [] } = useExpenseTxns();
   const { data: deliveries = [] } = useDeliveries();
+  const { data: events = [] } = useProjectEvents();
 
   const today = todayISO();
   const monthPrefix = today.slice(0, 7);
@@ -114,11 +117,40 @@ function Dashboard() {
     [income, expenses, projects],
   );
 
-  const todaysShoots = projects.filter((p) => p.event_date === today);
-  const upcoming = projects
-    .filter((p) => p.event_date > today)
-    .sort((a, b) => a.event_date.localeCompare(b.event_date))
-    .slice(0, 6);
+  const eventRows = events.map((e) => {
+    const project = projects.find((p) => p.id === e.project_id);
+    const meta = eventMeta(e.event_type);
+    return {
+      id: e.id,
+      date: e.event_date,
+      projectId: e.project_id,
+      primary: `${meta.emoji} ${eventLabel(e)} — ${e.projects?.project_name ?? project?.project_name ?? "Project"}`,
+      client: e.projects?.clients?.name ?? project?.clients?.name ?? "—",
+      time: fmtTime(e.arrival_time ?? e.event_time ?? e.muhurtham_time),
+      venue: e.location ?? project?.venue ?? "Venue TBD",
+      status: e.status ?? project?.shoot_status,
+    };
+  });
+  const eventProjectDates = new Set(eventRows.map((r) => `${r.projectId}|${r.date}`));
+  const bareProjectRows = projects
+    .filter((p) => p.event_date && !eventProjectDates.has(`${p.id}|${p.event_date}`))
+    .map((p) => ({
+      id: p.id,
+      date: p.event_date,
+      projectId: p.id,
+      primary: p.project_name,
+      client: p.clients?.name ?? "—",
+      time: "—",
+      venue: p.venue ?? "Venue TBD",
+      status: p.shoot_status,
+    }));
+  const allShootRows = [...eventRows, ...bareProjectRows];
+
+  const todaysShoots = allShootRows.filter((r) => r.date === today);
+  const upcoming = allShootRows
+    .filter((r) => r.date > today)
+    .sort((a, b) => a.date.localeCompare(b.date))
+    .slice(0, 8);
   const overdue = projects
     .filter((p) => Number(p.balance_due ?? 0) > 0 && p.event_date < today)
     .sort((a, b) => a.event_date.localeCompare(b.event_date))
@@ -142,11 +174,11 @@ function Dashboard() {
           title="Today's shoots"
           icon={<CalendarDays className="h-4 w-4" />}
           empty="No shoots scheduled today"
-          rows={todaysShoots.map((p) => ({
-            id: p.id,
-            primary: p.project_name,
-            secondary: `${p.clients?.name ?? "—"} · ${p.venue ?? "Venue TBD"}`,
-            badge: p.shoot_status,
+          rows={todaysShoots.map((r) => ({
+            id: r.id,
+            primary: r.primary,
+            secondary: `${r.client} · ⏰ ${r.time} · ${r.venue}`,
+            badge: r.status,
           }))}
         />
       </div>
@@ -164,11 +196,11 @@ function Dashboard() {
           title="Upcoming events"
           icon={<CalendarDays className="h-4 w-4" />}
           empty="No upcoming events"
-          rows={upcoming.map((p) => ({
-            id: p.id,
-            primary: p.project_name,
-            secondary: `${fmtDate(p.event_date)} · ${p.venue ?? "Venue TBD"}`,
-            badge: p.project_status,
+          rows={upcoming.map((r) => ({
+            id: r.id,
+            primary: r.primary,
+            secondary: `${fmtDate(r.date)} · ⏰ ${r.time} · ${r.venue}`,
+            badge: r.status,
           }))}
         />
       </div>

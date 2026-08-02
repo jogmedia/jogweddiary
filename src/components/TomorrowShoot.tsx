@@ -3,7 +3,7 @@ import { Link } from "@tanstack/react-router";
 import { Button } from "@/components/ui/button";
 import { useAssignments, useProjectEvents, useProjects } from "@/lib/db";
 import { fmtDate } from "@/lib/format";
-import { buildCrewMessage, eventMeta, fmtTime, openWhatsApp } from "@/lib/whatsapp";
+import { buildCrewMessage, eventLabel, eventMeta, fmtTime, openWhatsApp } from "@/lib/whatsapp";
 
 const tomorrowISO = () => {
   const d = new Date();
@@ -48,7 +48,7 @@ export function TomorrowShoot() {
       return {
         key: e.id,
         projectId: e.project_id,
-        title: `${eventMeta(e.event_type).emoji} ${eventMeta(e.event_type).label} — ${e.projects?.project_name ?? project?.project_name ?? "Project"}`,
+        title: `${eventMeta(e.event_type).emoji} ${eventLabel(e)} — ${e.projects?.project_name ?? project?.project_name ?? "Project"}`,
         client: clientName,
         venue: e.location,
         mapLink: e.google_maps_link,

@@ -8,6 +8,7 @@ import {
   EVENT_TYPES,
   buildCrewMessage,
   buildScheduleMessage,
+  eventLabel,
   eventMeta,
   fmtTime,
   openWhatsApp,
@@ -136,7 +137,7 @@ export function EventSchedule({
                 <div>
                   <p className="text-sm font-semibold">
                     <span className="mr-1.5">{meta.emoji}</span>
-                    {meta.label}
+                    {eventLabel(e)}
                   </p>
                   <p className="text-xs text-muted-foreground">{fmtDate(e.event_date)}</p>
                 </div>

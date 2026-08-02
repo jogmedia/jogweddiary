@@ -1,5 +1,5 @@
 import { fmtDate, inr } from "@/lib/format";
-import { eventMeta, fmtTime, type EventLike } from "@/lib/whatsapp";
+import { eventLabel, eventMeta, fmtTime, type EventLike } from "@/lib/whatsapp";
 
 const BRAND = "#A56A2A";
 const TEXT = "#2D241D";
@@ -146,7 +146,7 @@ export function WorkBrief({
           )}
           {sorted.map((e) => (
             <tr key={e.id}>
-              <td style={{ ...td, fontWeight: 600 }}>{eventMeta(e.event_type).label}</td>
+              <td style={{ ...td, fontWeight: 600 }}>{eventLabel(e)}</td>
               <td style={td}>{fmtDate(e.event_date)}</td>
               <td style={td}>{fmtTime(e.arrival_time)}</td>
               <td style={td}>{fmtTime(e.muhurtham_time ?? e.event_time)}</td>
@@ -188,7 +188,7 @@ export function WorkBrief({
             <div style={{ fontSize: 10, color: MUTED }}>
               {c.role || "Crew"}
               {c.eventId
-                ? ` · ${eventMeta(sorted.find((e) => e.id === c.eventId)?.event_type ?? "custom").label}`
+                ? ` · ${(() => { const ev = sorted.find((e) => e.id === c.eventId); return ev ? eventLabel(ev) : "Custom event"; })()}`
                 : " · All events"}
             </div>
           </div>

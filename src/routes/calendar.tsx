@@ -6,7 +6,7 @@ import { PageHeader } from "@/components/ui-kit";
 import { Button } from "@/components/ui/button";
 import { useProjectEvents, useProjects } from "@/lib/db";
 import { fmtDate, inr } from "@/lib/format";
-import { eventMeta, fmtTime } from "@/lib/whatsapp";
+import { eventLabel, eventMeta, fmtTime } from "@/lib/whatsapp";
 
 export const Route = createFileRoute("/calendar")({
   head: () => ({
@@ -66,7 +66,7 @@ function CalendarPage() {
         id: e.id,
         date: e.event_date,
         time: e.muhurtham_time ?? e.event_time ?? e.arrival_time ?? null,
-        title: eventMeta(e.event_type).label,
+        title: eventLabel(e),
         sub: `${p?.clients?.name ?? p?.project_name ?? "Project"} · ${e.location ?? "Venue TBD"}`,
         projectId: e.project_id,
         tone: p ? projectTone(p) : "info",

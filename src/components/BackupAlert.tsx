@@ -30,6 +30,11 @@ export function BackupAlert() {
       p.project_status !== "cancelled" &&
       (p.shoot_status === "completed" || p.project_status === "completed" || p.event_date < today),
   );
+  const backedUp = projects
+    .filter((p) => p.raw_backup_done && (p.backup_drive ?? "").trim())
+    .sort((a, b) => (a.event_date < b.event_date ? 1 : -1))
+    .slice(0, 5);
+
 
   if (pending.length === 0) return null;
 

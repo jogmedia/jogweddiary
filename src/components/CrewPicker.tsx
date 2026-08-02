@@ -73,13 +73,41 @@ export function CrewPicker({
             <ChevronsUpDown className="h-4 w-4 shrink-0 opacity-50" />
           </Button>
         </PopoverTrigger>
-        <PopoverContent className="w-[min(22rem,92vw)] p-0" align="start">
+        <PopoverContent
+          className="w-[min(22rem,92vw)] p-0 z-50"
+          align="start"
+          sideOffset={4}
+        >
+          <div className="border-b border-border p-2">
+            <div className="relative">
+              <Search className="absolute left-2.5 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+              <input
+                type="text"
+                placeholder="Search crew member..."
+                value={query}
+                onChange={(e) => setQuery(e.target.value)}
+                className="w-full rounded-md border border-input bg-background py-2 pl-9 pr-8 text-sm outline-none ring-offset-background placeholder:text-muted-foreground focus-visible:ring-2 focus-visible:ring-ring"
+              />
+              {query && (
+                <button
+                  type="button"
+                  onClick={() => setQuery("")}
+                  className="absolute right-2 top-1/2 -translate-y-1/2 rounded-sm p-0.5 text-muted-foreground hover:text-foreground"
+                  aria-label="Clear search"
+                >
+                  <X className="h-3.5 w-3.5" />
+                </button>
+              )}
+            </div>
+          </div>
           {available.length === 0 ? (
             <p className="p-3 text-xs text-muted-foreground">
-              No team members yet — add crew in the Staff page first.
+              {query
+                ? "No matching crew members found."
+                : "No team members yet — add crew in the Staff page first."}
             </p>
           ) : (
-            <ScrollArea className="max-h-[min(20rem,60vh)]">
+            <ScrollArea className="h-auto max-h-[min(18rem,50vh)] overflow-y-auto">
               <div className="space-y-1 p-1">
                 {available.map((s) => {
                   const active = ids.includes(s.id);

@@ -14,9 +14,12 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { CrewPicker, type CrewMember } from "@/components/CrewPicker";
+import { ADVANCE_REF, PAY_ACCOUNTS, modeForAccount } from "@/lib/accounts";
+import { todayISO } from "@/lib/format";
 import { TicketUpload } from "@/components/TicketUpload";
 import {
   useAssignments,
+  usePayments,
   useProjectEvents,
   useRemove,
   useStaff,
@@ -35,13 +38,7 @@ export const STATUS_OPTIONS = {
 
 const opts = (list: string[]) => list.map((v) => ({ value: v, label: v.replace(/_/g, " ") }));
 
-export const ADVANCE_ACCOUNTS = [
-  { value: "gpay_phonepe_hdfc", label: "GPay / PhonePe (HDFC Bank)" },
-  { value: "hdfc_transfer", label: "HDFC Bank (Direct Transfer)" },
-  { value: "sbi_account", label: "SBI Bank Account" },
-  { value: "cash_in_hand", label: "Cash in Hand" },
-  { value: "other_account", label: "Other Account" },
-];
+export const ADVANCE_ACCOUNTS = PAY_ACCOUNTS.map(({ value, label }) => ({ value, label }));
 
 /** Project fields — the single event date is replaced by the sub-events section. */
 export function projectFields(clients: { id: string; name: string }[]): Field[] {
@@ -201,6 +198,8 @@ export function ProjectDialog({
   const delEvent = useRemove("project_events", "Event");
   const saveAssignment = useUpsert("project_assignments", "Crew assignment");
   const delAssignment = useRemove("project_assignments", "Crew assignment");
+  const savePayment = useUpsert("project_payments", "Payment");
+  const { data: existingPayments = [] } = usePayments(projectId);
   const [rows, setRows] = useState<Record<string, Row>>(() => buildRows(events, assignments));
   const [customEvents, setCustomEvents] = useState<Row[]>(() => buildCustomRows(events, assignments));
   const [travel, setTravel] = useState<Travel>(() => buildTravel(initial));
@@ -264,6 +263,22 @@ export function ProjectDialog({
       ...(projectId ? { id: projectId } : {}),
     });
     const pid = (projectId ?? id) as string;
+
+    // Auto-record the advance as the first received payment, credited to the chosen account.
+    const advance = Number(values.advance_amount ?? 0);
+    const alreadyLogged = existingPayments.some((p) => (p.reference_no ?? "") === ADVANCE_REF);
+    if (pid && advance > 0 && !alreadyLogged) {
+      await savePayment.mutateAsync({
+        project_id: pid,
+        payment_date: (primaryDate && primaryDate < todayISO() ? primaryDate : todayISO()),
+        amount: advance,
+        payment_mode: modeForAccount(values.advance_account),
+        account: values.advance_account ?? null,
+        reference_no: ADVANCE_REF,
+        notes: "Advance received on booking (auto-recorded)",
+      });
+    }
+
 
     for (const [key, row] of Object.entries(rows)) {
       if (row.enabled && row.date) {

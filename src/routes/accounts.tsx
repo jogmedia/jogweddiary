@@ -22,10 +22,12 @@ import {
   useEquityTxns,
   useJournalEntries,
   useLiabilities,
+  usePayments,
   useProjects,
   useUpsert,
 } from "@/lib/db";
 import { fmtDate, inr, todayISO } from "@/lib/format";
+import { accountBalances } from "@/lib/accounts";
 
 export const Route = createFileRoute("/accounts")({
   head: () => ({
@@ -51,6 +53,7 @@ function AccountsPage() {
   const { data: liabilities = [] } = useLiabilities();
   const { data: equity = [] } = useEquityTxns();
   const { data: projects = [] } = useProjects();
+  const { data: payments = [] } = usePayments();
   const saveAccount = useUpsert("chart_of_accounts", "Account");
   const saveAsset = useUpsert("assets", "Asset");
   const saveLiability = useUpsert("liabilities", "Liability");
@@ -61,14 +64,36 @@ function AccountsPage() {
     <AppShell>
       <PageHeader title="Accounts" subtitle="Double-entry bookkeeping for the studio" />
 
-      <Tabs defaultValue="coa">
+      <Tabs defaultValue="banks">
         <TabsList className="mb-4 flex flex-wrap justify-start">
+          <TabsTrigger value="banks">Bank &amp; Cash</TabsTrigger>
           <TabsTrigger value="coa">Chart of Accounts</TabsTrigger>
           <TabsTrigger value="journal">Journal Entries</TabsTrigger>
           <TabsTrigger value="assets">Assets</TabsTrigger>
           <TabsTrigger value="liabilities">Liabilities</TabsTrigger>
           <TabsTrigger value="equity">Equity</TabsTrigger>
         </TabsList>
+
+        <TabsContent value="banks">
+          <div className="mb-3 grid grid-cols-2 gap-3 lg:grid-cols-3">
+            <StatCard
+              label="Total money received"
+              value={inr(payments.reduce((a, p) => a + Number(p.amount ?? 0), 0))}
+              tone="success"
+            />
+          </div>
+          <div className="surface divide-y divide-border">
+            {accountBalances(payments).map((b) => (
+              <div key={b.account} className="flex items-center justify-between p-3">
+                <div>
+                  <p className="text-sm font-medium">{b.label}</p>
+                  <p className="text-xs text-muted-foreground">{b.count} payment{b.count === 1 ? "" : "s"} credited</p>
+                </div>
+                <p className="text-sm font-semibold">{inr(b.received)}</p>
+              </div>
+            ))}
+          </div>
+        </TabsContent>
 
         <TabsContent value="coa">
           <div className="mb-3">

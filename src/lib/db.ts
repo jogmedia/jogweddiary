@@ -60,6 +60,7 @@ export type Payment = {
   payment_date: string;
   amount: number;
   payment_mode: string;
+  account?: string | null;
   reference_no: string | null;
   received_by: string | null;
   notes: string | null;

@@ -34,8 +34,13 @@ export function EditCrewDialog({ projectId, eventId, date, title }: Props) {
 
   const { data: staff = [] } = useStaff();
   const { data: assignments = [] } = useAssignments();
+  const { data: events = [] } = useProjectEvents();
+  const thisEvent = eventId ? events.find((e) => e.id === eventId) : undefined;
+  const slotTime =
+    thisEvent?.arrival_time ?? thisEvent?.event_time ?? (thisEvent as any)?.muhurtham_time ?? null;
   const saveAssignment = useUpsert("project_assignments", "Crew assignment");
   const delAssignment = useRemove("project_assignments", "Crew assignment");
+
 
   const current = assignments.filter((a) =>
     eventId ? a.event_id === eventId : a.project_id === projectId && !a.event_id,

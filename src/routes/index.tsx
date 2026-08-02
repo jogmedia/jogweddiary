@@ -170,23 +170,14 @@ function Dashboard() {
 
       {/* 1. Today's shoots */}
       <div className="grid gap-4">
-        <ListCard
-          title="Today's shoots"
-          icon={<CalendarDays className="h-4 w-4" />}
-          empty="No shoots scheduled today"
-          rows={todaysShoots.map((r) => ({
-            id: r.id,
-            primary: r.primary,
-            secondary: `${r.client} · ⏰ ${r.time} · ${r.venue}`,
-            badge: r.status,
-          }))}
-        />
+        <ShootDay date={today} title="Today's shoots" />
       </div>
 
       {/* 1b. Tomorrow's shoot */}
       <div className="mt-4">
-        <TomorrowShoot />
+        <ShootDay date={dayOffsetISO(1)} title="Tomorrow's Shoot" />
       </div>
+
 
 
 

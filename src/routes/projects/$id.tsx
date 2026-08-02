@@ -303,6 +303,11 @@ function ProjectDetail() {
           })}
         </div>
         <div className="mt-3 border-t border-border pt-3">
+          {project.raw_backup_done && (project.backup_drive ?? "").trim() ? (
+            <p className="mb-2 inline-flex items-center gap-1.5 rounded-lg border border-success/30 bg-success/10 px-2.5 py-1.5 text-xs font-medium text-success">
+              <HardDrive className="h-3.5 w-3.5" /> Storage Location: {project.backup_drive}
+            </p>
+          ) : null}
           <label className="text-xs font-medium" htmlFor="backup-drive">
             Storage Device / Hard Disk Name
           </label>

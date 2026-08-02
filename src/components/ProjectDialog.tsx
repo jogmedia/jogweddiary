@@ -459,8 +459,11 @@ export function ProjectDialog({
                           value={row.crew ?? []}
                           onChange={(crew) => setRow(s.type, { crew })}
                           date={row.date}
+                          time={row.time}
+                          eventId={row.id}
                           projectId={projectId}
                         />
+
                       </div>
                     </div>
                   )}
@@ -516,8 +519,11 @@ export function ProjectDialog({
                             value={row.crew ?? []}
                             onChange={(crew) => setCustomRow(index, { crew })}
                             date={row.date}
+                            time={row.time}
+                            eventId={row.id}
                             projectId={projectId}
                           />
+
                         </div>
                       </div>
                     </div>

@@ -29,6 +29,8 @@ export function CrewPicker({
   label = "Crew",
   date,
   projectId,
+  eventId,
+  time,
 }: {
   staff: Staff[];
   value: CrewMember[];
@@ -36,28 +38,36 @@ export function CrewPicker({
   label?: string;
   /** Event date used to check crew availability. */
   date?: string;
-  /** Current project — its own bookings are not treated as clashes. */
+  /** Current project (kept for context; clashes are checked per sub-event). */
   projectId?: string;
+  /** Sub-event being edited — its own booking is never a clash. */
+  eventId?: string | null;
+  /** Slot time of this sub-event; only overlapping slots clash. */
+  time?: string | null;
 }) {
   const [query, setQuery] = useState("");
   const { conflictsFor } = useCrewBookings();
+  const clashes = (id: string) => conflictsFor(id, date, { excludeEventId: eventId, time });
   const available = staff.filter(
     (s) => s.active_status !== false && s.name.toLowerCase().includes(query.toLowerCase()),
   );
   const ids = value.map((v) => v.staffId);
   const selected = available.filter((s) => ids.includes(s.id));
-  const clashing = selected.filter((s) => conflictsFor(s.id, date, projectId).length > 0);
+  const clashing = selected.filter((s) => clashes(s.id).length > 0);
   const roleOf = (id: string) => value.find((v) => v.staffId === id)?.role ?? null;
 
-  const toggle = (s: Staff) =>
+  const toggle = (s: Staff) => {
+    if (!ids.includes(s.id) && clashes(s.id).length > 0) return; // blocked: same date & slot
     onChange(
       ids.includes(s.id)
         ? value.filter((v) => v.staffId !== s.id)
         : [...value, { staffId: s.id, role: s.role ?? null }],
     );
+  };
 
   const setRole = (id: string, role: string) =>
     onChange(value.map((v) => (v.staffId === id ? { ...v, role } : v)));
+
 
   return (
     <div className="space-y-1.5">
@@ -111,12 +121,19 @@ export function CrewPicker({
               <div className="space-y-1 p-1">
                 {available.map((s) => {
                   const active = ids.includes(s.id);
+                  const blocked = !active && clashes(s.id).length > 0;
                   return (
                     <div key={s.id} className="rounded-md px-1 py-1">
                       <button
                         type="button"
                         onClick={() => toggle(s)}
-                        className="flex w-full items-center gap-2 rounded-md px-1.5 py-2 text-left text-sm hover:bg-muted"
+                        disabled={blocked}
+                        title={
+                          blocked
+                            ? `Already booked on this date & time slot (${clashes(s.id)[0]?.projectName})`
+                            : undefined
+                        }
+                        className="flex w-full items-center gap-2 rounded-md px-1.5 py-2 text-left text-sm hover:bg-muted disabled:cursor-not-allowed disabled:opacity-60"
                       >
                         <span
                           className={`flex h-4 w-4 shrink-0 items-center justify-center rounded border ${
@@ -129,12 +146,13 @@ export function CrewPicker({
                           <span className="font-medium">{s.name}</span>
                           <span className="text-muted-foreground"> — {prettyRole(s.role)}</span>
                         </span>
-                        {conflictsFor(s.id, date, projectId).length > 0 && (
+                        {clashes(s.id).length > 0 && (
                           <span className="shrink-0 rounded bg-destructive/12 px-1.5 py-0.5 text-[10px] font-medium text-destructive">
                             ⚠️ Booked
                           </span>
                         )}
                       </button>
+
                       {active && (
                         <div className="mt-1 pl-7 pr-1.5">
                           <Select
@@ -172,11 +190,11 @@ export function CrewPicker({
         <div className="flex items-start gap-1.5 rounded-lg border border-destructive/30 bg-destructive/10 p-2 text-[11px] text-destructive">
           <AlertTriangle className="mt-0.5 h-3.5 w-3.5 shrink-0" />
           <p>
-            ⚠️ Already Booked on this date!{" "}
+            ⚠️ Already booked on this date &amp; time slot!{" "}
             {clashing
               .map((s) => {
-                const other = conflictsFor(s.id, date, projectId)[0];
-                return `${s.name} → ${other?.projectName ?? "another project"}`;
+                const other = clashes(s.id)[0];
+                return `${s.name} → ${other?.projectName ?? "another event"}`;
               })
               .join(" · ")}
           </p>
@@ -188,7 +206,8 @@ export function CrewPicker({
           {selected.map((s) => (
             <Badge
               key={s.id}
-              variant={conflictsFor(s.id, date, projectId).length > 0 ? "destructive" : "secondary"}
+              variant={clashes(s.id).length > 0 ? "destructive" : "secondary"}
+
               className="gap-1 font-normal"
             >
               {s.name} — {prettyRole(roleOf(s.id) ?? s.role)}

@@ -11,7 +11,7 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { CrewPicker, type CrewMember } from "@/components/CrewPicker";
-import { useAssignments, useRemove, useStaff, useUpsert } from "@/lib/db";
+import { useAssignments, useProjectEvents, useRemove, useStaff, useUpsert } from "@/lib/db";
 
 const prettyRole = (role?: string | null) =>
   (role ?? "").replace(/_/g, " ").replace(/\b\w/g, (c) => c.toUpperCase()) || "Crew";
@@ -34,8 +34,13 @@ export function EditCrewDialog({ projectId, eventId, date, title }: Props) {
 
   const { data: staff = [] } = useStaff();
   const { data: assignments = [] } = useAssignments();
+  const { data: events = [] } = useProjectEvents();
+  const thisEvent = eventId ? events.find((e) => e.id === eventId) : undefined;
+  const slotTime =
+    thisEvent?.arrival_time ?? thisEvent?.event_time ?? (thisEvent as any)?.muhurtham_time ?? null;
   const saveAssignment = useUpsert("project_assignments", "Crew assignment");
   const delAssignment = useRemove("project_assignments", "Crew assignment");
+
 
   const current = assignments.filter((a) =>
     eventId ? a.event_id === eventId : a.project_id === projectId && !a.event_id,
@@ -153,9 +158,12 @@ export function EditCrewDialog({ projectId, eventId, date, title }: Props) {
             staff={staff}
             value={crew}
             onChange={setCrew}
-            date={date}
+            date={date ?? thisEvent?.event_date}
+            time={slotTime}
+            eventId={eventId ?? null}
             projectId={projectId}
           />
+
         </div>
         <DialogFooter>
           <Button type="button" variant="ghost" onClick={() => setOpen(false)}>

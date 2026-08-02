@@ -178,6 +178,12 @@ function Dashboard() {
         <ShootDay date={dayOffsetISO(1)} title="Tomorrow's Shoot" />
       </div>
 
+      {/* 1c. Day after tomorrow's shoot */}
+      <div className="mt-4">
+        <ShootDay date={dayOffsetISO(2)} title="Day After Tomorrow's Shoot" />
+      </div>
+
+
 
 
 

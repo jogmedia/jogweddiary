@@ -33,7 +33,7 @@ export function ShootDay({ date, title, empty = "No shoots scheduled for Today /
     venue: string | null;
     mapLink: string | null;
     reporting: string;
-    travel: { travel_required?: boolean | null; travel_booking_status?: string | null } | null;
+    travel: any;
     crew: { id: string; name: string; phone: string | null; role: string; message: string }[];
   };
 
@@ -60,7 +60,7 @@ export function ShootDay({ date, title, empty = "No shoots scheduled for Today /
         venue: e.location,
         mapLink: e.google_maps_link,
         reporting: fmtTime(e.arrival_time ?? e.event_time ?? e.muhurtham_time),
-        travel: (project ?? null) as Item["travel"],
+        travel: project ?? null,
         crew,
       };
     }),

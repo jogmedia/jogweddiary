@@ -9,6 +9,7 @@ import { Input } from "@/components/ui/input";
 import { usePayments, useProjects, useRemove, useUpsert } from "@/lib/db";
 import { fmtDate, inr, todayISO } from "@/lib/format";
 import { exportCsv, exportExcel } from "@/lib/exporters";
+import { PAY_ACCOUNTS, accountBalances, accountLabel } from "@/lib/accounts";
 
 export const Route = createFileRoute("/payments")({
   head: () => ({
@@ -50,6 +51,7 @@ function PaymentsPage() {
     Project: p.projects?.project_name ?? "",
     Client: p.projects?.clients?.name ?? "",
     Mode: p.payment_mode,
+    Account: accountLabel(p.account),
     Reference: p.reference_no ?? "",
     Amount: Number(p.amount),
   }));
@@ -87,6 +89,12 @@ function PaymentsPage() {
                   required: true,
                   options: ["cash", "upi", "bank", "cheque", "card"].map((v) => ({ value: v, label: v })),
                 },
+                {
+                  name: "account",
+                  label: "Deposited to account",
+                  type: "select",
+                  options: PAY_ACCOUNTS.map((a) => ({ value: a.value, label: a.label })),
+                },
                 { name: "reference_no", label: "Reference no." },
                 { name: "notes", label: "Notes", type: "textarea" },
               ]}
@@ -105,6 +113,12 @@ function PaymentsPage() {
       <div className="mb-4 grid grid-cols-2 gap-3 lg:grid-cols-4">
         <StatCard label="Payments listed" value={String(rows.length)} />
         <StatCard label="Total received" value={inr(total)} tone="success" />
+      </div>
+
+      <div className="mb-4 grid grid-cols-2 gap-3 lg:grid-cols-3">
+        {accountBalances(rows).map((b) => (
+          <StatCard key={b.account} label={b.label} value={inr(b.received)} />
+        ))}
       </div>
 
       <div className="mb-4 flex flex-wrap gap-2">
@@ -129,7 +143,7 @@ function PaymentsPage() {
                   {p.projects?.project_name} · {inr(p.amount)}
                 </p>
                 <p className="truncate text-xs text-muted-foreground">
-                  {p.projects?.clients?.name} · {fmtDate(p.payment_date)} · {p.payment_mode}
+                  {p.projects?.clients?.name} · {fmtDate(p.payment_date)} · {p.payment_mode} · {accountLabel(p.account)}
                 </p>
               </div>
               <Button size="sm" variant="ghost" onClick={() => remove.mutate(p.id)}>

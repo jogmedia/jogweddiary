@@ -43,6 +43,12 @@ export type Project = {
   album_status: string;
   delivery_status: string;
   notes: string | null;
+  travel_required?: boolean | null;
+  travel_booking_status?: string | null;
+  travel_mode?: string | null;
+  travel_notes?: string | null;
+  travel_ticket_path?: string | null;
+  travel_ticket_name?: string | null;
   created_at: string;
   clients?: Client | null;
 };

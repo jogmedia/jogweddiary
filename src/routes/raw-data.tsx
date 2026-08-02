@@ -7,6 +7,7 @@ import { DrivePicker } from "@/components/DrivePicker";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Switch } from "@/components/ui/switch";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import {
   Select,
   SelectContent,
@@ -68,6 +69,24 @@ function RawDataPage() {
   const driveOf = (p: Project) => (drives[p.id] ?? p.backup_drive ?? "").trim();
   const crewFor = (p: Project) => assignments.filter((a) => a.project_id === p.id);
   const folderOf = (p: Project) => (folders[p.id] ?? p.backup_folder ?? "").trim();
+
+  const isEditorRole = (role?: string | null) => {
+    if (!role) return false;
+    const r = role.toLowerCase();
+    return (
+      r.includes("editor") ||
+      r.includes("designer") ||
+      r.includes("album") ||
+      r.includes("video") ||
+      r.includes("lightroom")
+    );
+  };
+  const editorsFor = (p: Project) =>
+    crewFor(p).filter(
+      (a) =>
+        isEditorRole(a.role_in_project) ||
+        isEditorRole(a.staff?.role),
+    );
 
   const shot = useMemo(
     () =>
@@ -257,15 +276,92 @@ function RawDataPage() {
                     {p.project_name} · {fmtDate(p.event_date)}
                   </p>
                 </div>
-                <span
-                  className={`shrink-0 rounded-lg border px-2.5 py-1 text-xs font-semibold uppercase tracking-wide ${
-                    p.raw_backup_done
-                      ? "border-success/30 bg-success/10 text-success"
-                      : "border-destructive/30 bg-destructive/10 text-destructive"
-                  }`}
-                >
-                  {p.raw_backup_done ? "Backed Up" : "Pending"}
-                </span>
+                <div className="flex shrink-0 items-start gap-2">
+                  <span
+                    className={`shrink-0 rounded-lg border px-2.5 py-1 text-xs font-semibold uppercase tracking-wide ${
+                      p.raw_backup_done
+                        ? "border-success/30 bg-success/10 text-success"
+                        : "border-destructive/30 bg-destructive/10 text-destructive"
+                    }`}
+                  >
+                    {p.raw_backup_done ? "Backed Up" : "Pending"}
+                  </span>
+                  {q.trim() ? (
+                    editorsFor(p).length === 1 ? (
+                      <Button
+                        size="sm"
+                        className="h-8 shrink-0 gap-1.5"
+                        onClick={() => {
+                          const a = editorsFor(p)[0];
+                          openWhatsApp(
+                            a.staff?.phone,
+                            backupMsg(
+                              a.staff?.name ?? "team",
+                              clientName(p),
+                              p.event_date,
+                              driveOf(p),
+                              folderOf(p),
+                            ),
+                          );
+                        }}
+                      >
+                        <MessageCircle className="h-4 w-4" />
+                        <span className="hidden sm:inline">Send to WhatsApp</span>
+                      </Button>
+                    ) : (
+                      <Popover>
+                        <PopoverTrigger asChild>
+                          <Button size="sm" className="h-8 shrink-0 gap-1.5">
+                            <MessageCircle className="h-4 w-4" />
+                            <span className="hidden sm:inline">Send to WhatsApp</span>
+                          </Button>
+                        </PopoverTrigger>
+                        <PopoverContent className="w-64 p-3" align="end">
+                          {editorsFor(p).length === 0 ? (
+                            <p className="text-xs text-muted-foreground">No editor assigned to this project.</p>
+                          ) : (
+                            <>
+                              <p className="mb-2 text-xs font-medium text-muted-foreground">Send to editor</p>
+                              <div className="space-y-2">
+                                {editorsFor(p).map((a) => (
+                                  <div key={a.id} className="flex items-center justify-between gap-2">
+                                    <span className="min-w-0 text-sm">
+                                      <span className="font-medium">{a.staff?.name}</span>
+                                      <span className="text-muted-foreground">
+                                        {" · "}
+                                        {a.role_in_project ?? a.staff?.role ?? "Editor"}
+                                      </span>
+                                    </span>
+                                    <Button
+                                      size="sm"
+                                      variant="outline"
+                                      className="h-7 px-2 text-xs"
+                                      disabled={!a.staff?.phone}
+                                      onClick={() =>
+                                        openWhatsApp(
+                                          a.staff?.phone,
+                                          backupMsg(
+                                            a.staff?.name ?? "team",
+                                            clientName(p),
+                                            p.event_date,
+                                            driveOf(p),
+                                            folderOf(p),
+                                          ),
+                                        )
+                                      }
+                                    >
+                                      Send
+                                    </Button>
+                                  </div>
+                                ))}
+                              </div>
+                            </>
+                          )}
+                        </PopoverContent>
+                      </Popover>
+                    )
+                  ) : null}
+                </div>
               </div>
 
               {/* Highlighted details grid */}

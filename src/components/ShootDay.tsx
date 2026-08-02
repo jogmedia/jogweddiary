@@ -45,7 +45,7 @@ export function ShootDay({ date, title, empty = "No shoots scheduled for Today /
           id: a.id,
           name: a.staff?.name ?? "Crew",
           phone: a.staff?.phone ?? null,
-          role: a.role_in_project || a.staff?.role || "Crew",
+          role: `${eventLabel(e)} — ${prettyRole(a.role_in_project ?? a.staff?.role)}`,
           message: buildCrewMessage(e, clientName, a.role_in_project || a.staff?.role),
         }));
       return {

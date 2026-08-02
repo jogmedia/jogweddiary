@@ -27,6 +27,12 @@ export const EVENT_TYPES = [
 export const eventMeta = (type: string) =>
   EVENT_TYPES.find((t) => t.value === type) ?? { value: type, label: type, emoji: "✨" };
 
+/** Label for an event — custom events use their own name (stored in notes). */
+export const eventLabel = (e: { event_type: string; notes?: string | null }) => {
+  if (e.event_type === "custom" && e.notes?.trim()) return e.notes.trim();
+  return eventMeta(e.event_type).label;
+};
+
 /** 18:30:00 -> 6:30 PM */
 export const fmtTime = (t?: string | null) => {
   if (!t) return "—";
@@ -66,8 +72,8 @@ export function buildScheduleMessage(
       rows.push(line("• Location", e.location));
       if (e.google_maps_link) rows.push(`• 📍 Google Map: ${e.google_maps_link}`);
 
-      if (e.notes) rows.push(`• Note: ${e.notes}`);
-      return `${meta.emoji} *${meta.label}*\n${rows.filter(Boolean).join("\n")}`;
+      if (e.notes && e.event_type !== "custom") rows.push(`• Note: ${e.notes}`);
+      return `${meta.emoji} *${eventLabel(e)}*\n${rows.filter(Boolean).join("\n")}`;
     });
 
   return [
@@ -87,11 +93,12 @@ export function buildCrewMessage(
 ) {
   const meta = eventMeta(event.event_type);
   return [
-    `🎬 *${businessName.toUpperCase()} - CREW DUTY ALERT*`,
+    `${meta.emoji} *${businessName.toUpperCase()} - CREW DUTY ALERT*`,
     "",
-    `Event: ${meta.label} for ${clientName}`,
+    `Event: ${eventLabel(event)} for ${clientName}`,
     `🗓 Date: ${fmtDate(event.event_date)}`,
     `⏰ Team Reporting Time: ${fmtTime(event.arrival_time ?? event.event_time)}`,
+    `🎬 Shoot Start Time: ${fmtTime(event.muhurtham_time ?? event.event_time)}`,
     `📍 Venue: ${event.location ?? "TBD"}`,
     ...(event.google_maps_link ? [`🗺 Google Map: ${event.google_maps_link}`] : []),
     `🎥 Your Role: ${role || "Crew"}`,

@@ -20,7 +20,18 @@ export const fmtDate = (d: string | null | undefined) => {
   return date.toLocaleDateString("en-IN", { day: "2-digit", month: "short", year: "numeric" });
 };
 
-export const todayISO = () => new Date().toISOString().slice(0, 10);
+/** Local-date ISO (YYYY-MM-DD) — avoids UTC shift from toISOString(). */
+export const localISO = (d: Date = new Date()) =>
+  `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
+
+export const todayISO = () => localISO();
+
+/** Local ISO date offset by N days from today. */
+export const dayOffsetISO = (days: number) => {
+  const d = new Date();
+  d.setDate(d.getDate() + days);
+  return localISO(d);
+};
 
 export const monthStartISO = () => {
   const d = new Date();

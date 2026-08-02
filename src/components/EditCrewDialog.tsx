@@ -101,6 +101,10 @@ export function EditCrewDialog({ projectId, eventId, date, title }: Props) {
         <DialogHeader>
           <DialogTitle className="text-base">Manage crew</DialogTitle>
           <DialogDescription className="truncate">{title}</DialogDescription>
+          <p className="text-xs text-muted-foreground">
+            Changes apply only to this sub-event{date ? ` (${date})` : ""} — other event dates stay
+            untouched.
+          </p>
         </DialogHeader>
         <div className="space-y-2">
           <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">

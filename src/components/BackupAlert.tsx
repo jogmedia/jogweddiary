@@ -157,6 +157,30 @@ export function BackupAlert() {
               );
             })}
           </ul>
+
+          {backedUp.length > 0 && (
+            <div className="mt-4 border-t border-border pt-3">
+              <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+                Recently backed up
+              </p>
+              <ul className="mt-2 space-y-1.5">
+                {backedUp.map((p) => (
+                  <li
+                    key={p.id}
+                    className="flex flex-wrap items-center justify-between gap-2 rounded-lg border border-success/30 bg-success/10 px-2.5 py-1.5 text-xs"
+                  >
+                    <span className="min-w-0 truncate font-medium">
+                      {clientName(p)} · {fmtDate(p.event_date)}
+                    </span>
+                    <span className="flex items-center gap-1 text-success">
+                      <HardDrive className="h-3.5 w-3.5" />
+                      Storage Location: {p.backup_drive}
+                    </span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
         </div>
       </div>
     </div>

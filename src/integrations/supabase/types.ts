@@ -1009,6 +1009,7 @@ export type Database = {
           album_printed: boolean
           album_status: string
           backup_drive: string | null
+          backup_folder: string | null
           balance_due: number
           client_id: string
           created_at: string
@@ -1037,6 +1038,7 @@ export type Database = {
           album_printed?: boolean
           album_status?: string
           backup_drive?: string | null
+          backup_folder?: string | null
           balance_due?: number
           client_id: string
           created_at?: string
@@ -1065,6 +1067,7 @@ export type Database = {
           album_printed?: boolean
           album_status?: string
           backup_drive?: string | null
+          backup_folder?: string | null
           balance_due?: number
           client_id?: string
           created_at?: string

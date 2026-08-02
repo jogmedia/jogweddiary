@@ -23,6 +23,7 @@ import {
   PackageCheck,
 } from "lucide-react";
 import { AppShell } from "@/components/AppShell";
+import { BackupAlert } from "@/components/BackupAlert";
 import { TomorrowShoot } from "@/components/TomorrowShoot";
 
 import { PageHeader, StatCard, StatusBadge } from "@/components/ui-kit";
@@ -130,6 +131,10 @@ function Dashboard() {
         title="Studio Dashboard"
         subtitle={`Overview for ${new Date().toLocaleDateString("en-IN", { month: "long", year: "numeric" })}`}
       />
+
+      <BackupAlert />
+
+
 
       {/* 1. Today's shoots */}
       <div className="grid gap-4">

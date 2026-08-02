@@ -367,6 +367,15 @@ export function ProjectDialog({
                     onChange={(e) => setTravel((p) => ({ ...p, travel_notes: e.target.value }))}
                   />
                 </div>
+                <TicketUpload
+                  path={travel.travel_ticket_path}
+                  name={travel.travel_ticket_name}
+                  projectId={projectId}
+                  onChange={({ path, name }) =>
+                    setTravel((p) => ({ ...p, travel_ticket_path: path, travel_ticket_name: name }))
+                  }
+                />
+
               </div>
             )}
           </div>

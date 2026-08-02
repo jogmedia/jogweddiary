@@ -184,6 +184,7 @@ export function ProjectDialog({
   const delAssignment = useRemove("project_assignments", "Crew assignment");
   const [rows, setRows] = useState<Record<string, Row>>(() => buildRows(events, assignments));
   const [customEvents, setCustomEvents] = useState<Row[]>(() => buildCustomRows(events, assignments));
+  const [travel, setTravel] = useState<Travel>(() => buildTravel(initial));
 
   const setRow = (key: string, patch: Partial<Row>) =>
     setRows((p) => ({ ...p, [key]: { ...p[key], ...patch } }));

@@ -228,43 +228,105 @@ function RawDataPage() {
                 </p>
               ) : null}
 
-              <DrivePicker
-                className="mt-3"
-                value={drives[p.id] ?? p.backup_drive ?? ""}
-                onChange={(v) => setDrives((d) => ({ ...d, [p.id]: v }))}
-              />
-
-              <div className="mt-3">
-                <p className="mb-1 text-xs font-medium text-muted-foreground">Folder name</p>
-                <Input
-                  placeholder="e.g. JOG_2026_Akhil_Wedding"
-                  value={folders[p.id] ?? p.backup_folder ?? ""}
-                  onChange={(e) => setFolders((f) => ({ ...f, [p.id]: e.target.value }))}
-                />
-              </div>
-
-              <div className="mt-auto flex flex-wrap items-center justify-between gap-2 border-t border-border pt-3">
-                <label className="flex items-center gap-2 text-xs">
-                  <Switch
-                    checked={!!p.raw_backup_done}
-                    disabled={save.isPending}
-                    onCheckedChange={(v) => toggle(p, v)}
+              {editing[p.id] ? (
+                <div className="mt-3 space-y-3 rounded-xl border border-border bg-muted/40 p-3">
+                  <DrivePicker
+                    value={drives[p.id] ?? p.backup_drive ?? ""}
+                    onChange={(v) => setDrives((d) => ({ ...d, [p.id]: v }))}
                   />
-                  <span>Backed up to primary &amp; secondary disks</span>
-                </label>
+                  <div>
+                    <p className="mb-1 text-xs font-medium text-muted-foreground">Folder name</p>
+                    <Input
+                      placeholder="e.g. JOG_2026_Akhil_Wedding"
+                      value={folders[p.id] ?? p.backup_folder ?? ""}
+                      onChange={(e) => setFolders((f) => ({ ...f, [p.id]: e.target.value }))}
+                    />
+                  </div>
+                  <div className="flex flex-wrap items-center justify-between gap-2">
+                    <label className="flex items-center gap-2 text-xs">
+                      <Switch
+                        checked={!!p.raw_backup_done}
+                        disabled={save.isPending}
+                        onCheckedChange={(v) => toggle(p, v)}
+                      />
+                      <span>Backed up to primary &amp; secondary disks</span>
+                    </label>
+                    <span className="flex gap-2">
+                      <Button
+                        size="sm"
+                        variant="ghost"
+                        onClick={() => setEditing((e) => ({ ...e, [p.id]: false }))}
+                      >
+                        Close
+                      </Button>
+                      <Button
+                        size="sm"
+                        disabled={save.isPending || !dirty(p)}
+                        onClick={() => {
+                          save.mutate({
+                            id: p.id,
+                            backup_drive: driveOf(p) || null,
+                            backup_folder: folderOf(p) || null,
+                          });
+                          setEditing((e) => ({ ...e, [p.id]: false }));
+                        }}
+                      >
+                        <HardDriveDownload className="mr-1.5 h-4 w-4" /> Save
+                      </Button>
+                    </span>
+                  </div>
+                </div>
+              ) : null}
+
+              {sharing[p.id] ? (
+                <div className="mt-3 space-y-2 rounded-xl border border-border bg-muted/40 p-3">
+                  {crewFor(p).length === 0 ? (
+                    <p className="text-xs text-muted-foreground">No crew assigned to this project.</p>
+                  ) : (
+                    crewFor(p).map((a) => (
+                      <div key={a.id} className="flex flex-wrap items-center justify-between gap-2 text-xs">
+                        <span className="min-w-0">
+                          <span className="font-medium">{a.staff?.name}</span>
+                          <span className="text-muted-foreground">
+                            {" · "}
+                            {a.role_in_project ?? a.staff?.role ?? "Crew"}
+                          </span>
+                        </span>
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          className="h-8 px-2 text-xs"
+                          disabled={!a.staff?.phone}
+                          onClick={() =>
+                            openWhatsApp(
+                              a.staff?.phone,
+                              backupMsg(a.staff?.name ?? "team", clientName(p), p.event_date, driveOf(p), folderOf(p)),
+                            )
+                          }
+                        >
+                          <MessageCircle className="mr-1 h-3.5 w-3.5" /> Send
+                        </Button>
+                      </div>
+                    ))
+                  )}
+                </div>
+              ) : null}
+
+              <div className="mt-auto flex flex-wrap gap-2 border-t border-border pt-3">
                 <Button
                   size="sm"
                   variant="outline"
-                  disabled={save.isPending || !dirty(p)}
-                  onClick={() =>
-                    save.mutate({
-                      id: p.id,
-                      backup_drive: driveOf(p) || null,
-                      backup_folder: folderOf(p) || null,
-                    })
-                  }
+                  className="flex-1"
+                  onClick={() => setEditing((e) => ({ ...e, [p.id]: !e[p.id] }))}
                 >
-                  <HardDriveDownload className="mr-1.5 h-4 w-4" /> Save disk
+                  <Pencil className="mr-1.5 h-4 w-4" /> Edit Backup Info
+                </Button>
+                <Button
+                  size="sm"
+                  className="flex-1"
+                  onClick={() => setSharing((s) => ({ ...s, [p.id]: !s[p.id] }))}
+                >
+                  <MessageCircle className="mr-1.5 h-4 w-4" /> Send to WhatsApp
                 </Button>
               </div>
             </li>

@@ -3,7 +3,7 @@ import { useMemo, useState } from "react";
 import { Plus, Search } from "lucide-react";
 import { AppShell } from "@/components/AppShell";
 import { EmptyState, PageHeader, StatusBadge } from "@/components/ui-kit";
-import { RecordDialog, type Field } from "@/components/RecordDialog";
+import { ProjectDialog, STATUS_OPTIONS } from "@/components/ProjectDialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
@@ -13,7 +13,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { useClients, useProjects, useUpsert } from "@/lib/db";
+import { useClients, useProjects } from "@/lib/db";
 import { fmtDate, inr, todayISO } from "@/lib/format";
 
 export const Route = createFileRoute("/projects/")({
@@ -23,7 +23,7 @@ export const Route = createFileRoute("/projects/")({
       {
         name: "description",
         content:
-          "Every wedding managed as a project: event date, venue, package, payments, balance and delivery status.",
+          "Every wedding managed as a project: sub-event dates, venue, package, payments, balance and delivery status.",
       },
       { property: "og:title", content: "Projects — JOG MEDIA Studio Accounts" },
       { property: "og:description", content: "Every wedding managed as a project with full status tracking." },
@@ -32,45 +32,11 @@ export const Route = createFileRoute("/projects/")({
   component: ProjectsPage,
 });
 
-export const STATUS_OPTIONS = {
-  project: ["open", "ongoing", "completed", "cancelled"],
-  shoot: ["pending", "in_progress", "completed"],
-  editing: ["pending", "in_progress", "completed"],
-  album: ["pending", "in_progress", "completed"],
-  delivery: ["pending", "in_progress", "delivered"],
-};
-
-const opts = (list: string[]) => list.map((v) => ({ value: v, label: v.replace(/_/g, " ") }));
-
-export function projectFields(clients: { id: string; name: string }[]): Field[] {
-  return [
-    {
-      name: "client_id",
-      label: "Client",
-      type: "select",
-      required: true,
-      options: clients.map((c) => ({ value: c.id, label: c.name })),
-    },
-    { name: "project_name", label: "Project name", required: true },
-    { name: "event_date", label: "Event date", type: "date", required: true },
-    { name: "venue", label: "Venue" },
-    { name: "package_name", label: "Package" },
-    { name: "total_amount", label: "Total agreed amount", type: "number" },
-    { name: "advance_amount", label: "Advance amount", type: "number" },
-    { name: "payment_due_date", label: "Balance due date", type: "date" },
-    { name: "project_status", label: "Project status", type: "select", options: opts(STATUS_OPTIONS.project) },
-    { name: "shoot_status", label: "Shoot status", type: "select", options: opts(STATUS_OPTIONS.shoot) },
-    { name: "editing_status", label: "Editing status", type: "select", options: opts(STATUS_OPTIONS.editing) },
-    { name: "album_status", label: "Album status", type: "select", options: opts(STATUS_OPTIONS.album) },
-    { name: "delivery_status", label: "Delivery status", type: "select", options: opts(STATUS_OPTIONS.delivery) },
-    { name: "notes", label: "Notes", type: "textarea" },
-  ];
-}
+export { STATUS_OPTIONS };
 
 function ProjectsPage() {
   const { data: projects = [], isLoading } = useProjects();
   const { data: clients = [] } = useClients();
-  const upsert = useUpsert("projects", "Project");
   const [search, setSearch] = useState("");
   const [pStatus, setPStatus] = useState("all");
   const [payStatus, setPayStatus] = useState("all");
@@ -98,20 +64,18 @@ function ProjectsPage() {
     <AppShell>
       <PageHeader
         title="Projects"
-        subtitle="Each wedding is tracked end to end — shoot, editing, album, delivery and money."
+        subtitle="Each wedding is tracked end to end — sub-event dates, shoot, editing, album, delivery and money."
         actions={
-          <RecordDialog
+          <ProjectDialog
             title="New project"
-            fields={projectFields(clients)}
+            clients={clients}
             initial={{
-              event_date: today,
               project_status: "open",
               shoot_status: "pending",
               editing_status: "pending",
               album_status: "pending",
               delivery_status: "pending",
             }}
-            onSubmit={(v) => upsert.mutateAsync(v)}
             trigger={
               <Button>
                 <Plus className="mr-2 h-4 w-4" /> Add project
@@ -120,6 +84,7 @@ function ProjectsPage() {
           />
         }
       />
+
 
       <div className="mb-4 flex flex-wrap gap-2">
         <div className="relative min-w-[220px] flex-1">

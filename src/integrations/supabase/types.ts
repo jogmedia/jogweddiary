@@ -1004,6 +1004,7 @@ export type Database = {
       }
       projects: {
         Row: {
+          advance_account: string | null
           advance_amount: number
           album_editing_done: boolean
           album_printed: boolean
@@ -1039,6 +1040,7 @@ export type Database = {
           video_editing_done: boolean
         }
         Insert: {
+          advance_account?: string | null
           advance_amount?: number
           album_editing_done?: boolean
           album_printed?: boolean
@@ -1074,6 +1076,7 @@ export type Database = {
           video_editing_done?: boolean
         }
         Update: {
+          advance_account?: string | null
           advance_amount?: number
           album_editing_done?: boolean
           album_printed?: boolean

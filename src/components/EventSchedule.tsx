@@ -2,6 +2,7 @@ import { useMemo, useState } from "react";
 import { MapPin, MessageCircle, Pencil, Plus, Send, Trash2, UserPlus } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { crewRoleOptions } from "@/lib/roles";
+import { CrewPicker, type CrewMember } from "@/components/CrewPicker";
 import { RecordDialog, type Field } from "@/components/RecordDialog";
 import { StatusBadge } from "@/components/ui-kit";
 import { fmtDate, isMapsUrl, isValidPhone, waNumber } from "@/lib/format";
@@ -81,6 +82,7 @@ export function EventSchedule({
   onUnassign: (id: string) => void;
 }) {
   const [editing, setEditing] = useState<ProjectEvent | null>(null);
+  const [newCrew, setNewCrew] = useState<CrewMember[]>([]);
   const clientName = project.clients?.name ?? "Client";
   const clientPhone = project.clients?.whatsapp ?? project.clients?.phone;
   const business = settings?.business_name ?? "JOG MEDIA";
@@ -93,6 +95,19 @@ export function EventSchedule({
   const crewFor = (eventId: string) =>
     assignments.filter((a) => a.event_id === eventId || !a.event_id);
 
+  const crewSection = (
+    <div className="rounded-xl border border-border p-3">
+      <p className="mb-2 text-xs font-semibold">Assign Crew for this Event</p>
+      <CrewPicker
+        staff={staff}
+        value={newCrew}
+        onChange={setNewCrew}
+        projectId={project.id}
+      />
+    </div>
+  );
+
+
   return (
     <div className="space-y-4">
       <div className="flex flex-wrap gap-2">
@@ -100,7 +115,21 @@ export function EventSchedule({
           title="Add event"
           fields={eventFields}
           initial={{ event_type: "wedding_day", status: "pending" }}
-          onSubmit={(v) => onSaveEvent(v)}
+          extra={crewSection}
+          onReset={() => setNewCrew([])}
+          onSubmit={async (v) => {
+            const eventId = (await onSaveEvent(v)) as string | undefined;
+            if (eventId) {
+              for (const c of newCrew) {
+                await onAssign({
+                  staff_id: c.staffId,
+                  role_in_project: c.role,
+                  event_id: eventId,
+                });
+              }
+            }
+            setNewCrew([]);
+          }}
           trigger={
             <Button size="sm">
               <Plus className="mr-1.5 h-4 w-4" /> Add event

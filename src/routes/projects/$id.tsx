@@ -11,6 +11,7 @@ import {
   Pencil,
   FileDown,
   Send,
+  HardDrive,
 } from "lucide-react";
 import { AppShell } from "@/components/AppShell";
 import { EmptyState, PageHeader, StatCard, StatusBadge } from "@/components/ui-kit";

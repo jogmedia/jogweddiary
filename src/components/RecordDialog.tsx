@@ -167,6 +167,7 @@ export function RecordDialog({
 
           ))}
         </div>
+        {extra ? <div className="mt-2">{extra}</div> : null}
         <DialogFooter>
           <Button variant="outline" onClick={() => setOpen(false)}>
             Cancel

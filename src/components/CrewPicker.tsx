@@ -29,6 +29,8 @@ export function CrewPicker({
   label = "Crew",
   date,
   projectId,
+  eventId,
+  time,
 }: {
   staff: Staff[];
   value: CrewMember[];
@@ -36,28 +38,36 @@ export function CrewPicker({
   label?: string;
   /** Event date used to check crew availability. */
   date?: string;
-  /** Current project — its own bookings are not treated as clashes. */
+  /** Current project (kept for context; clashes are checked per sub-event). */
   projectId?: string;
+  /** Sub-event being edited — its own booking is never a clash. */
+  eventId?: string | null;
+  /** Slot time of this sub-event; only overlapping slots clash. */
+  time?: string | null;
 }) {
   const [query, setQuery] = useState("");
   const { conflictsFor } = useCrewBookings();
+  const clashes = (id: string) => conflictsFor(id, date, { excludeEventId: eventId, time });
   const available = staff.filter(
     (s) => s.active_status !== false && s.name.toLowerCase().includes(query.toLowerCase()),
   );
   const ids = value.map((v) => v.staffId);
   const selected = available.filter((s) => ids.includes(s.id));
-  const clashing = selected.filter((s) => conflictsFor(s.id, date, projectId).length > 0);
+  const clashing = selected.filter((s) => clashes(s.id).length > 0);
   const roleOf = (id: string) => value.find((v) => v.staffId === id)?.role ?? null;
 
-  const toggle = (s: Staff) =>
+  const toggle = (s: Staff) => {
+    if (!ids.includes(s.id) && clashes(s.id).length > 0) return; // blocked: same date & slot
     onChange(
       ids.includes(s.id)
         ? value.filter((v) => v.staffId !== s.id)
         : [...value, { staffId: s.id, role: s.role ?? null }],
     );
+  };
 
   const setRole = (id: string, role: string) =>
     onChange(value.map((v) => (v.staffId === id ? { ...v, role } : v)));
+
 
   return (
     <div className="space-y-1.5">

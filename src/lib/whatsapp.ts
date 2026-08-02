@@ -85,11 +85,44 @@ export function buildScheduleMessage(
   ].join("\n");
 }
 
+export type TravelLike = {
+  travel_required?: boolean | null;
+  travel_booking_status?: string | null;
+  travel_mode?: string | null;
+  travel_notes?: string | null;
+};
+
+const TRAVEL_MODE_LABEL: Record<string, string> = {
+  train: "Train",
+  flight: "Flight",
+  bus: "Bus",
+  cab: "Cab",
+  self_drive: "Self Drive",
+};
+
+/** WhatsApp lines describing travel / ticket booking status for a project. */
+export function travelLines(travel?: TravelLike | null): string[] {
+  if (!travel?.travel_required) return [];
+  const status = travel.travel_booking_status ?? "pending";
+  if (status === "not_needed") return [];
+  const mode = travel.travel_mode ? TRAVEL_MODE_LABEL[travel.travel_mode] ?? travel.travel_mode : null;
+  const head =
+    status === "booked"
+      ? `🚆 Travel: ${mode ?? "Travel"} — ✅ Ticket Booked`
+      : `🚆 Travel: ${mode ?? "Travel"} — ⚠️ Ticket NOT booked yet`;
+  const rows = [head];
+  if (travel.travel_notes?.trim()) {
+    rows.push(`🎫 ${mode === "Train" ? "Train Details" : "Ticket Details"}: ${travel.travel_notes.trim()}`);
+  }
+  return rows;
+}
+
 export function buildCrewMessage(
   event: EventLike,
   clientName: string,
   role: string | null | undefined,
   businessName = "JOG MEDIA",
+  travel?: TravelLike | null,
 ) {
   const meta = eventMeta(event.event_type);
   return [
@@ -102,7 +135,7 @@ export function buildCrewMessage(
     `📍 Venue: ${event.location ?? "TBD"}`,
     ...(event.google_maps_link ? [`🗺 Google Map: ${event.google_maps_link}`] : []),
     `🎥 Your Role: ${role || "Crew"}`,
-
+    ...travelLines(travel),
   ].join("\n");
 }
 

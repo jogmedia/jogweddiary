@@ -40,7 +40,7 @@ export function ShootDay({ date, title, empty = "No shoots scheduled for Today /
       const project = projects.find((p) => p.id === e.project_id);
       const clientName = e.projects?.clients?.name ?? project?.clients?.name ?? "—";
       const crew = assignments
-        .filter((a) => (a.event_id ? a.event_id === e.id : a.project_id === e.project_id))
+        .filter((a) => a.event_id === e.id)
         .map((a) => ({
           id: a.id,
           name: a.staff?.name ?? "Crew",
@@ -63,7 +63,7 @@ export function ShootDay({ date, title, empty = "No shoots scheduled for Today /
     ...bareProjects.map((p) => {
       const clientName = p.clients?.name ?? "—";
       const crew = assignments
-        .filter((a) => a.project_id === p.id)
+        .filter((a) => a.project_id === p.id && !a.event_id)
         .map((a) => ({
           id: a.id,
           name: a.staff?.name ?? "Crew",

@@ -18,6 +18,7 @@ import { ADVANCE_REF, PAY_ACCOUNTS, modeForAccount } from "@/lib/accounts";
 import { TicketUpload } from "@/components/TicketUpload";
 import {
   useAssignments,
+  usePayments,
   useProjectEvents,
   useRemove,
   useStaff,

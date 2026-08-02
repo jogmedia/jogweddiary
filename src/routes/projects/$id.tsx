@@ -295,7 +295,36 @@ function ProjectDetail() {
             );
           })}
         </div>
+        <div className="mt-3 border-t border-border pt-3">
+          <label className="text-xs font-medium" htmlFor="backup-drive">
+            Storage Device / Hard Disk Name
+          </label>
+          <div className="mt-1 flex flex-col gap-2 sm:flex-row">
+            <Input
+              id="backup-drive"
+              list="backup-drive-options"
+              className="h-9 text-sm"
+              placeholder="e.g. HDD-2 (8TB) or Cloud Server"
+              value={drive}
+              onChange={(e) => setDrive(e.target.value)}
+            />
+            <datalist id="backup-drive-options">
+              {DRIVE_OPTIONS.map((o) => (
+                <option key={o} value={o} />
+              ))}
+            </datalist>
+            <Button
+              variant="outline"
+              className="h-9 shrink-0"
+              disabled={saveProject.isPending || drive === (project.backup_drive ?? "")}
+              onClick={() => saveProject.mutate({ id, backup_drive: drive.trim() || null })}
+            >
+              Save drive
+            </Button>
+          </div>
+        </div>
       </div>
+
 
       <Tabs defaultValue="schedule">
         <TabsList className="mb-4 flex w-full flex-wrap justify-start">

@@ -15,6 +15,7 @@ import {
 } from "@/components/ui/select";
 import { CrewPicker, type CrewMember } from "@/components/CrewPicker";
 import { ADVANCE_REF, PAY_ACCOUNTS, modeForAccount } from "@/lib/accounts";
+import { todayISO } from "@/lib/format";
 import { TicketUpload } from "@/components/TicketUpload";
 import {
   useAssignments,

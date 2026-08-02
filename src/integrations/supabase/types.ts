@@ -1009,6 +1009,7 @@ export type Database = {
         Row: {
           advance_account: string | null
           advance_amount: number
+          advance_date: string | null
           album_editing_done: boolean
           album_printed: boolean
           album_status: string
@@ -1045,6 +1046,7 @@ export type Database = {
         Insert: {
           advance_account?: string | null
           advance_amount?: number
+          advance_date?: string | null
           album_editing_done?: boolean
           album_printed?: boolean
           album_status?: string
@@ -1081,6 +1083,7 @@ export type Database = {
         Update: {
           advance_account?: string | null
           advance_amount?: number
+          advance_date?: string | null
           album_editing_done?: boolean
           album_printed?: boolean
           album_status?: string

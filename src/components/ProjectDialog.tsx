@@ -61,6 +61,7 @@ export function projectFields(clients: { id: string; name: string }[]): Field[] 
       type: "select",
       options: ADVANCE_ACCOUNTS,
     },
+    { name: "advance_date", label: "Advance received on", type: "date" },
     { name: "payment_due_date", label: "Balance due date", type: "date" },
     { name: "project_status", label: "Project status", type: "select", options: opts(STATUS_OPTIONS.project) },
     { name: "shoot_status", label: "Shoot status", type: "select", options: opts(STATUS_OPTIONS.shoot) },
@@ -259,6 +260,7 @@ export function ProjectDialog({
       travel_notes: travel.travel_required ? travel.travel_notes || null : null,
       travel_ticket_path: travel.travel_required ? travel.travel_ticket_path : null,
       travel_ticket_name: travel.travel_required ? travel.travel_ticket_name : null,
+      advance_date: values.advance_date || todayISO(),
       ...(primaryDate ? { event_date: primaryDate } : {}),
       ...(projectId ? { id: projectId } : {}),
     });
@@ -270,7 +272,7 @@ export function ProjectDialog({
     if (pid && advance > 0 && !alreadyLogged) {
       await savePayment.mutateAsync({
         project_id: pid,
-        payment_date: (primaryDate && primaryDate < todayISO() ? primaryDate : todayISO()),
+        payment_date: values.advance_date || todayISO(),
         amount: advance,
         payment_mode: modeForAccount(values.advance_account),
         account: values.advance_account ?? null,
@@ -323,7 +325,7 @@ export function ProjectDialog({
     <RecordDialog
       title={title ?? (projectId ? "Edit project" : "New project")}
       fields={projectFields(clients)}
-      initial={initial}
+      initial={{ ...initial, advance_date: initial?.advance_date ?? todayISO() }}
       trigger={trigger}
       open={open}
       onOpenChange={onOpenChange}

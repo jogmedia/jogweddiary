@@ -243,31 +243,52 @@ function RawDataPage() {
       ) : (
         <ul className="mt-4 grid grid-cols-1 gap-4 lg:grid-cols-2">
           {rows.map((p) => (
-            <li key={p.id} className="surface flex h-full flex-col p-4">
-              <div className="flex flex-wrap items-start justify-between gap-2">
+            <li
+              key={p.id}
+              className={`surface flex h-full flex-col p-4 transition-shadow ${
+                q.trim() ? "ring-1 ring-primary/20 shadow-sm" : ""
+              }`}
+            >
+              {/* Header: Client / Event Name & Date + Status Badge */}
+              <div className="flex items-start justify-between gap-3">
                 <div className="min-w-0">
-                  <p className="truncate text-sm font-semibold">{clientName(p)}</p>
-                  <p className="truncate text-xs text-muted-foreground">
+                  <p className="truncate text-base font-semibold text-primary">{clientName(p)}</p>
+                  <p className="mt-0.5 truncate text-sm text-secondary-foreground">
                     {p.project_name} · {fmtDate(p.event_date)}
                   </p>
                 </div>
                 <span
-                  className={`rounded-lg border px-2 py-1 text-xs font-medium ${
+                  className={`shrink-0 rounded-lg border px-2.5 py-1 text-xs font-semibold uppercase tracking-wide ${
                     p.raw_backup_done
                       ? "border-success/30 bg-success/10 text-success"
                       : "border-destructive/30 bg-destructive/10 text-destructive"
                   }`}
                 >
-                  {p.raw_backup_done ? "Backed up" : "Pending"}
+                  {p.raw_backup_done ? "Backed Up" : "Pending"}
                 </span>
               </div>
 
-              {driveOf(p) ? (
-                <p className="mt-2 inline-flex w-fit items-center gap-1.5 rounded-lg border border-success/30 bg-success/10 px-2 py-1 text-xs font-medium text-success">
-                  <HardDrive className="h-3.5 w-3.5" /> Backup Location: {driveOf(p)}
-                  {folderOf(p) ? ` · Folder: ${folderOf(p)}` : ""}
-                </p>
-              ) : null}
+              {/* Highlighted details grid */}
+              <div className="mt-4 grid grid-cols-1 gap-3 rounded-xl border border-border bg-muted/30 p-3 sm:grid-cols-2">
+                <div>
+                  <p className="text-xs font-medium text-muted-foreground">Hard Disk No.</p>
+                  <div className="mt-1 flex items-center gap-1.5 text-sm font-semibold text-foreground">
+                    <HardDrive className="h-4 w-4 text-primary" />
+                    {driveOf(p) ? driveOf(p) : <span className="text-muted-foreground">Not assigned</span>}
+                  </div>
+                </div>
+                <div>
+                  <p className="text-xs font-medium text-muted-foreground">Folder Path / Name</p>
+                  <div className="mt-1 flex items-center gap-1.5 text-sm font-semibold text-foreground">
+                    <span className="font-mono text-xs text-primary">📁</span>
+                    {folderOf(p) ? (
+                      <span className="break-all font-mono text-xs">{folderOf(p)}</span>
+                    ) : (
+                      <span className="text-muted-foreground">Not set</span>
+                    )}
+                  </div>
+                </div>
+              </div>
 
               {editing[p.id] ? (
                 <div className="mt-3 space-y-3 rounded-xl border border-border bg-muted/40 p-3">

@@ -132,6 +132,10 @@ function Dashboard() {
         subtitle={`Overview for ${new Date().toLocaleDateString("en-IN", { month: "long", year: "numeric" })}`}
       />
 
+      <BackupAlert />
+
+
+
       {/* 1. Today's shoots */}
       <div className="grid gap-4">
         <ListCard

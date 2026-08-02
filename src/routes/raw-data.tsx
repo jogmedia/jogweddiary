@@ -286,7 +286,7 @@ function RawDataPage() {
                   >
                     {p.raw_backup_done ? "Backed Up" : "Pending"}
                   </span>
-                  {q.trim() && editorsFor(p).length > 0 ? (
+                  {q.trim() ? (
                     editorsFor(p).length === 1 ? (
                       <Button
                         size="sm"
@@ -317,40 +317,46 @@ function RawDataPage() {
                           </Button>
                         </PopoverTrigger>
                         <PopoverContent className="w-64 p-3" align="end">
-                          <p className="mb-2 text-xs font-medium text-muted-foreground">Send to editor</p>
-                          <div className="space-y-2">
-                            {editorsFor(p).map((a) => (
-                              <div key={a.id} className="flex items-center justify-between gap-2">
-                                <span className="min-w-0 text-sm">
-                                  <span className="font-medium">{a.staff?.name}</span>
-                                  <span className="text-muted-foreground">
-                                    {" · "}
-                                    {a.role_in_project ?? a.staff?.role ?? "Editor"}
-                                  </span>
-                                </span>
-                                <Button
-                                  size="sm"
-                                  variant="outline"
-                                  className="h-7 px-2 text-xs"
-                                  disabled={!a.staff?.phone}
-                                  onClick={() =>
-                                    openWhatsApp(
-                                      a.staff?.phone,
-                                      backupMsg(
-                                        a.staff?.name ?? "team",
-                                        clientName(p),
-                                        p.event_date,
-                                        driveOf(p),
-                                        folderOf(p),
-                                      ),
-                                    )
-                                  }
-                                >
-                                  Send
-                                </Button>
+                          {editorsFor(p).length === 0 ? (
+                            <p className="text-xs text-muted-foreground">No editor assigned to this project.</p>
+                          ) : (
+                            <>
+                              <p className="mb-2 text-xs font-medium text-muted-foreground">Send to editor</p>
+                              <div className="space-y-2">
+                                {editorsFor(p).map((a) => (
+                                  <div key={a.id} className="flex items-center justify-between gap-2">
+                                    <span className="min-w-0 text-sm">
+                                      <span className="font-medium">{a.staff?.name}</span>
+                                      <span className="text-muted-foreground">
+                                        {" · "}
+                                        {a.role_in_project ?? a.staff?.role ?? "Editor"}
+                                      </span>
+                                    </span>
+                                    <Button
+                                      size="sm"
+                                      variant="outline"
+                                      className="h-7 px-2 text-xs"
+                                      disabled={!a.staff?.phone}
+                                      onClick={() =>
+                                        openWhatsApp(
+                                          a.staff?.phone,
+                                          backupMsg(
+                                            a.staff?.name ?? "team",
+                                            clientName(p),
+                                            p.event_date,
+                                            driveOf(p),
+                                            folderOf(p),
+                                          ),
+                                        )
+                                      }
+                                    >
+                                      Send
+                                    </Button>
+                                  </div>
+                                ))}
                               </div>
-                            ))}
-                          </div>
+                            </>
+                          )}
                         </PopoverContent>
                       </Popover>
                     )

@@ -14,6 +14,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { CrewPicker, type CrewMember } from "@/components/CrewPicker";
+import { TicketUpload } from "@/components/TicketUpload";
 import {
   useAssignments,
   useProjectEvents,

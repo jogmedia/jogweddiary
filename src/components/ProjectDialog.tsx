@@ -196,6 +196,12 @@ export function ProjectDialog({
                           onChange={(e) => setRow(s.key, { date: e.target.value })}
                         />
                         <Input
+                          type="time"
+                          value={row.time}
+                          onChange={(e) => setRow(s.key, { time: e.target.value })}
+                        />
+                        <Input
+                          className="sm:col-span-2"
                           placeholder="Venue / location"
                           value={row.location}
                           onChange={(e) => setRow(s.key, { location: e.target.value })}

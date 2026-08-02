@@ -142,9 +142,8 @@ export function CrewPicker({
                         >
                           {active && <Check className="h-3 w-3" />}
                         </span>
-                        <span className="min-w-0 flex-1 truncate">
-                          <span className="font-medium">{s.name}</span>
-                          <span className="text-muted-foreground"> — {prettyRole(s.role)}</span>
+                        <span className="min-w-0 flex-1 truncate font-medium">
+                          {s.name}
                         </span>
                         {clashes(s.id).length > 0 && (
                           <span className="shrink-0 rounded bg-destructive/12 px-1.5 py-0.5 text-[10px] font-medium text-destructive">

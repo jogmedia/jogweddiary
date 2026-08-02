@@ -5,7 +5,6 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { useProjectEvents, useRemove, useUpsert, type ProjectEvent } from "@/lib/db";
-import { eventMeta } from "@/lib/whatsapp";
 
 export const STATUS_OPTIONS = {
   project: ["open", "ongoing", "completed", "cancelled"],
@@ -92,7 +91,8 @@ export function ProjectDialog({
   onOpenChange?: (v: boolean) => void;
   title?: string;
 }) {
-  const { data: events = [] } = useProjectEvents(projectId);
+  const { data: allEvents = [] } = useProjectEvents(projectId);
+  const events = projectId ? allEvents : [];
   const saveProject = useUpsert("projects", "Project");
   const saveEvent = useUpsert("project_events", "Event");
   const delEvent = useRemove("project_events", "Event");
@@ -163,7 +163,7 @@ export function ProjectDialog({
                   <div key={s.key} className="rounded-lg border border-border bg-card p-2.5">
                     <div className="flex items-center justify-between gap-2">
                       <Label htmlFor={`ev-${s.key}`} className="text-xs font-medium">
-                        {s.key === "custom" ? "✨ Other event" : `${eventMeta(s.key).emoji} ${s.label}`}
+                        {s.label}
                       </Label>
                       <Switch
                         id={`ev-${s.key}`}

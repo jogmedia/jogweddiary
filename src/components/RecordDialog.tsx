@@ -44,6 +44,8 @@ export function RecordDialog({
   onSubmit,
   open: controlledOpen,
   onOpenChange,
+  extra,
+  onReset,
 }: {
   title: string;
   fields: Field[];
@@ -53,6 +55,10 @@ export function RecordDialog({
   onSubmit: (values: Record<string, any>) => Promise<unknown> | unknown;
   open?: boolean;
   onOpenChange?: (v: boolean) => void;
+  /** Extra UI rendered below the standard fields (e.g. dynamic sub-sections). */
+  extra?: ReactNode;
+  /** Called whenever the dialog opens, so parents can reset their own extra state. */
+  onReset?: () => void;
 }) {
   const [uncontrolled, setUncontrolled] = useState(false);
   const open = controlledOpen ?? uncontrolled;

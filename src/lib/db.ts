@@ -25,6 +25,7 @@ export type Project = {
   package_name: string | null;
   total_amount: number;
   advance_amount: number;
+  advance_account?: string | null;
   balance_due: number;
   payment_due_date: string | null;
   payment_status: string;

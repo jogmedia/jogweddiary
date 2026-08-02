@@ -115,7 +115,7 @@ function ProjectsPage() {
           </SelectTrigger>
           <SelectContent>
             <SelectItem value="all">All payments</SelectItem>
-            {["pending", "partial", "paid"].map((s) => (
+            {["pending", "partial", "completed"].map((s) => (
               <SelectItem key={s} value={s}>
                 {s}
               </SelectItem>

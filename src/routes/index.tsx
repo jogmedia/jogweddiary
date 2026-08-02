@@ -23,6 +23,8 @@ import {
   PackageCheck,
 } from "lucide-react";
 import { AppShell } from "@/components/AppShell";
+import { TomorrowShoot } from "@/components/TomorrowShoot";
+
 import { PageHeader, StatCard, StatusBadge } from "@/components/ui-kit";
 import {
   useDeliveries,
@@ -143,6 +145,13 @@ function Dashboard() {
           }))}
         />
       </div>
+
+      {/* 1b. Tomorrow's shoot */}
+      <div className="mt-4">
+        <TomorrowShoot />
+      </div>
+
+
 
       {/* 2. Upcoming events */}
       <div className="mt-4 grid gap-4">

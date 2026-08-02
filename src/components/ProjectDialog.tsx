@@ -43,22 +43,29 @@ export function projectFields(clients: { id: string; name: string }[]): Field[] 
 
 const SUB_EVENTS = [
   { type: "save_the_date", label: "Save the Date" },
-  { type: "haldi", label: "Haldi" },
   { type: "engagement", label: "Engagement" },
+  { type: "haldi", label: "Haldi / Mehendi" },
+  { type: "wedding_eve", label: "Wedding Eve / Sangeeth" },
   { type: "wedding_day", label: "Wedding Day / Muhurtham" },
   { type: "reception", label: "Reception" },
 ] as const;
 
-type Row = { enabled: boolean; date: string; location: string; name?: string; id?: string };
+type Row = { enabled: boolean; date: string; time: string; location: string; name?: string; id?: string };
 
-const emptyRow = (): Row => ({ enabled: false, date: "", location: "" });
+const emptyRow = (): Row => ({ enabled: false, date: "", time: "", location: "" });
 
 function buildRows(events: ProjectEvent[]) {
   const rows: Record<string, Row> = {};
   SUB_EVENTS.forEach(({ type }) => {
     const e = events.find((ev) => ev.event_type === type);
     rows[type] = e
-      ? { enabled: true, date: e.event_date ?? "", location: e.location ?? "", id: e.id }
+      ? {
+          enabled: true,
+          date: e.event_date ?? "",
+          time: (e.event_time ?? "").slice(0, 5),
+          location: e.location ?? "",
+          id: e.id,
+        }
       : emptyRow();
   });
   const custom = events.find((ev) => ev.event_type === "custom");
@@ -66,6 +73,7 @@ function buildRows(events: ProjectEvent[]) {
     ? {
         enabled: true,
         date: custom.event_date ?? "",
+        time: (custom.event_time ?? "").slice(0, 5),
         location: custom.location ?? "",
         name: custom.notes ?? "",
         id: custom.id,

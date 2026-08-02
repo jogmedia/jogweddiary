@@ -7,6 +7,7 @@ import { useAssignments, useProjectEvents, useProjects } from "@/lib/db";
 import { fmtDate } from "@/lib/format";
 import { prettyRole } from "@/lib/roles";
 import { buildCrewMessage, eventLabel, eventMeta, fmtTime, openWhatsApp } from "@/lib/whatsapp";
+import { hasTicketInfo, sendTicketWhatsApp } from "@/lib/travel-share";
 
 type Props = {
   /** Strict ISO date (YYYY-MM-DD) to show shoots for. */
@@ -34,6 +35,7 @@ export function ShootDay({ date, title, empty = "No shoots scheduled for Today /
     mapLink: string | null;
     reporting: string;
     travel: any;
+    eventName: string;
     crew: { id: string; name: string; phone: string | null; role: string; message: string }[];
   };
 
@@ -61,6 +63,7 @@ export function ShootDay({ date, title, empty = "No shoots scheduled for Today /
         mapLink: e.google_maps_link,
         reporting: fmtTime(e.arrival_time ?? e.event_time ?? e.muhurtham_time),
         travel: project ?? null,
+        eventName: eventLabel(e),
         crew,
       };
     }),
@@ -95,6 +98,7 @@ export function ShootDay({ date, title, empty = "No shoots scheduled for Today /
         mapLink: null,
         reporting: "—",
         travel: p,
+        eventName: p.project_name,
         crew,
       };
     }),
@@ -150,13 +154,34 @@ export function ShootDay({ date, title, empty = "No shoots scheduled for Today /
                           <p className="truncate text-sm font-medium">{c.name}</p>
                           <p className="truncate text-xs capitalize text-muted-foreground">{c.role}</p>
                         </div>
-                        <Button
-                          size="sm"
-                          className="shrink-0 bg-[hsl(142_70%_35%)] text-white hover:bg-[hsl(142_70%_29%)]"
-                          onClick={() => openWhatsApp(c.phone, c.message)}
-                        >
-                          WhatsApp
-                        </Button>
+                        <div className="flex shrink-0 items-center gap-1.5">
+                          {hasTicketInfo(it.travel) && (
+                            <Button
+                              size="sm"
+                              variant="outline"
+                              className="h-8 text-xs"
+                              onClick={() =>
+                                void sendTicketWhatsApp({
+                                  phone: c.phone,
+                                  crewName: c.name,
+                                  clientName: it.client,
+                                  eventName: it.eventName,
+                                  date,
+                                  project: it.travel,
+                                })
+                              }
+                            >
+                              📱 Send Ticket
+                            </Button>
+                          )}
+                          <Button
+                            size="sm"
+                            className="bg-[hsl(142_70%_35%)] text-white hover:bg-[hsl(142_70%_29%)]"
+                            onClick={() => openWhatsApp(c.phone, c.message)}
+                          >
+                            WhatsApp
+                          </Button>
+                        </div>
                       </li>
                     ))}
                   </ul>

@@ -61,7 +61,7 @@ export function CrewPicker({
 
   return (
     <div className="space-y-1.5">
-      <Popover>
+      <Popover onOpenChange={(open) => !open && setQuery("")}>
         <PopoverTrigger asChild>
           <Button type="button" variant="outline" className="w-full justify-between font-normal">
             <span className="flex items-center gap-2 truncate">

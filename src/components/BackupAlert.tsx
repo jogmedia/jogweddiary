@@ -1,5 +1,6 @@
 import { useState } from "react";
-import { AlertTriangle, HardDrive, HardDriveDownload, MessageCircle } from "lucide-react";
+import { AlertTriangle, FileDown, HardDrive, HardDriveDownload, MessageCircle } from "lucide-react";
+import { exportPdf } from "@/lib/exporters";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Switch } from "@/components/ui/switch";

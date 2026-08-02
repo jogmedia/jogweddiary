@@ -5,7 +5,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { Button } from "@/components/ui/button";
-import { CrewPicker } from "@/components/CrewPicker";
+import { CrewPicker, type CrewMember } from "@/components/CrewPicker";
 import {
   useAssignments,
   useProjectEvents,
@@ -67,21 +67,25 @@ type Row = {
   location: string;
   name?: string;
   id?: string;
-  staffIds: string[];
+  crew: CrewMember[];
 };
 
-const emptyRow = (): Row => ({ enabled: false, date: "", time: "", location: "", staffIds: [] });
+const emptyRow = (): Row => ({ enabled: false, date: "", time: "", location: "", crew: [] });
 const emptyCustomRow = (): Row => ({
   enabled: true,
   date: "",
   time: "",
   location: "",
   name: "",
-  staffIds: [],
+  crew: [],
 });
 
-const crewFor = (assignments: Assignment[], eventId?: string) =>
-  eventId ? assignments.filter((a) => a.event_id === eventId).map((a) => a.staff_id) : [];
+const crewFor = (assignments: Assignment[], eventId?: string): CrewMember[] =>
+  eventId
+    ? assignments
+        .filter((a) => a.event_id === eventId)
+        .map((a) => ({ staffId: a.staff_id, role: a.role_in_project ?? a.staff?.role ?? null }))
+    : [];
 
 function buildRows(events: ProjectEvent[], assignments: Assignment[] = []) {
   const rows: Record<string, Row> = {};
@@ -94,7 +98,7 @@ function buildRows(events: ProjectEvent[], assignments: Assignment[] = []) {
           time: (e.event_time ?? "").slice(0, 5),
           location: e.location ?? "",
           id: e.id,
-          staffIds: crewFor(assignments, e.id),
+          crew: crewFor(assignments, e.id),
         }
       : emptyRow();
   });
@@ -111,7 +115,7 @@ function buildCustomRows(events: ProjectEvent[], assignments: Assignment[] = [])
       location: e.location ?? "",
       name: e.notes ?? "",
       id: e.id,
-      staffIds: crewFor(assignments, e.id),
+      crew: crewFor(assignments, e.id),
     }));
 }
 
@@ -166,19 +170,22 @@ export function ProjectDialog({
       .filter(([, r]) => r.enabled && r.date)
       .map(([key, r]) => ({ key, ...r }));
 
-  const syncCrew = async (pid: string, eventId: string, staffIds: string[]) => {
+  const syncCrew = async (pid: string, eventId: string, crew: CrewMember[]) => {
     const current = assignments.filter((a) => a.event_id === eventId);
     for (const a of current) {
-      if (!staffIds.includes(a.staff_id)) await delAssignment.mutateAsync(a.id);
+      if (!crew.some((c) => c.staffId === a.staff_id)) await delAssignment.mutateAsync(a.id);
     }
-    for (const sid of staffIds) {
-      if (current.some((a) => a.staff_id === sid)) continue;
-      const member = staff.find((s) => s.id === sid);
+    for (const c of crew) {
+      const existing = current.find((a) => a.staff_id === c.staffId);
+      const member = staff.find((s) => s.id === c.staffId);
+      const role = c.role ?? member?.role ?? null;
+      if (existing && existing.role_in_project === role) continue;
       await saveAssignment.mutateAsync({
+        ...(existing ? { id: existing.id } : {}),
         project_id: pid,
         event_id: eventId,
-        staff_id: sid,
-        role_in_project: member?.role ?? null,
+        staff_id: c.staffId,
+        role_in_project: role,
       });
     }
   };
@@ -206,7 +213,7 @@ export function ProjectDialog({
           event_time: row.time || null,
           location: row.location || null,
         })) as string;
-        if (evId) await syncCrew(pid, evId, row.staffIds ?? []);
+        if (evId) await syncCrew(pid, evId, row.crew ?? []);
       } else if (row.id) {
         await delEvent.mutateAsync(row.id);
       }
@@ -223,7 +230,7 @@ export function ProjectDialog({
           location: row.location || null,
           notes: row.name || "Custom event",
         })) as string;
-        if (evId) await syncCrew(pid, evId, row.staffIds ?? []);
+        if (evId) await syncCrew(pid, evId, row.crew ?? []);
       } else if (row.id) {
         await delEvent.mutateAsync(row.id);
       }
@@ -293,8 +300,8 @@ export function ProjectDialog({
                       <div className="sm:col-span-2">
                         <CrewPicker
                           staff={staff}
-                          value={row.staffIds ?? []}
-                          onChange={(ids) => setRow(s.type, { staffIds: ids })}
+                          value={row.crew ?? []}
+                          onChange={(crew) => setRow(s.type, { crew })}
                           date={row.date}
                           projectId={projectId}
                         />
@@ -350,8 +357,8 @@ export function ProjectDialog({
                         <div className="sm:col-span-2">
                           <CrewPicker
                             staff={staff}
-                            value={row.staffIds ?? []}
-                            onChange={(ids) => setCustomRow(index, { staffIds: ids })}
+                            value={row.crew ?? []}
+                            onChange={(crew) => setCustomRow(index, { crew })}
                             date={row.date}
                             projectId={projectId}
                           />

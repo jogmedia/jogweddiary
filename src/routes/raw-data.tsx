@@ -143,7 +143,36 @@ function RawDataPage() {
         <StatCard label="Backed up" value={String(doneCount)} tone="success" hint="Stored on hard disks" />
       </div>
 
-      <div className="mt-6 flex flex-wrap items-center gap-2">
+      <div className="surface mt-6 p-3">
+        <div className="relative">
+          <Search className="pointer-events-none absolute left-3 top-1/2 h-5 w-5 -translate-y-1/2 text-primary" />
+          <Input
+            type="search"
+            aria-label="Search raw data by client, event, folder or hard disk"
+            className="h-12 pl-11 pr-24 text-base"
+            placeholder="Search client, event, folder name or Hard Disk 3…"
+            value={q}
+            onChange={(e) => setQ(e.target.value)}
+          />
+          {q ? (
+            <Button
+              size="sm"
+              variant="ghost"
+              className="absolute right-2 top-1/2 h-8 -translate-y-1/2 px-2 text-xs"
+              onClick={() => setQ("")}
+            >
+              Clear
+            </Button>
+          ) : null}
+        </div>
+        {q.trim() ? (
+          <p className="mt-2 text-xs text-muted-foreground">
+            {rows.length} {rows.length === 1 ? "shoot" : "shoots"} matching “{q.trim()}”
+          </p>
+        ) : null}
+      </div>
+
+      <div className="mt-4 flex flex-wrap items-center gap-2">
         {([
           { key: "all", label: "All Drives" },
           { key: "done", label: "Backed Up" },
@@ -159,7 +188,7 @@ function RawDataPage() {
           </Button>
         ))}
         <Select value={disk} onValueChange={setDisk}>
-          <SelectTrigger className="h-9 w-full sm:w-52">
+          <SelectTrigger className="h-9 w-full sm:ml-auto sm:w-52">
             <SelectValue placeholder="Filter by Hard Disk" />
           </SelectTrigger>
           <SelectContent>
@@ -171,15 +200,6 @@ function RawDataPage() {
             ))}
           </SelectContent>
         </Select>
-        <div className="relative ml-auto w-full sm:w-64">
-          <Search className="pointer-events-none absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
-          <Input
-            className="pl-8"
-            placeholder="Search client, project, disk or folder"
-            value={q}
-            onChange={(e) => setQ(e.target.value)}
-          />
-        </div>
       </div>
 
       {/* Hidden source for the PDF export */}

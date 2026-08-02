@@ -1,12 +1,13 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
-import { AlertTriangle, ChevronLeft, ChevronRight } from "lucide-react";
+import { AlertTriangle, ChevronLeft, ChevronRight, Users } from "lucide-react";
 import { AppShell } from "@/components/AppShell";
 import { PageHeader } from "@/components/ui-kit";
 import { Button } from "@/components/ui/button";
 import { useProjectEvents, useProjects } from "@/lib/db";
 import { fmtDate, inr } from "@/lib/format";
 import { eventLabel, eventMeta, fmtTime } from "@/lib/whatsapp";
+import { useCrewBookings } from "@/lib/crew";
 
 export const Route = createFileRoute("/calendar")({
   head: () => ({
@@ -48,6 +49,7 @@ const TONE_CLASS: Record<Item["tone"], string> = {
 function CalendarPage() {
   const { data: projects = [] } = useProjects();
   const { data: events = [] } = useProjectEvents();
+  const { byDate } = useCrewBookings();
   const [cursor, setCursor] = useState(() => {
     const d = new Date();
     return new Date(d.getFullYear(), d.getMonth(), 1);
@@ -108,6 +110,28 @@ function CalendarPage() {
         .sort((a, b) => a[0] - b[0]),
     [byDay],
   );
+
+  const monthKey = `${cursor.getFullYear()}-${String(cursor.getMonth() + 1).padStart(2, "0")}`;
+  const crewByDay = useMemo(() => {
+    const map = new Map<number, { name: string; role: string | null; projectName: string; conflict: boolean }[]>();
+    Array.from(byDate.entries())
+      .filter(([date]) => date.startsWith(monthKey))
+      .forEach(([date, list]) => {
+        const day = Number(date.slice(8, 10));
+        const perStaff = new Map<string, typeof list>();
+        list.forEach((b) => perStaff.set(b.staffId, [...(perStaff.get(b.staffId) ?? []), b]));
+        map.set(
+          day,
+          Array.from(perStaff.values()).map((rows) => ({
+            name: rows[0].staffName,
+            role: rows[0].role,
+            projectName: Array.from(new Set(rows.map((r) => r.projectName))).join(" + "),
+            conflict: new Set(rows.map((r) => r.projectId)).size > 1,
+          })),
+        );
+      });
+    return map;
+  }, [byDate, monthKey]);
 
   const first = new Date(cursor.getFullYear(), cursor.getMonth(), 1);
   const daysInMonth = new Date(cursor.getFullYear(), cursor.getMonth() + 1, 0).getDate();
@@ -191,11 +215,64 @@ function CalendarPage() {
                   {list.length > 3 && (
                     <p className="text-[10px] text-muted-foreground">+{list.length - 3} more</p>
                   )}
+                  {(crewByDay.get(day)?.length ?? 0) > 0 && (
+                    <p
+                      className={`flex items-center gap-0.5 text-[10px] ${
+                        crewByDay.get(day)!.some((c) => c.conflict)
+                          ? "text-destructive"
+                          : "text-muted-foreground"
+                      }`}
+                      title={crewByDay
+                        .get(day)!
+                        .map((c) => `${c.name} — ${c.projectName}`)
+                        .join(", ")}
+                    >
+                      <Users className="h-2.5 w-2.5" />
+                      {crewByDay.get(day)!.length} booked
+                    </p>
+                  )}
                 </div>
               </div>
             );
           })}
         </div>
+      </div>
+
+      <div className="surface mt-6 divide-y divide-border">
+        <p className="flex items-center gap-2 p-3 text-sm font-semibold">
+          <Users className="h-4 w-4 text-primary" />
+          Crew availability — booked days
+        </p>
+        {crewByDay.size === 0 && (
+          <p className="p-6 text-center text-sm text-muted-foreground">
+            No crew assigned to any shoot this month.
+          </p>
+        )}
+        {Array.from(crewByDay.entries())
+          .sort((a, b) => a[0] - b[0])
+          .map(([day, crew]) => (
+            <div key={day} className="p-3">
+              <p className="mb-1.5 text-xs font-medium text-muted-foreground">
+                {day} {cursor.toLocaleDateString("en-IN", { month: "short", year: "numeric" })}
+              </p>
+              <div className="flex flex-wrap gap-1.5">
+                {crew.map((c) => (
+                  <span
+                    key={c.name + c.projectName}
+                    className={`rounded-full border px-2 py-0.5 text-[11px] ${
+                      c.conflict
+                        ? "border-destructive/30 bg-destructive/10 text-destructive"
+                        : "border-border bg-muted/40 text-foreground"
+                    }`}
+                  >
+                    {c.conflict && "⚠️ "}
+                    {c.name}
+                    {c.role ? ` — ${c.role.replace(/_/g, " ")}` : ""} · Booked ({c.projectName})
+                  </span>
+                ))}
+              </div>
+            </div>
+          ))}
       </div>
 
       <div className="surface mt-6 divide-y divide-border">

@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { EditCrewDialog } from "@/components/EditCrewDialog";
 import { useAssignments, useProjectEvents, useProjects } from "@/lib/db";
 import { fmtDate } from "@/lib/format";
+import { prettyRole } from "@/lib/roles";
 import { buildCrewMessage, eventLabel, eventMeta, fmtTime, openWhatsApp } from "@/lib/whatsapp";
 
 type Props = {
@@ -68,7 +69,7 @@ export function ShootDay({ date, title, empty = "No shoots scheduled for Today /
           id: a.id,
           name: a.staff?.name ?? "Crew",
           phone: a.staff?.phone ?? null,
-          role: a.role_in_project || a.staff?.role || "Crew",
+          role: prettyRole(a.role_in_project ?? a.staff?.role),
           message: buildCrewMessage(
             {
               event_type: "wedding_day",

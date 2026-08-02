@@ -144,6 +144,13 @@ function Dashboard() {
         />
       </div>
 
+      {/* 1b. Tomorrow's shoot */}
+      <div className="mt-4">
+        <TomorrowShoot />
+      </div>
+
+
+
       {/* 2. Upcoming events */}
       <div className="mt-4 grid gap-4">
         <ListCard

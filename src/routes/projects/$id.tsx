@@ -107,6 +107,10 @@ function ProjectDetail() {
 
   const [editOpen, setEditOpen] = useState(false);
   const [receipt, setReceipt] = useState<any | null>(null);
+  const [driveEdit, setDriveEdit] = useState<string | null>(null);
+  const drive = driveEdit ?? project?.backup_drive ?? "";
+  const setDrive = (v: string) => setDriveEdit(v);
+
 
   const totals = useMemo(() => {
     const received = payments.reduce((a, p) => a + Number(p.amount ?? 0), 0);

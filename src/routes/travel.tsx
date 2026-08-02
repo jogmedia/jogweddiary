@@ -9,7 +9,10 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { fmtDate } from "@/lib/format";
 import { eventLabel } from "@/lib/whatsapp";
-import { useProjectEvents, useProjects } from "@/lib/db";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { prettyRole } from "@/lib/roles";
+import { hasTicketInfo, sendTicketWhatsApp } from "@/lib/travel-share";
+import { useAssignments, useProjectEvents, useProjects } from "@/lib/db";
 import type { Project, ProjectEvent } from "@/lib/db";
 
 export const Route = createFileRoute("/travel")({
@@ -48,11 +51,13 @@ type Row = {
   project: Project;
   date: string;
   subEvent: string;
+  eventId: string | null;
 };
 
 function TravelPage() {
   const { data: projects = [], isLoading } = useProjects();
   const { data: events = [] } = useProjectEvents();
+  const { data: assignments = [] } = useAssignments();
   const [tab, setTab] = useState<Tab>("all");
   const [q, setQ] = useState("");
 
@@ -68,10 +73,12 @@ function TravelPage() {
     trips.forEach((p) => {
       const evs = (byProject.get(p.id) ?? []).slice().sort((a, b) => a.event_date.localeCompare(b.event_date));
       if (evs.length === 0) {
-        out.push({ key: p.id, project: p, date: p.event_date, subEvent: "Main event" });
+        out.push({ key: p.id, project: p, date: p.event_date, subEvent: "Main event", eventId: null });
         return;
       }
-      evs.forEach((e) => out.push({ key: e.id, project: p, date: e.event_date, subEvent: eventLabel(e) }));
+      evs.forEach((e) =>
+        out.push({ key: e.id, project: p, date: e.event_date, subEvent: eventLabel(e), eventId: e.id }),
+      );
     });
     return out.sort((a, b) => a.date.localeCompare(b.date));
   }, [projects, events]);
@@ -163,7 +170,7 @@ function TravelPage() {
         <EmptyState message="No travel records match this filter." />
       ) : (
         <div className="surface overflow-x-auto p-0">
-          <table className="w-full min-w-[900px] text-sm">
+          <table className="w-full min-w-[1040px] text-sm">
             <thead>
               <tr className="border-b border-border text-left text-xs uppercase tracking-wide text-muted-foreground">
                 <th className="px-4 py-3 font-medium">Client / Project</th>
@@ -173,6 +180,7 @@ function TravelPage() {
                 <th className="px-4 py-3 font-medium">PNR / ticket notes</th>
                 <th className="px-4 py-3 font-medium">Status</th>
                 <th className="px-4 py-3 font-medium">Ticket file</th>
+                <th className="px-4 py-3 font-medium">Send to crew</th>
               </tr>
             </thead>
             <tbody>
@@ -210,6 +218,14 @@ function TravelPage() {
                       <span className="text-xs text-muted-foreground">No file</span>
                     )}
                   </td>
+                  <td className="px-4 py-3">
+                    <SendTicketButton
+                      row={r}
+                      crew={assignments.filter((a) =>
+                        r.eventId ? a.event_id === r.eventId : a.project_id === r.project.id && !a.event_id,
+                      )}
+                    />
+                  </td>
                 </tr>
               ))}
             </tbody>
@@ -217,5 +233,65 @@ function TravelPage() {
         </div>
       )}
     </AppShell>
+  );
+}
+
+function SendTicketButton({
+  row,
+  crew,
+}: {
+  row: Row;
+  crew: { id: string; staff?: { name: string; phone: string | null; role: string } | null; role_in_project?: string | null }[];
+}) {
+  const send = (phone?: string | null, name?: string | null) =>
+    void sendTicketWhatsApp({
+      phone,
+      crewName: name,
+      clientName: row.project.clients?.name ?? row.project.project_name,
+      eventName: row.subEvent,
+      date: row.date,
+      project: row.project,
+    });
+
+  if (!hasTicketInfo(row.project))
+    return <span className="text-xs text-muted-foreground">—</span>;
+
+  return (
+    <Popover>
+      <PopoverTrigger asChild>
+        <Button size="sm" className="h-8 whitespace-nowrap bg-[hsl(142_70%_35%)] text-xs text-white hover:bg-[hsl(142_70%_29%)]">
+          📱 Send Ticket via WhatsApp
+        </Button>
+      </PopoverTrigger>
+      <PopoverContent align="end" className="w-72 p-2">
+        <p className="px-1 pb-1.5 text-xs font-medium text-muted-foreground">Assigned crew</p>
+        {crew.length === 0 ? (
+          <p className="px-1 pb-2 text-xs text-muted-foreground">No crew assigned for this event yet.</p>
+        ) : (
+          <ul className="max-h-56 space-y-1 overflow-y-auto">
+            {crew.map((a) => (
+              <li key={a.id} className="flex items-center justify-between gap-2 rounded-md px-1 py-1">
+                <div className="min-w-0">
+                  <p className="truncate text-sm font-medium">{a.staff?.name ?? "Crew"}</p>
+                  <p className="truncate text-[11px] capitalize text-muted-foreground">
+                    {prettyRole(a.role_in_project ?? a.staff?.role)}
+                  </p>
+                </div>
+                <Button
+                  size="sm"
+                  className="h-7 shrink-0 bg-[hsl(142_70%_35%)] px-2 text-[11px] text-white hover:bg-[hsl(142_70%_29%)]"
+                  onClick={() => send(a.staff?.phone, a.staff?.name)}
+                >
+                  Send
+                </Button>
+              </li>
+            ))}
+          </ul>
+        )}
+        <Button variant="outline" size="sm" className="mt-2 w-full text-xs" onClick={() => send(null, null)}>
+          Share to any number / group
+        </Button>
+      </PopoverContent>
+    </Popover>
   );
 }

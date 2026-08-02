@@ -24,6 +24,7 @@ export function ShootDay({ date, title, empty = "No shoots scheduled for Today /
   type Item = {
     key: string;
     projectId: string;
+    eventId: string | null;
     title: string;
     client: string;
     venue: string | null;
@@ -31,6 +32,7 @@ export function ShootDay({ date, title, empty = "No shoots scheduled for Today /
     reporting: string;
     crew: { id: string; name: string; phone: string | null; role: string; message: string }[];
   };
+
 
   const items: Item[] = [
     ...evs.map((e) => {

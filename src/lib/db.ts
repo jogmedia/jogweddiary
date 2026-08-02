@@ -29,6 +29,8 @@ export type Project = {
   payment_due_date: string | null;
   payment_status: string;
   raw_backup_done?: boolean;
+  backup_drive?: string | null;
+
   photo_selection_done?: boolean;
   album_editing_done?: boolean;
   video_editing_done?: boolean;

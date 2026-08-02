@@ -2,11 +2,10 @@ import { useState } from "react";
 import { AlertTriangle, FileDown, HardDrive, HardDriveDownload, MessageCircle } from "lucide-react";
 import { exportPdf } from "@/lib/exporters";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { Switch } from "@/components/ui/switch";
 import { fmtDate, todayISO } from "@/lib/format";
 import { openWhatsApp } from "@/lib/whatsapp";
-import { DRIVE_OPTIONS } from "@/lib/drives";
+import { DrivePicker } from "@/components/DrivePicker";
 import { useAssignments, useProjects, useUpsert } from "@/lib/db";
 import type { Assignment, Project } from "@/lib/db";
 

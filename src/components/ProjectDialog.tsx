@@ -263,6 +263,22 @@ export function ProjectDialog({
     });
     const pid = (projectId ?? id) as string;
 
+    // Auto-record the advance as the first received payment, credited to the chosen account.
+    const advance = Number(values.advance_amount ?? 0);
+    const alreadyLogged = existingPayments.some((p) => (p.reference_no ?? "") === ADVANCE_REF);
+    if (pid && advance > 0 && !alreadyLogged) {
+      await savePayment.mutateAsync({
+        project_id: pid,
+        payment_date: (primaryDate && primaryDate < todayISO() ? primaryDate : todayISO()),
+        amount: advance,
+        payment_mode: modeForAccount(values.advance_account),
+        account: values.advance_account ?? null,
+        reference_no: ADVANCE_REF,
+        notes: "Advance received on booking (auto-recorded)",
+      });
+    }
+
+
     for (const [key, row] of Object.entries(rows)) {
       if (row.enabled && row.date) {
         const evId = (await saveEvent.mutateAsync({

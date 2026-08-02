@@ -24,7 +24,7 @@ import {
 } from "lucide-react";
 import { AppShell } from "@/components/AppShell";
 import { BackupAlert } from "@/components/BackupAlert";
-import { TomorrowShoot } from "@/components/TomorrowShoot";
+import { ShootDay } from "@/components/ShootDay";
 
 import { PageHeader, StatCard, StatusBadge } from "@/components/ui-kit";
 import {

@@ -1,21 +1,27 @@
+import { useState } from "react";
 import { AlertTriangle, HardDriveDownload, MessageCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import { Switch } from "@/components/ui/switch";
 import { fmtDate, todayISO } from "@/lib/format";
 import { openWhatsApp } from "@/lib/whatsapp";
+import { DRIVE_OPTIONS } from "@/lib/drives";
 import { useAssignments, useProjects, useUpsert } from "@/lib/db";
 import type { Assignment, Project } from "@/lib/db";
 
 const reminderMsg = (crew: string, client: string, date: string) =>
   `Hi ${crew}, please upload/handover the raw data for ${client}'s shoot held on ${fmtDate(date)}. Backup is currently pending.`;
 
-const doneMsg = (crew: string, client: string, date: string) =>
-  `Hi ${crew}, Raw Data Backup for ${client}'s shoot (${fmtDate(date)}) has been successfully completed and verified. Thank you!`;
+const doneMsg = (crew: string, client: string, date: string, drive?: string) =>
+  `Hi ${crew}, Raw Data Backup for ${client}'s shoot (${fmtDate(date)}) has been successfully completed and verified${
+    drive ? ` (stored on ${drive})` : ""
+  }. Thank you!`;
 
 export function BackupAlert() {
   const { data: projects = [] } = useProjects();
   const { data: assignments = [] } = useAssignments();
   const save = useUpsert("projects", "Backup status");
+  const [drives, setDrives] = useState<Record<string, string>>({});
   const today = todayISO();
 
   const pending = projects.filter(
@@ -31,14 +37,16 @@ export function BackupAlert() {
   const clientName = (p: Project) => p.clients?.name ?? p.project_name;
 
   const markDone = (p: Project, notify?: Assignment) => {
-    save.mutate({ id: p.id, raw_backup_done: true });
+    const drive = (drives[p.id] ?? p.backup_drive ?? "").trim();
+    save.mutate({ id: p.id, raw_backup_done: true, backup_drive: drive || null });
     if (notify?.staff?.phone) {
       openWhatsApp(
         notify.staff.phone,
-        doneMsg(notify.staff.name ?? "team", clientName(p), p.event_date),
+        doneMsg(notify.staff.name ?? "team", clientName(p), p.event_date, drive),
       );
     }
   };
+
 
   return (
     <div className="mb-4 rounded-[18px] border-2 border-destructive/50 bg-destructive/10 p-4">

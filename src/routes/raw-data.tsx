@@ -1,6 +1,6 @@
 import { useMemo, useState } from "react";
 import { createFileRoute } from "@tanstack/react-router";
-import { FileDown, HardDrive, HardDriveDownload, Search } from "lucide-react";
+import { FileDown, HardDrive, HardDriveDownload, MessageCircle, Pencil, Search } from "lucide-react";
 import { AppShell } from "@/components/AppShell";
 import { EmptyState, PageHeader, StatCard } from "@/components/ui-kit";
 import { DrivePicker } from "@/components/DrivePicker";
@@ -17,7 +17,8 @@ import {
 import { DRIVE_OPTIONS } from "@/lib/drives";
 import { exportPdf } from "@/lib/exporters";
 import { fmtDate, todayISO } from "@/lib/format";
-import { useProjects, useUpsert } from "@/lib/db";
+import { openWhatsApp } from "@/lib/whatsapp";
+import { useAssignments, useProjects, useUpsert } from "@/lib/db";
 import type { Project } from "@/lib/db";
 
 export const Route = createFileRoute("/raw-data")({
@@ -45,18 +46,27 @@ type Filter = "all" | "pending" | "done";
 
 const ALL_DISKS = "__all__";
 
+const backupMsg = (crew: string, client: string, date: string, drive: string, folder: string) =>
+  `Hi ${crew}, raw data for ${client}'s shoot (${fmtDate(date)}) is ready.\n\nHard Disk: ${
+    drive || "not assigned"
+  }\nFolder: ${folder || "not assigned"}\n\nPlease start the editing work. - JOG MEDIA`;
+
 function RawDataPage() {
   const { data: projects = [], isLoading } = useProjects();
+  const { data: assignments = [] } = useAssignments();
   const save = useUpsert("projects", "Backup status");
   const [drives, setDrives] = useState<Record<string, string>>({});
   const [folders, setFolders] = useState<Record<string, string>>({});
   const [filter, setFilter] = useState<Filter>("all");
   const [disk, setDisk] = useState<string>(ALL_DISKS);
   const [q, setQ] = useState("");
+  const [editing, setEditing] = useState<Record<string, boolean>>({});
+  const [sharing, setSharing] = useState<Record<string, boolean>>({});
   const today = todayISO();
 
   const clientName = (p: Project) => p.clients?.name ?? p.project_name;
   const driveOf = (p: Project) => (drives[p.id] ?? p.backup_drive ?? "").trim();
+  const crewFor = (p: Project) => assignments.filter((a) => a.project_id === p.id);
   const folderOf = (p: Project) => (folders[p.id] ?? p.backup_folder ?? "").trim();
 
   const shot = useMemo(

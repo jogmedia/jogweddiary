@@ -155,7 +155,9 @@ function ProjectsPage() {
                   </div>
                   <div className="rounded-lg bg-muted/60 p-2">
                     <p className="text-muted-foreground">Received</p>
-                    <p className="font-semibold">{inr(Number(p.total_amount) - Number(p.balance_due))}</p>
+                    <p className="font-semibold">
+                      {inr(Math.max(Number(p.total_amount ?? 0) - Number(p.balance_due ?? 0), 0))}
+                    </p>
                   </div>
                   <div className="rounded-lg bg-muted/60 p-2">
                     <p className="text-muted-foreground">Balance</p>

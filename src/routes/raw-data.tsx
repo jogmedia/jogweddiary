@@ -7,6 +7,14 @@ import { DrivePicker } from "@/components/DrivePicker";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Switch } from "@/components/ui/switch";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { DRIVE_OPTIONS } from "@/lib/drives";
 import { exportPdf } from "@/lib/exporters";
 import { fmtDate, todayISO } from "@/lib/format";
 import { useProjects, useUpsert } from "@/lib/db";
@@ -35,16 +43,21 @@ export const Route = createFileRoute("/raw-data")({
 
 type Filter = "all" | "pending" | "done";
 
+const ALL_DISKS = "__all__";
+
 function RawDataPage() {
   const { data: projects = [], isLoading } = useProjects();
   const save = useUpsert("projects", "Backup status");
   const [drives, setDrives] = useState<Record<string, string>>({});
-  const [filter, setFilter] = useState<Filter>("pending");
+  const [folders, setFolders] = useState<Record<string, string>>({});
+  const [filter, setFilter] = useState<Filter>("all");
+  const [disk, setDisk] = useState<string>(ALL_DISKS);
   const [q, setQ] = useState("");
   const today = todayISO();
 
   const clientName = (p: Project) => p.clients?.name ?? p.project_name;
   const driveOf = (p: Project) => (drives[p.id] ?? p.backup_drive ?? "").trim();
+  const folderOf = (p: Project) => (folders[p.id] ?? p.backup_folder ?? "").trim();
 
   const shot = useMemo(
     () =>
@@ -61,16 +74,30 @@ function RawDataPage() {
   const pendingCount = shot.filter((p) => !p.raw_backup_done).length;
   const doneCount = shot.filter((p) => p.raw_backup_done).length;
 
+  const diskOptions = useMemo(() => {
+    const used = new Set(shot.map((p) => (p.backup_drive ?? "").trim()).filter(Boolean));
+    return [...DRIVE_OPTIONS.filter((d) => used.has(d)), ...[...used].filter((d) => !DRIVE_OPTIONS.includes(d))];
+  }, [shot]);
+
   const rows = shot.filter((p) => {
     if (filter === "pending" && p.raw_backup_done) return false;
     if (filter === "done" && !p.raw_backup_done) return false;
+    if (disk !== ALL_DISKS && (p.backup_drive ?? "").trim() !== disk) return false;
     if (!q.trim()) return true;
-    const hay = `${clientName(p)} ${p.project_name} ${driveOf(p)}`.toLowerCase();
+    const hay = `${clientName(p)} ${p.project_name} ${driveOf(p)} ${folderOf(p)}`.toLowerCase();
     return hay.includes(q.trim().toLowerCase());
   });
 
   const toggle = (p: Project, done: boolean) =>
-    save.mutate({ id: p.id, raw_backup_done: done, backup_drive: driveOf(p) || null });
+    save.mutate({
+      id: p.id,
+      raw_backup_done: done,
+      backup_drive: driveOf(p) || null,
+      backup_folder: folderOf(p) || null,
+    });
+
+  const dirty = (p: Project) =>
+    driveOf(p) !== (p.backup_drive ?? "").trim() || folderOf(p) !== (p.backup_folder ?? "").trim();
 
   return (
     <AppShell>
@@ -96,22 +123,38 @@ function RawDataPage() {
       </div>
 
       <div className="mt-6 flex flex-wrap items-center gap-2">
-        {(["pending", "done", "all"] as Filter[]).map((f) => (
+        {([
+          { key: "all", label: "All Drives" },
+          { key: "done", label: "Backed Up" },
+          { key: "pending", label: "Pending Backup" },
+        ] as { key: Filter; label: string }[]).map((f) => (
           <Button
-            key={f}
+            key={f.key}
             size="sm"
-            variant={filter === f ? "default" : "outline"}
-            onClick={() => setFilter(f)}
-            className="capitalize"
+            variant={filter === f.key ? "default" : "outline"}
+            onClick={() => setFilter(f.key)}
           >
-            {f === "done" ? "Backed up" : f}
+            {f.label}
           </Button>
         ))}
+        <Select value={disk} onValueChange={setDisk}>
+          <SelectTrigger className="h-9 w-full sm:w-52">
+            <SelectValue placeholder="Filter by Hard Disk" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value={ALL_DISKS}>Filter by Hard Disk: All</SelectItem>
+            {diskOptions.map((d) => (
+              <SelectItem key={d} value={d}>
+                {d}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
         <div className="relative ml-auto w-full sm:w-64">
           <Search className="pointer-events-none absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
           <Input
             className="pl-8"
-            placeholder="Search client, project or hard disk"
+            placeholder="Search client, project, disk or folder"
             value={q}
             onChange={(e) => setQ(e.target.value)}
           />
@@ -132,6 +175,7 @@ function RawDataPage() {
               <th align="left">Event Date</th>
               <th align="left">Backup Status</th>
               <th align="left">Hard Disk No.</th>
+              <th align="left">Folder Name</th>
             </tr>
           </thead>
           <tbody>
@@ -142,6 +186,7 @@ function RawDataPage() {
                 <td>{fmtDate(p.event_date)}</td>
                 <td>{p.raw_backup_done ? "Backed up" : "Pending"}</td>
                 <td>{driveOf(p) || "—"}</td>
+                <td>{folderOf(p) || "—"}</td>
               </tr>
             ))}
           </tbody>
@@ -179,6 +224,7 @@ function RawDataPage() {
               {driveOf(p) ? (
                 <p className="mt-2 inline-flex w-fit items-center gap-1.5 rounded-lg border border-success/30 bg-success/10 px-2 py-1 text-xs font-medium text-success">
                   <HardDrive className="h-3.5 w-3.5" /> Backup Location: {driveOf(p)}
+                  {folderOf(p) ? ` · Folder: ${folderOf(p)}` : ""}
                 </p>
               ) : null}
 
@@ -187,6 +233,15 @@ function RawDataPage() {
                 value={drives[p.id] ?? p.backup_drive ?? ""}
                 onChange={(v) => setDrives((d) => ({ ...d, [p.id]: v }))}
               />
+
+              <div className="mt-3">
+                <p className="mb-1 text-xs font-medium text-muted-foreground">Folder name</p>
+                <Input
+                  placeholder="e.g. JOG_2026_Akhil_Wedding"
+                  value={folders[p.id] ?? p.backup_folder ?? ""}
+                  onChange={(e) => setFolders((f) => ({ ...f, [p.id]: e.target.value }))}
+                />
+              </div>
 
               <div className="mt-auto flex flex-wrap items-center justify-between gap-2 border-t border-border pt-3">
                 <label className="flex items-center gap-2 text-xs">
@@ -200,8 +255,14 @@ function RawDataPage() {
                 <Button
                   size="sm"
                   variant="outline"
-                  disabled={save.isPending || driveOf(p) === (p.backup_drive ?? "")}
-                  onClick={() => save.mutate({ id: p.id, backup_drive: driveOf(p) || null })}
+                  disabled={save.isPending || !dirty(p)}
+                  onClick={() =>
+                    save.mutate({
+                      id: p.id,
+                      backup_drive: driveOf(p) || null,
+                      backup_folder: folderOf(p) || null,
+                    })
+                  }
                 >
                   <HardDriveDownload className="mr-1.5 h-4 w-4" /> Save disk
                 </Button>

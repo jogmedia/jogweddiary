@@ -44,12 +44,13 @@ export function WorkBrief({
   return (
     <div
       style={{
-        width: 760,
+        width: 740,
         background: "#FFFFFF",
         color: TEXT,
         fontFamily: "Inter, Arial, sans-serif",
-        padding: 28,
+        padding: 24,
         boxSizing: "border-box",
+        overflow: "hidden",
       }}
     >
       {/* Header */}
@@ -58,16 +59,18 @@ export function WorkBrief({
           display: "flex",
           justifyContent: "space-between",
           alignItems: "flex-start",
+          gap: 16,
           borderBottom: `3px solid ${BRAND}`,
           paddingBottom: 14,
           marginBottom: 18,
         }}
       >
-        <div style={{ display: "flex", gap: 12, alignItems: "center" }}>
+        <div style={{ display: "flex", gap: 12, alignItems: "center", minWidth: 0, flex: "1 1 auto" }}>
           <div
             style={{
               width: 54,
               height: 54,
+              flexShrink: 0,
               borderRadius: 12,
               background: SOFT,
               border: `1px solid ${BORDER}`,
@@ -81,8 +84,8 @@ export function WorkBrief({
           >
             JM
           </div>
-          <div>
-            <div style={{ fontSize: 22, fontWeight: 700, letterSpacing: 0.5 }}>{business}</div>
+          <div style={{ minWidth: 0 }}>
+            <div style={{ fontSize: 20, fontWeight: 700, letterSpacing: 0.3 }}>{business}</div>
             <div style={{ fontSize: 11, color: MUTED }}>
               {settings?.address ?? "Kozhikode, Kerala, India"}
             </div>
@@ -91,13 +94,14 @@ export function WorkBrief({
             </div>
           </div>
         </div>
-        <div style={{ textAlign: "right" }}>
-          <div style={{ fontSize: 13, fontWeight: 700, color: BRAND, letterSpacing: 1 }}>
+        <div style={{ textAlign: "right", flexShrink: 0, whiteSpace: "nowrap" }}>
+          <div style={{ fontSize: 12, fontWeight: 700, color: BRAND, letterSpacing: 0.6 }}>
             WEDDING EVENT BRIEF
           </div>
           <div style={{ fontSize: 11, color: MUTED }}>Generated {fmtDate(new Date().toISOString())}</div>
         </div>
       </div>
+
 
       {/* Client card */}
       <div

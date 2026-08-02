@@ -15,10 +15,10 @@ export async function downloadElementPdf(elementId: string, filename: string) {
   try {
     await html2pdf()
       .set({
-        margin: [10, 10, 12, 10],
+        margin: [8, 6, 10, 6],
         filename: `${filename}.pdf`,
         image: { type: "jpeg", quality: 0.98 },
-        html2canvas: { scale: 2, useCORS: true, backgroundColor: "#ffffff" },
+        html2canvas: { scale: 2, useCORS: true, backgroundColor: "#ffffff", windowWidth: 800 },
         jsPDF: { unit: "mm", format: "a4", orientation: "portrait" },
         pagebreak: { mode: ["css", "legacy"] },
       })

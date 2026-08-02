@@ -78,6 +78,8 @@ type Travel = {
   travel_booking_status: string;
   travel_mode: string;
   travel_notes: string;
+  travel_ticket_path: string | null;
+  travel_ticket_name: string | null;
 };
 
 const buildTravel = (initial?: Record<string, any>): Travel => ({
@@ -85,6 +87,8 @@ const buildTravel = (initial?: Record<string, any>): Travel => ({
   travel_booking_status: initial?.travel_booking_status ?? "not_needed",
   travel_mode: initial?.travel_mode ?? "",
   travel_notes: initial?.travel_notes ?? "",
+  travel_ticket_path: initial?.travel_ticket_path ?? null,
+  travel_ticket_name: initial?.travel_ticket_name ?? null,
 });
 
 const SUB_EVENTS = [

@@ -197,6 +197,8 @@ export function ProjectDialog({
   const delEvent = useRemove("project_events", "Event");
   const saveAssignment = useUpsert("project_assignments", "Crew assignment");
   const delAssignment = useRemove("project_assignments", "Crew assignment");
+  const savePayment = useUpsert("project_payments", "Payment");
+  const { data: existingPayments = [] } = usePayments(projectId);
   const [rows, setRows] = useState<Record<string, Row>>(() => buildRows(events, assignments));
   const [customEvents, setCustomEvents] = useState<Row[]>(() => buildCustomRows(events, assignments));
   const [travel, setTravel] = useState<Travel>(() => buildTravel(initial));

@@ -295,6 +295,8 @@ export function ProjectDialog({
                           staff={staff}
                           value={row.staffIds ?? []}
                           onChange={(ids) => setRow(s.type, { staffIds: ids })}
+                          date={row.date}
+                          projectId={projectId}
                         />
                       </div>
                     </div>
@@ -350,6 +352,8 @@ export function ProjectDialog({
                             staff={staff}
                             value={row.staffIds ?? []}
                             onChange={(ids) => setCustomRow(index, { staffIds: ids })}
+                            date={row.date}
+                            projectId={projectId}
                           />
                         </div>
                       </div>

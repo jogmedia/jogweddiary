@@ -16,6 +16,9 @@ import { AppShell } from "@/components/AppShell";
 import { EmptyState, PageHeader, StatCard, StatusBadge } from "@/components/ui-kit";
 import { RecordDialog, type Field } from "@/components/RecordDialog";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { DRIVE_OPTIONS } from "@/lib/drives";
+
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
   useAssignments,
@@ -107,6 +110,10 @@ function ProjectDetail() {
 
   const [editOpen, setEditOpen] = useState(false);
   const [receipt, setReceipt] = useState<any | null>(null);
+  const [driveEdit, setDriveEdit] = useState<string | null>(null);
+  const drive = driveEdit ?? project?.backup_drive ?? "";
+  const setDrive = (v: string) => setDriveEdit(v);
+
 
   const totals = useMemo(() => {
     const received = payments.reduce((a, p) => a + Number(p.amount ?? 0), 0);
@@ -295,7 +302,36 @@ function ProjectDetail() {
             );
           })}
         </div>
+        <div className="mt-3 border-t border-border pt-3">
+          <label className="text-xs font-medium" htmlFor="backup-drive">
+            Storage Device / Hard Disk Name
+          </label>
+          <div className="mt-1 flex flex-col gap-2 sm:flex-row">
+            <Input
+              id="backup-drive"
+              list="backup-drive-options"
+              className="h-9 text-sm"
+              placeholder="e.g. HDD-2 (8TB) or Cloud Server"
+              value={drive}
+              onChange={(e) => setDrive(e.target.value)}
+            />
+            <datalist id="backup-drive-options">
+              {DRIVE_OPTIONS.map((o) => (
+                <option key={o} value={o} />
+              ))}
+            </datalist>
+            <Button
+              variant="outline"
+              className="h-9 shrink-0"
+              disabled={saveProject.isPending || drive === (project.backup_drive ?? "")}
+              onClick={() => saveProject.mutate({ id, backup_drive: drive.trim() || null })}
+            >
+              Save drive
+            </Button>
+          </div>
+        </div>
       </div>
+
 
       <Tabs defaultValue="schedule">
         <TabsList className="mb-4 flex w-full flex-wrap justify-start">

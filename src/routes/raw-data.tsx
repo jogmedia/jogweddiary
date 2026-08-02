@@ -89,13 +89,24 @@ function RawDataPage() {
     return [...DRIVE_OPTIONS.filter((d) => used.has(d)), ...[...used].filter((d) => !DRIVE_OPTIONS.includes(d))];
   }, [shot]);
 
+  const matchesQuery = (p: Project) => {
+    const query = q.trim().toLowerCase();
+    if (!query) return true;
+    const hay = `${clientName(p)} ${p.project_name} ${p.venue ?? ""} ${driveOf(p)} ${folderOf(p)}`
+      .toLowerCase()
+      .replace(/[_\-.]/g, " ");
+    // every word typed must appear somewhere → "disk 3" and "hard disk 3" both work
+    return query
+      .replace(/[_\-.]/g, " ")
+      .split(/\s+/)
+      .every((word) => hay.includes(word));
+  };
+
   const rows = shot.filter((p) => {
     if (filter === "pending" && p.raw_backup_done) return false;
     if (filter === "done" && !p.raw_backup_done) return false;
     if (disk !== ALL_DISKS && (p.backup_drive ?? "").trim() !== disk) return false;
-    if (!q.trim()) return true;
-    const hay = `${clientName(p)} ${p.project_name} ${driveOf(p)} ${folderOf(p)}`.toLowerCase();
-    return hay.includes(q.trim().toLowerCase());
+    return matchesQuery(p);
   });
 
   const toggle = (p: Project, done: boolean) =>

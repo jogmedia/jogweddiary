@@ -1,6 +1,7 @@
 import { CalendarClock, MapPin } from "lucide-react";
 import { Link } from "@tanstack/react-router";
 import { Button } from "@/components/ui/button";
+import { EditCrewDialog } from "@/components/EditCrewDialog";
 import { useAssignments, useProjectEvents, useProjects } from "@/lib/db";
 import { fmtDate } from "@/lib/format";
 import { buildCrewMessage, eventLabel, eventMeta, fmtTime, openWhatsApp } from "@/lib/whatsapp";
@@ -50,6 +51,7 @@ export function ShootDay({ date, title, empty = "No shoots scheduled for Today /
       return {
         key: e.id,
         projectId: e.project_id,
+        eventId: e.id,
         title: `${eventMeta(e.event_type).emoji} ${eventLabel(e)} — ${e.projects?.project_name ?? project?.project_name ?? "Project"}`,
         client: clientName,
         venue: e.location,
@@ -80,6 +82,7 @@ export function ShootDay({ date, title, empty = "No shoots scheduled for Today /
       return {
         key: p.id,
         projectId: p.id,
+        eventId: null,
         title: `💍 ${p.project_name}`,
         client: clientName,
         venue: p.venue,
@@ -104,10 +107,18 @@ export function ShootDay({ date, title, empty = "No shoots scheduled for Today /
         <div className="grid gap-3">
           {items.map((it) => (
             <div key={it.key} className="rounded-xl border border-border p-3">
-              <Link to="/projects/$id" params={{ id: it.projectId }} className="block">
-                <p className="text-sm font-semibold">{it.title}</p>
-                <p className="text-xs text-muted-foreground">Client: {it.client}</p>
-              </Link>
+              <div className="flex items-start justify-between gap-2">
+                <Link to="/projects/$id" params={{ id: it.projectId }} className="block min-w-0">
+                  <p className="text-sm font-semibold">{it.title}</p>
+                  <p className="text-xs text-muted-foreground">Client: {it.client}</p>
+                </Link>
+                <EditCrewDialog
+                  projectId={it.projectId}
+                  eventId={it.eventId}
+                  date={date}
+                  title={it.title}
+                />
+              </div>
               <div className="mt-1 flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-muted-foreground">
                 <span className="inline-flex items-center gap-1">
                   <MapPin className="h-3.5 w-3.5" /> {it.venue || "Venue TBD"}

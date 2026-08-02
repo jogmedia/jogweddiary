@@ -409,6 +409,7 @@ export function ProjectDialog({
             </Button>
           </div>
         </div>
+        </>
       }
     />
   );

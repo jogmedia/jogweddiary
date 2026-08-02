@@ -1,10 +1,18 @@
 import { useState, type ReactNode } from "react";
-import { CalendarDays, Plus, Trash2 } from "lucide-react";
+import { CalendarDays, Plane, Plus, Trash2 } from "lucide-react";
 import { RecordDialog, type Field } from "@/components/RecordDialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { Button } from "@/components/ui/button";
+import { Textarea } from "@/components/ui/textarea";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { CrewPicker, type CrewMember } from "@/components/CrewPicker";
 import {
   useAssignments,
@@ -50,6 +58,34 @@ export function projectFields(clients: { id: string; name: string }[]): Field[] 
     { name: "notes", label: "Notes", type: "textarea" },
   ];
 }
+
+const BOOKING_STATUS = [
+  { value: "pending", label: "Pending / Not Booked" },
+  { value: "booked", label: "Booked" },
+  { value: "not_needed", label: "Not Needed" },
+];
+
+const TRAVEL_MODES = [
+  { value: "train", label: "Train" },
+  { value: "flight", label: "Flight" },
+  { value: "bus", label: "Bus" },
+  { value: "cab", label: "Cab" },
+  { value: "self_drive", label: "Self Drive" },
+];
+
+type Travel = {
+  travel_required: boolean;
+  travel_booking_status: string;
+  travel_mode: string;
+  travel_notes: string;
+};
+
+const buildTravel = (initial?: Record<string, any>): Travel => ({
+  travel_required: !!initial?.travel_required,
+  travel_booking_status: initial?.travel_booking_status ?? "not_needed",
+  travel_mode: initial?.travel_mode ?? "",
+  travel_notes: initial?.travel_notes ?? "",
+});
 
 const SUB_EVENTS = [
   { type: "save_the_date", label: "Save the Date" },
@@ -148,6 +184,7 @@ export function ProjectDialog({
   const delAssignment = useRemove("project_assignments", "Crew assignment");
   const [rows, setRows] = useState<Record<string, Row>>(() => buildRows(events, assignments));
   const [customEvents, setCustomEvents] = useState<Row[]>(() => buildCustomRows(events, assignments));
+  const [travel, setTravel] = useState<Travel>(() => buildTravel(initial));
 
   const setRow = (key: string, patch: Partial<Row>) =>
     setRows((p) => ({ ...p, [key]: { ...p[key], ...patch } }));
@@ -198,6 +235,10 @@ export function ProjectDialog({
 
     const id = await saveProject.mutateAsync({
       ...values,
+      travel_required: travel.travel_required,
+      travel_booking_status: travel.travel_required ? travel.travel_booking_status : "not_needed",
+      travel_mode: travel.travel_required ? travel.travel_mode || null : null,
+      travel_notes: travel.travel_required ? travel.travel_notes || null : null,
       ...(primaryDate ? { event_date: primaryDate } : {}),
       ...(projectId ? { id: projectId } : {}),
     });
@@ -253,9 +294,77 @@ export function ProjectDialog({
       onReset={() => {
         setRows(buildRows(events, assignments));
         setCustomEvents(buildCustomRows(events, assignments));
+        setTravel(buildTravel(initial));
       }}
       onSubmit={submit}
       extra={
+        <>
+        <div className="mb-3 rounded-xl border border-border bg-muted/30 p-3">
+          <div className="mb-2 flex items-center gap-2">
+            <Plane className="h-4 w-4 text-primary" />
+            <p className="text-sm font-semibold">Travel &amp; Booking Details</p>
+          </div>
+          <div className="space-y-3">
+            <div className="flex items-center justify-between gap-2 rounded-lg border border-border bg-card p-2.5">
+              <Label htmlFor="travel-required" className="text-xs font-medium">
+                Travel required?
+              </Label>
+              <Switch
+                id="travel-required"
+                checked={travel.travel_required}
+                onCheckedChange={(v) => setTravel((p) => ({ ...p, travel_required: v }))}
+              />
+            </div>
+            {travel.travel_required && (
+              <div className="grid gap-3 sm:grid-cols-2">
+                <div>
+                  <Label className="mb-1.5 block text-xs font-medium">Booking status</Label>
+                  <Select
+                    value={travel.travel_booking_status}
+                    onValueChange={(v) => setTravel((p) => ({ ...p, travel_booking_status: v }))}
+                  >
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select status" />
+                    </SelectTrigger>
+                    <SelectContent className="z-50">
+                      {BOOKING_STATUS.map((o) => (
+                        <SelectItem key={o.value} value={o.value}>
+                          {o.label}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div>
+                  <Label className="mb-1.5 block text-xs font-medium">Mode of travel</Label>
+                  <Select
+                    value={travel.travel_mode}
+                    onValueChange={(v) => setTravel((p) => ({ ...p, travel_mode: v }))}
+                  >
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select mode" />
+                    </SelectTrigger>
+                    <SelectContent className="z-50">
+                      {TRAVEL_MODES.map((o) => (
+                        <SelectItem key={o.value} value={o.value}>
+                          {o.label}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div className="sm:col-span-2">
+                  <Label className="mb-1.5 block text-xs font-medium">Ticket notes / PNR details</Label>
+                  <Textarea
+                    placeholder="Train name / number, PNR, departure & arrival time, seat details…"
+                    value={travel.travel_notes}
+                    onChange={(e) => setTravel((p) => ({ ...p, travel_notes: e.target.value }))}
+                  />
+                </div>
+              </div>
+            )}
+          </div>
+        </div>
         <div className="rounded-xl border border-border bg-muted/30 p-3">
           <div className="mb-2 flex items-center gap-2">
             <CalendarDays className="h-4 w-4 text-primary" />
@@ -381,6 +490,7 @@ export function ProjectDialog({
             </Button>
           </div>
         </div>
+        </>
       }
     />
   );

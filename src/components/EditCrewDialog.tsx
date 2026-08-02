@@ -141,13 +141,18 @@ export function EditCrewDialog({ projectId, eventId, date, title }: Props) {
           )}
         </div>
 
-        <CrewPicker
-          staff={staff}
-          value={crew}
-          onChange={setCrew}
-          date={date}
-          projectId={projectId}
-        />
+        <div className="space-y-2">
+          <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+            Add / Reassign Crew
+          </p>
+          <CrewPicker
+            staff={staff}
+            value={crew}
+            onChange={setCrew}
+            date={date}
+            projectId={projectId}
+          />
+        </div>
         <DialogFooter>
           <Button type="button" variant="ghost" onClick={() => setOpen(false)}>
             Cancel

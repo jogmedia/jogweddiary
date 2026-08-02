@@ -235,6 +235,10 @@ export function ProjectDialog({
 
     const id = await saveProject.mutateAsync({
       ...values,
+      travel_required: travel.travel_required,
+      travel_booking_status: travel.travel_required ? travel.travel_booking_status : "not_needed",
+      travel_mode: travel.travel_required ? travel.travel_mode || null : null,
+      travel_notes: travel.travel_required ? travel.travel_notes || null : null,
       ...(primaryDate ? { event_date: primaryDate } : {}),
       ...(projectId ? { id: projectId } : {}),
     });

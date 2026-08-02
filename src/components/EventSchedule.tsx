@@ -1,6 +1,7 @@
 import { useMemo, useState } from "react";
 import { MapPin, MessageCircle, Pencil, Plus, Send, Trash2, UserPlus } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { crewRoleOptions } from "@/lib/roles";
 import { RecordDialog, type Field } from "@/components/RecordDialog";
 import { StatusBadge } from "@/components/ui-kit";
 import { fmtDate, isMapsUrl, isValidPhone, waNumber } from "@/lib/format";
@@ -195,16 +196,9 @@ export function EventSchedule({
                         name: "role_in_project",
                         label: "Duty / role",
                         type: "select",
-                        options: [
-                          "Lead Photographer",
-                          "Photographer",
-                          "Cinematographer",
-                          "Videographer",
-                          "Drone Operator",
-                          "Assistant",
-                          "Candid Photographer",
-                          "Light Assistant",
-                        ].map((v) => ({ value: v, label: v })),
+                        options: crewRoleOptions,
+                        allowCustom: true,
+                        placeholder: "Select role",
                       },
                     ]}
                     onSubmit={(v) => onAssign({ ...v, event_id: e.id })}

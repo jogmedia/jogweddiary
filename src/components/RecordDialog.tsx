@@ -32,6 +32,8 @@ export type Field = {
   validate?: (value: any, values: Record<string, any>) => string | null | undefined;
   /** Transform the value right before submit (e.g. phone normalisation). */
   transform?: (value: any) => any;
+  /** Select fields only: adds a "Custom…" option that reveals a free-text input. */
+  allowCustom?: boolean;
 };
 
 
@@ -65,6 +67,7 @@ export function RecordDialog({
   const setOpen = onOpenChange ?? setUncontrolled;
   const [values, setValues] = useState<Record<string, any>>(initial ?? {});
   const [busy, setBusy] = useState(false);
+  const [customMode, setCustomMode] = useState<Record<string, boolean>>({});
   const [errors, setErrors] = useState<Record<string, string>>({});
 
   useEffect(() => {
@@ -134,18 +137,48 @@ export function RecordDialog({
                   onChange={(e) => set(f.name, e.target.value)}
                 />
               ) : f.type === "select" ? (
-                <Select value={values[f.name] ?? ""} onValueChange={(v) => set(f.name, v)}>
-                  <SelectTrigger id={f.name}>
-                    <SelectValue placeholder={f.placeholder ?? "Select"} />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {(f.options ?? []).map((o) => (
-                      <SelectItem key={o.value} value={o.value}>
-                        {o.label}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
+                (() => {
+                  const current = values[f.name] ?? "";
+                  const known = (f.options ?? []).some((o) => o.value === current);
+                  const isCustom =
+                    !!f.allowCustom && (customMode[f.name] || (!!current && !known));
+                  return (
+                    <div className="space-y-2">
+                      <Select
+                        value={isCustom ? "__custom__" : current}
+                        onValueChange={(v) => {
+                          if (v === "__custom__") {
+                            setCustomMode((p) => ({ ...p, [f.name]: true }));
+                            if (known) set(f.name, "");
+                          } else {
+                            setCustomMode((p) => ({ ...p, [f.name]: false }));
+                            set(f.name, v);
+                          }
+                        }}
+                      >
+                        <SelectTrigger id={f.name}>
+                          <SelectValue placeholder={f.placeholder ?? "Select"} />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {(f.options ?? []).map((o) => (
+                            <SelectItem key={o.value} value={o.value}>
+                              {o.label}
+                            </SelectItem>
+                          ))}
+                          {f.allowCustom && <SelectItem value="__custom__">Custom Role…</SelectItem>}
+                        </SelectContent>
+                      </Select>
+                      {isCustom && (
+                        <Input
+                          autoFocus
+                          placeholder="Type custom role"
+                          value={current}
+                          onChange={(e) => set(f.name, e.target.value)}
+                        />
+                      )}
+                    </div>
+                  );
+                })()
               ) : (
                 <Input
                   id={f.name}

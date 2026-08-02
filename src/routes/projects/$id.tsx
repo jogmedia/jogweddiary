@@ -13,6 +13,7 @@ import {
   Send,
   HardDrive,
 } from "lucide-react";
+import { crewRoleOptions } from "@/lib/roles";
 import { AppShell } from "@/components/AppShell";
 import { EmptyState, PageHeader, StatCard, StatusBadge } from "@/components/ui-kit";
 import { RecordDialog, type Field } from "@/components/RecordDialog";
@@ -464,7 +465,14 @@ function ProjectDetail() {
                   required: true,
                   options: staff.map((s) => ({ value: s.id, label: s.name })),
                 },
-                { name: "role_in_project", label: "Role in project", placeholder: "Lead photographer" },
+                {
+                  name: "role_in_project",
+                  label: "Role in project",
+                  type: "select",
+                  options: crewRoleOptions,
+                  allowCustom: true,
+                  placeholder: "Select role",
+                },
               ]}
               onSubmit={(v) => saveAssignment.mutateAsync({ ...v, project_id: id })}
               trigger={

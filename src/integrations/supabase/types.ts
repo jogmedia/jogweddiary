@@ -863,6 +863,7 @@ export type Database = {
       }
       project_payments: {
         Row: {
+          account: string | null
           amount: number
           created_at: string
           id: string
@@ -874,6 +875,7 @@ export type Database = {
           reference_no: string | null
         }
         Insert: {
+          account?: string | null
           amount: number
           created_at?: string
           id?: string
@@ -885,6 +887,7 @@ export type Database = {
           reference_no?: string | null
         }
         Update: {
+          account?: string | null
           amount?: number
           created_at?: string
           id?: string

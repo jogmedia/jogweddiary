@@ -51,6 +51,34 @@ export function projectFields(clients: { id: string; name: string }[]): Field[] 
   ];
 }
 
+const BOOKING_STATUS = [
+  { value: "pending", label: "Pending / Not Booked" },
+  { value: "booked", label: "Booked" },
+  { value: "not_needed", label: "Not Needed" },
+];
+
+const TRAVEL_MODES = [
+  { value: "train", label: "Train" },
+  { value: "flight", label: "Flight" },
+  { value: "bus", label: "Bus" },
+  { value: "cab", label: "Cab" },
+  { value: "self_drive", label: "Self Drive" },
+];
+
+type Travel = {
+  travel_required: boolean;
+  travel_booking_status: string;
+  travel_mode: string;
+  travel_notes: string;
+};
+
+const buildTravel = (initial?: Record<string, any>): Travel => ({
+  travel_required: !!initial?.travel_required,
+  travel_booking_status: initial?.travel_booking_status ?? "not_needed",
+  travel_mode: initial?.travel_mode ?? "",
+  travel_notes: initial?.travel_notes ?? "",
+});
+
 const SUB_EVENTS = [
   { type: "save_the_date", label: "Save the Date" },
   { type: "engagement", label: "Engagement" },

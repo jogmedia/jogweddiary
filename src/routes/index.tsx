@@ -34,7 +34,7 @@ import {
   useProjectEvents,
   useProjects,
 } from "@/lib/db";
-import { fmtDate, inr, inrShort, monthLabel, todayISO } from "@/lib/format";
+import { dayOffsetISO, fmtDate, inr, inrShort, monthLabel, todayISO } from "@/lib/format";
 import { monthlySeries } from "@/lib/reports";
 import { eventLabel, eventMeta, fmtTime } from "@/lib/whatsapp";
 

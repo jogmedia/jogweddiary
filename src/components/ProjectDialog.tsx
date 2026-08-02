@@ -14,6 +14,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { CrewPicker, type CrewMember } from "@/components/CrewPicker";
+import { ADVANCE_REF, PAY_ACCOUNTS, modeForAccount } from "@/lib/accounts";
 import { TicketUpload } from "@/components/TicketUpload";
 import {
   useAssignments,
@@ -35,13 +36,7 @@ export const STATUS_OPTIONS = {
 
 const opts = (list: string[]) => list.map((v) => ({ value: v, label: v.replace(/_/g, " ") }));
 
-export const ADVANCE_ACCOUNTS = [
-  { value: "gpay_phonepe_hdfc", label: "GPay / PhonePe (HDFC Bank)" },
-  { value: "hdfc_transfer", label: "HDFC Bank (Direct Transfer)" },
-  { value: "sbi_account", label: "SBI Bank Account" },
-  { value: "cash_in_hand", label: "Cash in Hand" },
-  { value: "other_account", label: "Other Account" },
-];
+export const ADVANCE_ACCOUNTS = PAY_ACCOUNTS.map(({ value, label }) => ({ value, label }));
 
 /** Project fields — the single event date is replaced by the sub-events section. */
 export function projectFields(clients: { id: string; name: string }[]): Field[] {

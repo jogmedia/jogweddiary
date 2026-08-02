@@ -30,6 +30,7 @@ export function EditCrewDialog({ projectId, eventId, date, title }: Props) {
   const [open, setOpen] = useState(false);
   const [crew, setCrew] = useState<CrewMember[]>([]);
   const [saving, setSaving] = useState(false);
+  const [removing, setRemoving] = useState<string | null>(null);
 
   const { data: staff = [] } = useStaff();
   const { data: assignments = [] } = useAssignments();
@@ -50,6 +51,19 @@ export function EditCrewDialog({ projectId, eventId, date, title }: Props) {
     );
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [open]);
+
+  /** Deletes the assignment from the database immediately. */
+  const removeNow = async (staffId: string) => {
+    setCrew((prev) => prev.filter((v) => v.staffId !== staffId));
+    const existing = current.find((a) => a.staff_id === staffId);
+    if (!existing) return;
+    setRemoving(staffId);
+    try {
+      await delAssignment.mutateAsync(existing.id);
+    } finally {
+      setRemoving(null);
+    }
+  };
 
   const save = async () => {
     setSaving(true);
@@ -110,13 +124,15 @@ export function EditCrewDialog({ projectId, eventId, date, title }: Props) {
                     </div>
                     <Button
                       type="button"
-                      size="icon"
-                      variant="ghost"
+                      size="sm"
+                      variant="destructive"
                       aria-label={`Remove ${s?.name ?? "crew member"}`}
-                      className="h-8 w-8 shrink-0 text-destructive hover:bg-destructive/10 hover:text-destructive"
-                      onClick={() => setCrew(crew.filter((v) => v.staffId !== c.staffId))}
+                      className="h-8 shrink-0 gap-1.5 px-2.5"
+                      disabled={removing === c.staffId}
+                      onClick={() => removeNow(c.staffId)}
                     >
                       <Trash2 className="h-4 w-4" />
+                      Remove
                     </Button>
                   </li>
                 );

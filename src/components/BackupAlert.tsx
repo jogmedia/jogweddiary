@@ -53,15 +53,58 @@ export function BackupAlert() {
   };
 
 
+  const reportRows = [...pending, ...backedUp];
+
   return (
     <div className="mb-4 rounded-[18px] border-2 border-destructive/50 bg-destructive/10 p-4">
       <div className="flex items-start gap-2">
         <AlertTriangle className="mt-0.5 h-5 w-5 shrink-0 text-destructive" />
         <div className="min-w-0 flex-1">
-          <p className="text-sm font-bold uppercase tracking-wide text-destructive">
-            Warning: {pending.length} {pending.length === 1 ? "shoot has" : "shoots have"} pending raw
-            data backups!
-          </p>
+          <div className="flex flex-wrap items-center justify-between gap-2">
+            <p className="text-sm font-bold uppercase tracking-wide text-destructive">
+              Warning: {pending.length} {pending.length === 1 ? "shoot has" : "shoots have"} pending
+              raw data backups!
+            </p>
+            <Button
+              size="sm"
+              variant="outline"
+              className="h-8 shrink-0 bg-card px-2 text-xs"
+              onClick={() => exportPdf("backup-report", "Raw Data Backup Report")}
+            >
+              <FileDown className="mr-1 h-3.5 w-3.5" /> Export PDF
+            </Button>
+          </div>
+
+          {/* Print-only report source for the PDF export */}
+          <div id="backup-report" className="hidden">
+            <h1 style={{ fontSize: 18, fontWeight: 700, marginBottom: 4 }}>
+              JOG MEDIA — Raw Data Backup Report
+            </h1>
+            <p style={{ fontSize: 12, marginBottom: 12 }}>Generated on {fmtDate(today)}</p>
+            <table border={1} cellPadding={6} style={{ borderCollapse: "collapse", width: "100%", fontSize: 12 }}>
+              <thead>
+                <tr>
+                  <th align="left">Client</th>
+                  <th align="left">Project / Event</th>
+                  <th align="left">Event Date</th>
+                  <th align="left">Backup Status</th>
+                  <th align="left">Hard Disk / Storage Location</th>
+                </tr>
+              </thead>
+              <tbody>
+                {reportRows.map((p) => (
+                  <tr key={p.id}>
+                    <td>{clientName(p)}</td>
+                    <td>{p.project_name}</td>
+                    <td>{fmtDate(p.event_date)}</td>
+                    <td>{p.raw_backup_done ? "Backed up" : "Pending"}</td>
+                    <td>{(drives[p.id] ?? p.backup_drive ?? "").trim() || "—"}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+
 
           <ul className="mt-3 space-y-3">
             {pending.map((p) => {

@@ -1028,6 +1028,10 @@ export type Database = {
           raw_backup_done: boolean
           shoot_status: string
           total_amount: number
+          travel_booking_status: string | null
+          travel_mode: string | null
+          travel_notes: string | null
+          travel_required: boolean
           updated_at: string
           venue: string | null
           video_editing_done: boolean
@@ -1057,6 +1061,10 @@ export type Database = {
           raw_backup_done?: boolean
           shoot_status?: string
           total_amount?: number
+          travel_booking_status?: string | null
+          travel_mode?: string | null
+          travel_notes?: string | null
+          travel_required?: boolean
           updated_at?: string
           venue?: string | null
           video_editing_done?: boolean
@@ -1086,6 +1094,10 @@ export type Database = {
           raw_backup_done?: boolean
           shoot_status?: string
           total_amount?: number
+          travel_booking_status?: string | null
+          travel_mode?: string | null
+          travel_notes?: string | null
+          travel_required?: boolean
           updated_at?: string
           venue?: string | null
           video_editing_done?: boolean

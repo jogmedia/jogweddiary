@@ -1032,6 +1032,8 @@ export type Database = {
           travel_mode: string | null
           travel_notes: string | null
           travel_required: boolean
+          travel_ticket_name: string | null
+          travel_ticket_path: string | null
           updated_at: string
           venue: string | null
           video_editing_done: boolean
@@ -1065,6 +1067,8 @@ export type Database = {
           travel_mode?: string | null
           travel_notes?: string | null
           travel_required?: boolean
+          travel_ticket_name?: string | null
+          travel_ticket_path?: string | null
           updated_at?: string
           venue?: string | null
           video_editing_done?: boolean
@@ -1098,6 +1102,8 @@ export type Database = {
           travel_mode?: string | null
           travel_notes?: string | null
           travel_required?: boolean
+          travel_ticket_name?: string | null
+          travel_ticket_path?: string | null
           updated_at?: string
           venue?: string | null
           video_editing_done?: boolean

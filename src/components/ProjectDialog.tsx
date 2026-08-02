@@ -14,6 +14,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { CrewPicker, type CrewMember } from "@/components/CrewPicker";
+import { TicketUpload } from "@/components/TicketUpload";
 import {
   useAssignments,
   useProjectEvents,
@@ -78,6 +79,8 @@ type Travel = {
   travel_booking_status: string;
   travel_mode: string;
   travel_notes: string;
+  travel_ticket_path: string | null;
+  travel_ticket_name: string | null;
 };
 
 const buildTravel = (initial?: Record<string, any>): Travel => ({
@@ -85,6 +88,8 @@ const buildTravel = (initial?: Record<string, any>): Travel => ({
   travel_booking_status: initial?.travel_booking_status ?? "not_needed",
   travel_mode: initial?.travel_mode ?? "",
   travel_notes: initial?.travel_notes ?? "",
+  travel_ticket_path: initial?.travel_ticket_path ?? null,
+  travel_ticket_name: initial?.travel_ticket_name ?? null,
 });
 
 const SUB_EVENTS = [
@@ -239,6 +244,8 @@ export function ProjectDialog({
       travel_booking_status: travel.travel_required ? travel.travel_booking_status : "not_needed",
       travel_mode: travel.travel_required ? travel.travel_mode || null : null,
       travel_notes: travel.travel_required ? travel.travel_notes || null : null,
+      travel_ticket_path: travel.travel_required ? travel.travel_ticket_path : null,
+      travel_ticket_name: travel.travel_required ? travel.travel_ticket_name : null,
       ...(primaryDate ? { event_date: primaryDate } : {}),
       ...(projectId ? { id: projectId } : {}),
     });
@@ -361,6 +368,15 @@ export function ProjectDialog({
                     onChange={(e) => setTravel((p) => ({ ...p, travel_notes: e.target.value }))}
                   />
                 </div>
+                <TicketUpload
+                  path={travel.travel_ticket_path}
+                  name={travel.travel_ticket_name}
+                  projectId={projectId}
+                  onChange={({ path, name }) =>
+                    setTravel((p) => ({ ...p, travel_ticket_path: path, travel_ticket_name: name }))
+                  }
+                />
+
               </div>
             )}
           </div>

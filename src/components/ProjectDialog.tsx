@@ -135,6 +135,7 @@ export function ProjectDialog({
           project_id: pid,
           event_type: type,
           event_date: row.date,
+          event_time: row.time || null,
           location: row.location || null,
           ...(type === "custom" ? { notes: row.name || "Other event" } : {}),
         });

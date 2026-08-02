@@ -60,7 +60,7 @@ export function ShootDay({ date, title, empty = "No shoots scheduled for Today /
         venue: e.location,
         mapLink: e.google_maps_link,
         reporting: fmtTime(e.arrival_time ?? e.event_time ?? e.muhurtham_time),
-        travel: project ?? e.projects ?? null,
+        travel: (project ?? null) as Item["travel"],
         crew,
       };
     }),

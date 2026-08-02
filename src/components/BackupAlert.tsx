@@ -88,7 +88,7 @@ export function BackupAlert() {
                   <th align="left">Project / Event</th>
                   <th align="left">Event Date</th>
                   <th align="left">Backup Status</th>
-                  <th align="left">Hard Disk / Storage Location</th>
+                  <th align="left">Hard Disk No.</th>
                 </tr>
               </thead>
               <tbody>
@@ -117,6 +117,12 @@ export function BackupAlert() {
                       <p className="truncate text-xs text-muted-foreground">
                         {p.project_name} · {fmtDate(p.event_date)}
                       </p>
+                      {(drives[p.id] ?? p.backup_drive ?? "").trim() ? (
+                        <p className="mt-1 inline-flex items-center gap-1.5 rounded-lg border border-success/30 bg-success/10 px-2 py-1 text-xs font-medium text-success">
+                          <HardDrive className="h-3.5 w-3.5" /> Backup Location:{" "}
+                          {(drives[p.id] ?? p.backup_drive ?? "").trim()}
+                        </p>
+                      ) : null}
                     </div>
                     <Button
                       size="sm"
@@ -210,7 +216,7 @@ export function BackupAlert() {
                     </span>
                     <span className="flex items-center gap-1 text-success">
                       <HardDrive className="h-3.5 w-3.5" />
-                      Storage Location: {p.backup_drive}
+                      Backup Location: {p.backup_drive}
                     </span>
                   </li>
                 ))}

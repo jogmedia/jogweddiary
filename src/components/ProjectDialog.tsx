@@ -266,11 +266,12 @@ export function ProjectDialog({
     });
     const pid = (projectId ?? id) as string;
 
-    // Auto-record the advance as the first received payment, credited to the chosen account.
+    // Keep the advance in sync as the first received payment, credited to the chosen account.
     const advance = Number(values.advance_amount ?? 0);
-    const alreadyLogged = existingPayments.some((p) => (p.reference_no ?? "") === ADVANCE_REF);
-    if (pid && advance > 0 && !alreadyLogged) {
+    const logged = existingPayments.find((p) => (p.reference_no ?? "") === ADVANCE_REF);
+    if (pid && advance > 0) {
       await savePayment.mutateAsync({
+        ...(logged ? { id: logged.id } : {}),
         project_id: pid,
         payment_date: values.advance_date || todayISO(),
         amount: advance,

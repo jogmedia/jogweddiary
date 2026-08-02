@@ -294,6 +294,7 @@ export function ProjectDialog({
       onReset={() => {
         setRows(buildRows(events, assignments));
         setCustomEvents(buildCustomRows(events, assignments));
+        setTravel(buildTravel(initial));
       }}
       onSubmit={submit}
       extra={

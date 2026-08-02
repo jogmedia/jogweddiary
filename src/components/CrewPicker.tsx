@@ -1,4 +1,4 @@
-import { AlertTriangle, Check, ChevronsUpDown, Users, X } from "lucide-react";
+import { AlertTriangle, Check, ChevronsUpDown, Search, Users, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";

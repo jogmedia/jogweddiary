@@ -243,6 +243,8 @@ export function ProjectDialog({
       travel_booking_status: travel.travel_required ? travel.travel_booking_status : "not_needed",
       travel_mode: travel.travel_required ? travel.travel_mode || null : null,
       travel_notes: travel.travel_required ? travel.travel_notes || null : null,
+      travel_ticket_path: travel.travel_required ? travel.travel_ticket_path : null,
+      travel_ticket_name: travel.travel_required ? travel.travel_ticket_name : null,
       ...(primaryDate ? { event_date: primaryDate } : {}),
       ...(projectId ? { id: projectId } : {}),
     });

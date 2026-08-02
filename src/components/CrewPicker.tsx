@@ -190,11 +190,11 @@ export function CrewPicker({
         <div className="flex items-start gap-1.5 rounded-lg border border-destructive/30 bg-destructive/10 p-2 text-[11px] text-destructive">
           <AlertTriangle className="mt-0.5 h-3.5 w-3.5 shrink-0" />
           <p>
-            ⚠️ Already Booked on this date!{" "}
+            ⚠️ Already booked on this date &amp; time slot!{" "}
             {clashing
               .map((s) => {
-                const other = conflictsFor(s.id, date, projectId)[0];
-                return `${s.name} → ${other?.projectName ?? "another project"}`;
+                const other = clashes(s.id)[0];
+                return `${s.name} → ${other?.projectName ?? "another event"}`;
               })
               .join(" · ")}
           </p>
@@ -206,7 +206,8 @@ export function CrewPicker({
           {selected.map((s) => (
             <Badge
               key={s.id}
-              variant={conflictsFor(s.id, date, projectId).length > 0 ? "destructive" : "secondary"}
+              variant={clashes(s.id).length > 0 ? "destructive" : "secondary"}
+
               className="gap-1 font-normal"
             >
               {s.name} — {prettyRole(roleOf(s.id) ?? s.role)}

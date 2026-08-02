@@ -158,9 +158,12 @@ export function EditCrewDialog({ projectId, eventId, date, title }: Props) {
             staff={staff}
             value={crew}
             onChange={setCrew}
-            date={date}
+            date={date ?? thisEvent?.event_date}
+            time={slotTime}
+            eventId={eventId ?? null}
             projectId={projectId}
           />
+
         </div>
         <DialogFooter>
           <Button type="button" variant="ghost" onClick={() => setOpen(false)}>

@@ -13,3 +13,7 @@ export const CREW_ROLES = [
 ] as const;
 
 export const crewRoleOptions = CREW_ROLES.map((v) => ({ value: v, label: v }));
+
+/** Formats a stored role value (e.g. `lead_photographer`) for display. */
+export const prettyRole = (role?: string | null) =>
+  (role ?? "").trim().replace(/_/g, " ").replace(/\b\w/g, (c) => c.toUpperCase()) || "Crew";

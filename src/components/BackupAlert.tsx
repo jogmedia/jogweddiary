@@ -125,6 +125,25 @@ export function BackupAlert() {
                     </div>
                   )}
 
+                  <div className="mt-3 border-t border-border pt-2.5">
+                    <label className="text-xs font-medium" htmlFor={`drive-${p.id}`}>
+                      Storage Device / Hard Disk Name
+                    </label>
+                    <Input
+                      id={`drive-${p.id}`}
+                      list={`drive-options-${p.id}`}
+                      className="mt-1 h-9 text-xs"
+                      placeholder="e.g. HDD-2 (8TB) or Cloud Server"
+                      value={drives[p.id] ?? p.backup_drive ?? ""}
+                      onChange={(e) => setDrives((d) => ({ ...d, [p.id]: e.target.value }))}
+                    />
+                    <datalist id={`drive-options-${p.id}`}>
+                      {DRIVE_OPTIONS.map((o) => (
+                        <option key={o} value={o} />
+                      ))}
+                    </datalist>
+                  </div>
+
                   <label className="mt-3 flex items-center gap-2 border-t border-border pt-2.5 text-xs">
                     <Switch
                       checked={!!p.raw_backup_done}
@@ -133,6 +152,7 @@ export function BackupAlert() {
                     />
                     <span>Raw Data Backed Up to Primary &amp; Secondary Hard Drives</span>
                   </label>
+
                 </li>
               );
             })}

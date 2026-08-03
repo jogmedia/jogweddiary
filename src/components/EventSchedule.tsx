@@ -240,14 +240,38 @@ export function EventSchedule({
                 </div>
                 {crew.length === 0 && <p className="text-xs text-muted-foreground">Nobody assigned.</p>}
                 <div className="space-y-1.5">
-                  {crew.map((a) => (
+                  {crew.map((a) => {
+                    const an = a as CrewAssignment;
+                    return (
                     <div key={a.id} className="flex items-center justify-between gap-2 text-xs">
                       <span>
                         {a.staff?.name}
                         <span className="text-muted-foreground"> · {a.role_in_project ?? "Crew"}</span>
                         {!a.event_id && <span className="text-muted-foreground"> (all events)</span>}
+                        <StatusBadge
+                          className="ml-1.5"
+                          value={an.block_sent_at ? "dates sent" : "dates pending"}
+                        />
                       </span>
                       <div className="flex items-center gap-1">
+                        <Button
+                          size="sm"
+                          variant="ghost"
+                          className="h-7 px-2"
+                          title="Send Date Block Request (WhatsApp)"
+                          onClick={() => notify(an, e, "block")}
+                        >
+                          <CalendarCheck className="h-3.5 w-3.5" />
+                        </Button>
+                        <Button
+                          size="sm"
+                          variant="ghost"
+                          className="h-7 px-2"
+                          title="Send Event Reminder (WhatsApp)"
+                          onClick={() => notify(an, e, "reminder")}
+                        >
+                          <BellRing className="h-3.5 w-3.5" />
+                        </Button>
                         <Button
                           size="sm"
                           variant="ghost"
@@ -274,7 +298,7 @@ export function EventSchedule({
                         )}
                       </div>
                     </div>
-                  ))}
+                  );})}
                 </div>
               </div>
 

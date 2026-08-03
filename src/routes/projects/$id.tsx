@@ -486,17 +486,28 @@ function ProjectDetail() {
             {assignments.length === 0 && (
               <p className="p-6 text-center text-sm text-muted-foreground">Nobody assigned yet.</p>
             )}
-            {assignments.map((a) => (
-              <div key={a.id} className="flex items-center justify-between gap-3 p-3">
+            {assignments.map((a) => {
+              const an = a as CrewAssignment;
+              return (
+              <div key={a.id} className="flex flex-wrap items-center justify-between gap-3 p-3">
                 <div>
                   <p className="text-sm font-medium">{a.staff?.name}</p>
                   <p className="text-xs text-muted-foreground">{a.role_in_project ?? "Crew"}</p>
                 </div>
-                <Button size="sm" variant="ghost" onClick={() => delAssignment.mutate(a.id)}>
-                  <Trash2 className="h-4 w-4 text-destructive" />
-                </Button>
+                <div className="flex flex-wrap items-center gap-1.5">
+                  <StatusBadge value={an.block_sent_at ? "dates sent" : "dates pending"} />
+                  <Button size="sm" variant="outline" onClick={() => notifyCrew(an, "block")}>
+                    <Send className="mr-1.5 h-4 w-4" /> Send WhatsApp Schedule
+                  </Button>
+                  <Button size="sm" variant="ghost" onClick={() => notifyCrew(an, "reminder")}>
+                    <MessageCircle className="mr-1.5 h-4 w-4" /> Send Reminder
+                  </Button>
+                  <Button size="sm" variant="ghost" onClick={() => delAssignment.mutate(a.id)}>
+                    <Trash2 className="h-4 w-4 text-destructive" />
+                  </Button>
+                </div>
               </div>
-            ))}
+            );})}
           </div>
         </TabsContent>
 

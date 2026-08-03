@@ -26,6 +26,7 @@ import {
 import { AppShell } from "@/components/AppShell";
 import { Button } from "@/components/ui/button";
 import { BackupAlert } from "@/components/BackupAlert";
+import { CrewReminders } from "@/components/CrewReminders";
 import { ShootDay } from "@/components/ShootDay";
 import { TravelBadge, travelState } from "@/components/TravelBadge";
 

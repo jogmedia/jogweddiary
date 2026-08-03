@@ -102,6 +102,43 @@ export function EventSchedule({
   const crewFor = (eventId: string) =>
     assignments.filter((a) => a.event_id === eventId || !a.event_id);
 
+  /** Group all of this crew member's events in the project (block) or just this event (reminder). */
+  const notify = async (a: CrewAssignment, e: ProjectEvent, kind: "block" | "reminder") => {
+    const mine =
+      kind === "block"
+        ? (assignments as CrewAssignment[]).filter((x) => x.staff_id === a.staff_id && x.event_id)
+        : [a];
+    const rows = mine
+      .map((x) => {
+        const ev = events.find((v) => v.id === x.event_id) ?? (x.id === a.id ? e : null);
+        return ev ? { assignmentId: x.id, event: ev, role: x.role_in_project ?? null } : null;
+      })
+      .filter(Boolean) as CrewGroup["rows"];
+    const group: CrewGroup = {
+      key: a.id,
+      staffId: a.staff_id,
+      staffName: a.staff?.name ?? "Crew",
+      phone: (a.staff as any)?.whatsapp ?? a.staff?.phone ?? null,
+      projectId: project.id,
+      projectName: project.project_name ?? "Project",
+      clientName,
+      project,
+      rows: rows.length ? rows : [{ assignmentId: a.id, event: e, role: a.role_in_project ?? null }],
+      assignmentIds: (rows.length ? rows : [{ assignmentId: a.id }]).map((r: any) => r.assignmentId),
+      sent: false,
+    };
+    sendWhatsApp(
+      group,
+      kind === "block"
+        ? buildDateBlockMessage(group, business, settings?.phone)
+        : buildEventReminderMessage(group, business, settings?.phone),
+    );
+    const field = kind === "block" ? "block_sent_at" : "reminder_sent_at";
+    for (const id of group.assignmentIds) {
+      await onAssign({ id, [field]: new Date().toISOString() });
+    }
+  };
+
   const crewSection = (
     <div className="rounded-xl border border-border p-3">
       <p className="mb-2 text-xs font-semibold">Assign Crew for this Event</p>

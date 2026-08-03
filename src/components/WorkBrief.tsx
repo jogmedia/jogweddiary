@@ -44,11 +44,11 @@ export function WorkBrief({
   return (
     <div
       style={{
-        width: 740,
+        width: 720,
         background: "#FFFFFF",
         color: TEXT,
         fontFamily: "Inter, Arial, sans-serif",
-        padding: 24,
+        padding: 28,
         boxSizing: "border-box",
         overflow: "hidden",
       }}
@@ -94,7 +94,16 @@ export function WorkBrief({
             </div>
           </div>
         </div>
-        <div style={{ textAlign: "right", flexShrink: 0, whiteSpace: "nowrap" }}>
+        <div
+          style={{
+            textAlign: "right",
+            flex: "0 0 auto",
+            flexShrink: 0,
+            whiteSpace: "nowrap",
+            minWidth: 200,
+            paddingRight: 2,
+          }}
+        >
           <div style={{ fontSize: 12, fontWeight: 700, color: BRAND, letterSpacing: 0.6 }}>
             WEDDING EVENT BRIEF
           </div>

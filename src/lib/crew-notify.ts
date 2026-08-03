@@ -135,7 +135,7 @@ const groupRows = (
         key,
         staffId: a.staff_id,
         staffName: a.staff?.name ?? "Crew",
-        phone: a.staff?.whatsapp ?? a.staff?.phone ?? null,
+        phone: (a.staff as any)?.whatsapp ?? a.staff?.phone ?? null,
         projectId: a.project_id,
         projectName: project?.project_name ?? a.projects?.project_name ?? "Project",
         clientName: project?.clients?.name ?? (ev.projects as any)?.clients?.name ?? "Client",

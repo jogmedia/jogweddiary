@@ -14,6 +14,13 @@ import {
   HardDrive,
 } from "lucide-react";
 import { crewRoleOptions } from "@/lib/roles";
+import {
+  buildDateBlockMessage,
+  buildEventReminderMessage,
+  sendWhatsApp,
+  type CrewAssignment,
+  type CrewGroup,
+} from "@/lib/crew-notify";
 import { AppShell } from "@/components/AppShell";
 import { EmptyState, PageHeader, StatCard, StatusBadge } from "@/components/ui-kit";
 import { RecordDialog, type Field } from "@/components/RecordDialog";

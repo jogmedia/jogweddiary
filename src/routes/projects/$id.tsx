@@ -94,6 +94,44 @@ function ProjectDetail() {
   const { data: assignments = [] } = useAssignments(id);
   const { data: deliveries = [] } = useDeliveries(id);
   const { data: events = [] } = useProjectEvents(id);
+
+  const notifyCrew = async (a: CrewAssignment, kind: "block" | "reminder") => {
+    const mine = (assignments as CrewAssignment[]).filter(
+      (x) => x.staff_id === a.staff_id && (kind === "block" ? true : x.id === a.id),
+    );
+    const rows = mine
+      .map((x) => {
+        const ev = events.find((v) => v.id === x.event_id);
+        return ev ? { assignmentId: x.id, event: ev, role: x.role_in_project ?? null } : null;
+      })
+      .filter(Boolean) as CrewGroup["rows"];
+    if (rows.length === 0) return;
+    const group: CrewGroup = {
+      key: a.id,
+      staffId: a.staff_id,
+      staffName: a.staff?.name ?? "Crew",
+      phone: (a.staff as any)?.whatsapp ?? a.staff?.phone ?? null,
+      projectId: id,
+      projectName: project?.project_name ?? "Project",
+      clientName: project?.clients?.name ?? "Client",
+      project,
+      rows,
+      assignmentIds: rows.map((r) => r.assignmentId),
+      sent: false,
+    };
+    const business = settings?.business_name ?? "JOG MEDIA";
+    sendWhatsApp(
+      group,
+      kind === "block"
+        ? buildDateBlockMessage(group, business, settings?.phone)
+        : buildEventReminderMessage(group, business, settings?.phone),
+    );
+    const field = kind === "block" ? "block_sent_at" : "reminder_sent_at";
+    for (const aid of group.assignmentIds) {
+      await saveAssignment.mutateAsync({ id: aid, [field]: new Date().toISOString() });
+    }
+  };
+
   const { data: settings } = useSettings();
 
   const saveProject = useUpsert("projects", "Project");

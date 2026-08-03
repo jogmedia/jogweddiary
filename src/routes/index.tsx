@@ -176,6 +176,8 @@ function Dashboard() {
 
       <BackupAlert />
 
+      <CrewReminders />
+
 
 
       {/* 1. Today's shoots */}

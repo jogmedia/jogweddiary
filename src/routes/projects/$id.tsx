@@ -14,6 +14,13 @@ import {
   HardDrive,
 } from "lucide-react";
 import { crewRoleOptions } from "@/lib/roles";
+import {
+  buildDateBlockMessage,
+  buildEventReminderMessage,
+  sendWhatsApp,
+  type CrewAssignment,
+  type CrewGroup,
+} from "@/lib/crew-notify";
 import { AppShell } from "@/components/AppShell";
 import { EmptyState, PageHeader, StatCard, StatusBadge } from "@/components/ui-kit";
 import { RecordDialog, type Field } from "@/components/RecordDialog";
@@ -94,6 +101,44 @@ function ProjectDetail() {
   const { data: assignments = [] } = useAssignments(id);
   const { data: deliveries = [] } = useDeliveries(id);
   const { data: events = [] } = useProjectEvents(id);
+
+  const notifyCrew = async (a: CrewAssignment, kind: "block" | "reminder") => {
+    const mine = (assignments as CrewAssignment[]).filter(
+      (x) => x.staff_id === a.staff_id && (kind === "block" ? true : x.id === a.id),
+    );
+    const rows = mine
+      .map((x) => {
+        const ev = events.find((v) => v.id === x.event_id);
+        return ev ? { assignmentId: x.id, event: ev, role: x.role_in_project ?? null } : null;
+      })
+      .filter(Boolean) as CrewGroup["rows"];
+    if (rows.length === 0) return;
+    const group: CrewGroup = {
+      key: a.id,
+      staffId: a.staff_id,
+      staffName: a.staff?.name ?? "Crew",
+      phone: (a.staff as any)?.whatsapp ?? a.staff?.phone ?? null,
+      projectId: id,
+      projectName: project?.project_name ?? "Project",
+      clientName: project?.clients?.name ?? "Client",
+      project,
+      rows,
+      assignmentIds: rows.map((r) => r.assignmentId),
+      sent: false,
+    };
+    const business = settings?.business_name ?? "JOG MEDIA";
+    sendWhatsApp(
+      group,
+      kind === "block"
+        ? buildDateBlockMessage(group, business, settings?.phone)
+        : buildEventReminderMessage(group, business, settings?.phone),
+    );
+    const field = kind === "block" ? "block_sent_at" : "reminder_sent_at";
+    for (const aid of group.assignmentIds) {
+      await saveAssignment.mutateAsync({ id: aid, [field]: new Date().toISOString() });
+    }
+  };
+
   const { data: settings } = useSettings();
 
   const saveProject = useUpsert("projects", "Project");
@@ -486,17 +531,28 @@ function ProjectDetail() {
             {assignments.length === 0 && (
               <p className="p-6 text-center text-sm text-muted-foreground">Nobody assigned yet.</p>
             )}
-            {assignments.map((a) => (
-              <div key={a.id} className="flex items-center justify-between gap-3 p-3">
+            {assignments.map((a) => {
+              const an = a as CrewAssignment;
+              return (
+              <div key={a.id} className="flex flex-wrap items-center justify-between gap-3 p-3">
                 <div>
                   <p className="text-sm font-medium">{a.staff?.name}</p>
                   <p className="text-xs text-muted-foreground">{a.role_in_project ?? "Crew"}</p>
                 </div>
-                <Button size="sm" variant="ghost" onClick={() => delAssignment.mutate(a.id)}>
-                  <Trash2 className="h-4 w-4 text-destructive" />
-                </Button>
+                <div className="flex flex-wrap items-center gap-1.5">
+                  <StatusBadge value={an.block_sent_at ? "dates sent" : "dates pending"} />
+                  <Button size="sm" variant="outline" onClick={() => notifyCrew(an, "block")}>
+                    <Send className="mr-1.5 h-4 w-4" /> Send WhatsApp Schedule
+                  </Button>
+                  <Button size="sm" variant="ghost" onClick={() => notifyCrew(an, "reminder")}>
+                    <MessageCircle className="mr-1.5 h-4 w-4" /> Send Reminder
+                  </Button>
+                  <Button size="sm" variant="ghost" onClick={() => delAssignment.mutate(a.id)}>
+                    <Trash2 className="h-4 w-4 text-destructive" />
+                  </Button>
+                </div>
               </div>
-            ))}
+            );})}
           </div>
         </TabsContent>
 

@@ -564,25 +564,31 @@ export type Database = {
       project_assignments: {
         Row: {
           assigned_at: string
+          block_sent_at: string | null
           event_id: string | null
           id: string
           project_id: string
+          reminder_sent_at: string | null
           role_in_project: string | null
           staff_id: string
         }
         Insert: {
           assigned_at?: string
+          block_sent_at?: string | null
           event_id?: string | null
           id?: string
           project_id: string
+          reminder_sent_at?: string | null
           role_in_project?: string | null
           staff_id: string
         }
         Update: {
           assigned_at?: string
+          block_sent_at?: string | null
           event_id?: string | null
           id?: string
           project_id?: string
+          reminder_sent_at?: string | null
           role_in_project?: string | null
           staff_id?: string
         }

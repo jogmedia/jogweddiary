@@ -1,5 +1,12 @@
 import { useMemo, useState } from "react";
-import { MapPin, MessageCircle, Pencil, Plus, Send, Trash2, UserPlus } from "lucide-react";
+import { BellRing, CalendarCheck, MapPin, MessageCircle, Pencil, Plus, Send, Trash2, UserPlus } from "lucide-react";
+import {
+  buildDateBlockMessage,
+  buildEventReminderMessage,
+  sendWhatsApp,
+  type CrewAssignment,
+  type CrewGroup,
+} from "@/lib/crew-notify";
 import { Button } from "@/components/ui/button";
 import { crewRoleOptions } from "@/lib/roles";
 import { CrewPicker, type CrewMember } from "@/components/CrewPicker";
@@ -94,6 +101,43 @@ export function EventSchedule({
 
   const crewFor = (eventId: string) =>
     assignments.filter((a) => a.event_id === eventId || !a.event_id);
+
+  /** Group all of this crew member's events in the project (block) or just this event (reminder). */
+  const notify = async (a: CrewAssignment, e: ProjectEvent, kind: "block" | "reminder") => {
+    const mine =
+      kind === "block"
+        ? (assignments as CrewAssignment[]).filter((x) => x.staff_id === a.staff_id && x.event_id)
+        : [a];
+    const rows = mine
+      .map((x) => {
+        const ev = events.find((v) => v.id === x.event_id) ?? (x.id === a.id ? e : null);
+        return ev ? { assignmentId: x.id, event: ev, role: x.role_in_project ?? null } : null;
+      })
+      .filter(Boolean) as CrewGroup["rows"];
+    const group: CrewGroup = {
+      key: a.id,
+      staffId: a.staff_id,
+      staffName: a.staff?.name ?? "Crew",
+      phone: (a.staff as any)?.whatsapp ?? a.staff?.phone ?? null,
+      projectId: project.id,
+      projectName: project.project_name ?? "Project",
+      clientName,
+      project,
+      rows: rows.length ? rows : [{ assignmentId: a.id, event: e, role: a.role_in_project ?? null }],
+      assignmentIds: (rows.length ? rows : [{ assignmentId: a.id }]).map((r: any) => r.assignmentId),
+      sent: false,
+    };
+    sendWhatsApp(
+      group,
+      kind === "block"
+        ? buildDateBlockMessage(group, business, settings?.phone)
+        : buildEventReminderMessage(group, business, settings?.phone),
+    );
+    const field = kind === "block" ? "block_sent_at" : "reminder_sent_at";
+    for (const id of group.assignmentIds) {
+      await onAssign({ id, [field]: new Date().toISOString() });
+    }
+  };
 
   const crewSection = (
     <div className="rounded-xl border border-border p-3">
@@ -240,14 +284,38 @@ export function EventSchedule({
                 </div>
                 {crew.length === 0 && <p className="text-xs text-muted-foreground">Nobody assigned.</p>}
                 <div className="space-y-1.5">
-                  {crew.map((a) => (
+                  {crew.map((a) => {
+                    const an = a as CrewAssignment;
+                    return (
                     <div key={a.id} className="flex items-center justify-between gap-2 text-xs">
                       <span>
                         {a.staff?.name}
                         <span className="text-muted-foreground"> · {a.role_in_project ?? "Crew"}</span>
                         {!a.event_id && <span className="text-muted-foreground"> (all events)</span>}
+                        <StatusBadge
+                          className="ml-1.5"
+                          value={an.block_sent_at ? "dates sent" : "dates pending"}
+                        />
                       </span>
                       <div className="flex items-center gap-1">
+                        <Button
+                          size="sm"
+                          variant="ghost"
+                          className="h-7 px-2"
+                          title="Send Date Block Request (WhatsApp)"
+                          onClick={() => notify(an, e, "block")}
+                        >
+                          <CalendarCheck className="h-3.5 w-3.5" />
+                        </Button>
+                        <Button
+                          size="sm"
+                          variant="ghost"
+                          className="h-7 px-2"
+                          title="Send Event Reminder (WhatsApp)"
+                          onClick={() => notify(an, e, "reminder")}
+                        >
+                          <BellRing className="h-3.5 w-3.5" />
+                        </Button>
                         <Button
                           size="sm"
                           variant="ghost"
@@ -274,7 +342,7 @@ export function EventSchedule({
                         )}
                       </div>
                     </div>
-                  ))}
+                  );})}
                 </div>
               </div>
 

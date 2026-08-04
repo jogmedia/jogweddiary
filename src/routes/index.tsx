@@ -175,26 +175,23 @@ function Dashboard() {
         subtitle={`Overview for ${new Date().toLocaleDateString("en-IN", { month: "long", year: "numeric" })}`}
       />
 
-      <BackupAlert />
-
-      <CrewReminders />
-
-
-
-      {/* 1. Today's shoots */}
+      {/* 1. Daily shoot widgets — very top */}
       <div className="grid gap-4">
         <ShootDay date={today} title="Today's shoots" />
       </div>
 
-      {/* 1b. Tomorrow's shoot */}
       <div className="mt-4">
         <ShootDay date={dayOffsetISO(1)} title="Tomorrow's Shoot" />
       </div>
 
-      {/* 1c. Day after tomorrow's shoot */}
       <div className="mt-4">
         <ShootDay date={dayOffsetISO(2)} title="Day After Tomorrow's Shoot" />
       </div>
+
+      {/* 2. Crew reminders below daily shoots */}
+      <CrewReminders />
+
+      <BackupAlert />
 
 
 

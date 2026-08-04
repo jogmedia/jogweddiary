@@ -84,10 +84,13 @@ export function CrewReminders() {
 
       {blockList.length === 0 ? (
         <p className="mt-4 text-sm text-muted-foreground">
-          {tab === "block"
-            ? "Every assigned crew member has received their date block request."
-            : `No sub-events within the next ${REMINDER_DAYS} days.`}
+          {showSent
+            ? "Nothing sent yet."
+            : tab === "block"
+              ? "Every assigned crew member has received their date block request."
+              : `No pending reminders for sub-events within the next ${REMINDER_DAYS} days.`}
         </p>
+
       ) : (
         <div className="mt-3 grid gap-3 lg:grid-cols-2">
           {blockList.map((g) => (

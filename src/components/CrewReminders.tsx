@@ -20,6 +20,7 @@ type Tab = "block" | "reminder";
 
 export function CrewReminders() {
   const [tab, setTab] = useState<Tab>("block");
+  const [showSent, setShowSent] = useState(false);
   const { pendingBlocks, sentBlocks, reminders } = useCrewNotifications();
   const { data: settings } = useSettings();
   const save = useUpsert("project_assignments", "Crew notification");
@@ -39,7 +40,12 @@ export function CrewReminders() {
     }
   };
 
-  const blockList = tab === "block" ? [...pendingBlocks, ...sentBlocks] : reminders;
+  const pendingReminders = reminders.filter((g) => !g.sent);
+  const sentReminders = reminders.filter((g) => g.sent);
+
+  const pending = tab === "block" ? pendingBlocks : pendingReminders;
+  const sent = tab === "block" ? sentBlocks : sentReminders;
+  const blockList = showSent ? sent : pending;
 
   return (
     <div className="surface mt-4 p-4">
@@ -51,19 +57,30 @@ export function CrewReminders() {
           <Button
             size="sm"
             variant={tab === "block" ? "default" : "outline"}
-            onClick={() => setTab("block")}
+            onClick={() => {
+              setTab("block");
+              setShowSent(false);
+            }}
           >
             <Users className="mr-1.5 h-4 w-4" /> Pending Date Block Alerts ({pendingBlocks.length})
           </Button>
           <Button
             size="sm"
             variant={tab === "reminder" ? "default" : "outline"}
-            onClick={() => setTab("reminder")}
+            onClick={() => {
+              setTab("reminder");
+              setShowSent(false);
+            }}
           >
-            <CalendarClock className="mr-1.5 h-4 w-4" /> Upcoming Reminders ({reminders.length})
+            <CalendarClock className="mr-1.5 h-4 w-4" /> Upcoming Event Reminders (3 Days Prior) (
+            {pendingReminders.length})
+          </Button>
+          <Button size="sm" variant="ghost" onClick={() => setShowSent((s) => !s)}>
+            {showSent ? "Hide Sent History" : `Show Sent History (${sent.length})`}
           </Button>
         </div>
       </div>
+
 
       {blockList.length === 0 ? (
         <p className="mt-4 text-sm text-muted-foreground">

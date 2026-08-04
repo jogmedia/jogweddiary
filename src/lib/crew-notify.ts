@@ -95,7 +95,7 @@ export function buildEventReminderMessage(
   });
 
   return [
-    `⏳ *${business.toUpperCase()} - EVENT REMINDER (${REMINDER_DAYS} DAYS TO GO)*`,
+    `⏳ *${business.toUpperCase()} - EVENT REMINDER*`,
     "",
     `Hi ${g.staffName}, reminder for your upcoming shoot duty.`,
     `Client: ${g.clientName}`,

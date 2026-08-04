@@ -12,4 +12,11 @@ export default defineConfig({
     // nitro/vite builds from this
     server: { entry: "server" },
   },
+  nitro: {
+    cloudflare: {
+      // The `nodejs_compat` flag is the platform default from 2026-08-04 onward and
+      // is now rejected when declared explicitly (deploy fails with a 502).
+      nodeCompat: false,
+    },
+  },
 });

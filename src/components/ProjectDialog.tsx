@@ -248,9 +248,12 @@ export function ProjectDialog({
 
   const submit = async (values: Record<string, any>) => {
     const active = activeDates();
+    const customActive = customEvents.filter((r) => r.enabled && r.date);
     const wedding = active.find((r) => r.key === "wedding_day");
-    const earliest = [...active].sort((a, b) => (a.date < b.date ? -1 : 1))[0];
-    const primaryDate = wedding?.date ?? earliest?.date ?? initial?.event_date ?? null;
+    const allDates = [...active.map((r) => r.date), ...customActive.map((r) => r.date)]
+      .filter(Boolean)
+      .sort();
+    const primaryDate = wedding?.date ?? allDates[0] ?? initial?.event_date ?? todayISO();
 
     const id = await saveProject.mutateAsync({
       ...values,
@@ -261,7 +264,7 @@ export function ProjectDialog({
       travel_ticket_path: travel.travel_required ? travel.travel_ticket_path : null,
       travel_ticket_name: travel.travel_required ? travel.travel_ticket_name : null,
       advance_date: values.advance_date || todayISO(),
-      ...(primaryDate ? { event_date: primaryDate } : {}),
+      event_date: primaryDate,
       ...(projectId ? { id: projectId } : {}),
     });
     const pid = (projectId ?? id) as string;

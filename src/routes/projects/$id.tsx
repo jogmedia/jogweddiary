@@ -21,6 +21,7 @@ import {
   type CrewAssignment,
   type CrewGroup,
 } from "@/lib/crew-notify";
+import { BookingReceiptButton } from "@/components/BookingReceiptButton";
 import { AppShell } from "@/components/AppShell";
 import { EmptyState, PageHeader, StatCard, StatusBadge } from "@/components/ui-kit";
 import { RecordDialog, type Field } from "@/components/RecordDialog";
@@ -233,6 +234,19 @@ function ProjectDetail() {
             >
               <Send className="mr-1.5 h-4 w-4" /> Share Schedule
             </Button>
+            <BookingReceiptButton
+              data={{
+                clientName: project.clients?.name,
+                clientPhone: project.clients?.whatsapp ?? project.clients?.phone,
+                projectName: project.project_name,
+                eventDate: project.event_date,
+                venue: project.venue,
+                total: project.total_amount,
+                advance: totals.received,
+                balance: project.balance_due,
+                packageName: project.package_name,
+              }}
+            />
           </>
         }
       />

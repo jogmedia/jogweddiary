@@ -1,5 +1,5 @@
 import { useState, type ReactNode } from "react";
-import { CalendarDays, Plane, Plus, Trash2 } from "lucide-react";
+import { CalendarDays, Package as PackageIcon, Plane, Plus, Trash2 } from "lucide-react";
 import { RecordDialog, type Field } from "@/components/RecordDialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -18,6 +18,12 @@ import { ADVANCE_REF, PAY_ACCOUNTS, modeForAccount } from "@/lib/accounts";
 import { todayISO } from "@/lib/format";
 import { TicketUpload } from "@/components/TicketUpload";
 import { BookingReceiptButton } from "@/components/BookingReceiptButton";
+import {
+  PRESET_PACKAGES,
+  findPackage,
+  packageByName,
+  toDeliverables,
+} from "@/lib/packages";
 import {
   useAssignments,
   useClients,
@@ -207,6 +213,27 @@ export function ProjectDialog({
   const [rows, setRows] = useState<Record<string, Row>>(() => buildRows(events, assignments));
   const [customEvents, setCustomEvents] = useState<Row[]>(() => buildCustomRows(events, assignments));
   const [travel, setTravel] = useState<Travel>(() => buildTravel(initial));
+  const [deliverables, setDeliverables] = useState<string[]>(() =>
+    toDeliverables(initial?.deliverables),
+  );
+  const [packageId, setPackageId] = useState<string>(
+    () => packageByName(initial?.package_name)?.id ?? "",
+  );
+
+  const applyPackage = (id: string, set: (name: string, value: any) => void) => {
+    setPackageId(id);
+    const preset = findPackage(id);
+    if (!preset) return;
+    set("package_name", preset.label);
+    set("total_amount", preset.amount);
+    setDeliverables([...preset.items]);
+  };
+
+  const setItem = (index: number, value: string) =>
+    setDeliverables((prev) => prev.map((v, i) => (i === index ? value : v)));
+  const removeItem = (index: number) =>
+    setDeliverables((prev) => prev.filter((_, i) => i !== index));
+  const addItem = () => setDeliverables((prev) => [...prev, ""]);
 
   const setRow = (key: string, patch: Partial<Row>) =>
     setRows((p) => ({ ...p, [key]: { ...p[key], ...patch } }));
@@ -266,8 +293,10 @@ export function ProjectDialog({
       .sort();
     const primaryDate = wedding?.date ?? allDates[0] ?? initial?.event_date ?? todayISO();
 
+    const cleanItems = deliverables.map((d) => d.trim()).filter(Boolean);
     const id = await saveProject.mutateAsync({
       ...values,
+      deliverables: cleanItems,
       travel_required: travel.travel_required,
       travel_booking_status: travel.travel_required ? travel.travel_booking_status : "not_needed",
       travel_mode: travel.travel_required ? travel.travel_mode || null : null,
@@ -348,14 +377,75 @@ export function ProjectDialog({
         setRows(buildRows(events, assignments));
         setCustomEvents(buildCustomRows(events, assignments));
         setTravel(buildTravel(initial));
+        setDeliverables(toDeliverables(initial?.deliverables));
+        setPackageId(packageByName(initial?.package_name)?.id ?? "");
       }}
       onSubmit={submit}
-      extra={(values) => {
+      extra={(values, set) => {
         const client = clientRows.find((c) => c.id === values.client_id);
         const total = Number(values.total_amount ?? 0);
         const advance = Number(values.advance_amount ?? 0);
         return (
         <>
+        <div className="mb-3 rounded-xl border border-border bg-muted/30 p-3">
+          <div className="mb-2 flex items-center gap-2">
+            <PackageIcon className="h-4 w-4 text-primary" />
+            <p className="text-sm font-semibold">Package Details &amp; Deliverables</p>
+          </div>
+          <div className="mb-3">
+            <Label className="mb-1.5 block text-xs font-medium">Select package</Label>
+            <Select value={packageId} onValueChange={(v) => applyPackage(v, set)}>
+              <SelectTrigger>
+                <SelectValue placeholder="Choose a preset package" />
+              </SelectTrigger>
+              <SelectContent className="z-50 max-h-72">
+                {PRESET_PACKAGES.map((p) => (
+                  <SelectItem key={p.id} value={p.id}>
+                    {p.label}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+            <p className="mt-1 text-xs text-muted-foreground">
+              Selecting a package fills the total amount and the deliverables below — everything stays editable.
+            </p>
+          </div>
+          <div className="space-y-2">
+            {deliverables.length === 0 && (
+              <p className="text-xs text-muted-foreground">
+                No deliverables yet — pick a package or add items manually.
+              </p>
+            )}
+            {deliverables.map((item, index) => (
+              <div key={index} className="flex items-center gap-2">
+                <Input
+                  value={item}
+                  placeholder="e.g. 80 page album"
+                  onChange={(e) => setItem(index, e.target.value)}
+                />
+                <Button
+                  type="button"
+                  size="icon"
+                  variant="ghost"
+                  className="shrink-0 text-destructive"
+                  aria-label="Remove deliverable"
+                  onClick={() => removeItem(index)}
+                >
+                  <Trash2 className="h-4 w-4" />
+                </Button>
+              </div>
+            ))}
+            <Button
+              type="button"
+              variant="outline"
+              className="w-full gap-1 border-dashed text-primary hover:bg-primary/5 hover:text-primary"
+              onClick={addItem}
+            >
+              <Plus className="h-4 w-4" />
+              Add Extra Deliverable
+            </Button>
+          </div>
+        </div>
         <div className="mb-3 rounded-xl border border-border bg-success/5 p-3">
           <p className="mb-2 text-sm font-semibold">Booking confirmation &amp; receipt</p>
           <p className="mb-2 text-xs text-muted-foreground">
@@ -373,6 +463,7 @@ export function ProjectDialog({
               advance,
               balance: Math.max(total - advance, 0),
               packageName: values.package_name,
+              services: deliverables.map((d) => d.trim()).filter(Boolean),
             }}
           />
         </div>

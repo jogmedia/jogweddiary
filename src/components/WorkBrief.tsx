@@ -1,5 +1,6 @@
 import { fmtDate, inr } from "@/lib/format";
 import { eventLabel, eventMeta, fmtTime, type EventLike } from "@/lib/whatsapp";
+import { toDeliverables } from "@/lib/packages";
 
 const BRAND = "#A56A2A";
 const TEXT = "#2D241D";
@@ -207,6 +208,35 @@ export function WorkBrief({
           </div>
         ))}
       </div>
+
+      {/* Package details & deliverables */}
+      {toDeliverables(project.deliverables).length > 0 && (
+        <>
+          <div style={{ fontSize: 13, fontWeight: 700, marginBottom: 8, color: BRAND }}>
+            PACKAGE DETAILS &amp; DELIVERABLES
+          </div>
+          <div
+            style={{
+              border: `1px solid ${BORDER}`,
+              borderRadius: 8,
+              padding: 12,
+              marginBottom: 20,
+              background: SOFT,
+            }}
+          >
+            {project.package_name ? (
+              <div style={{ fontSize: 12, fontWeight: 700, marginBottom: 6 }}>{project.package_name}</div>
+            ) : null}
+            <div style={{ display: "flex", flexWrap: "wrap" }}>
+              {toDeliverables(project.deliverables).map((d: string, i: number) => (
+                <div key={i} style={{ width: "50%", fontSize: 11, padding: "3px 0", color: TEXT }}>
+                  • {d}
+                </div>
+              ))}
+            </div>
+          </div>
+        </>
+      )}
 
       {/* Payment summary */}
       <div style={{ fontSize: 13, fontWeight: 700, marginBottom: 8, color: BRAND }}>Payment Summary</div>

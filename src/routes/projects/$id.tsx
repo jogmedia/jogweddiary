@@ -22,6 +22,7 @@ import {
   type CrewGroup,
 } from "@/lib/crew-notify";
 import { BookingReceiptButton } from "@/components/BookingReceiptButton";
+import { toDeliverables } from "@/lib/packages";
 import { AppShell } from "@/components/AppShell";
 import { EmptyState, PageHeader, StatCard, StatusBadge } from "@/components/ui-kit";
 import { RecordDialog, type Field } from "@/components/RecordDialog";
@@ -245,6 +246,7 @@ function ProjectDetail() {
                 advance: totals.received,
                 balance: project.balance_due,
                 packageName: project.package_name,
+                services: toDeliverables((project as any).deliverables),
               }}
             />
           </>
@@ -750,6 +752,19 @@ function PrintDoc({
           ))}
         </tbody>
       </table>
+      {toDeliverables(project.deliverables).length > 0 && (
+        <div className="mt-4">
+          <p className="mb-1.5 text-xs font-semibold tracking-wide">PACKAGE DETAILS &amp; DELIVERABLES</p>
+          {project.package_name && (
+            <p className="mb-1 text-xs font-medium">{project.package_name}</p>
+          )}
+          <ul className="grid grid-cols-2 gap-x-4 text-xs">
+            {toDeliverables(project.deliverables).map((d: string, i: number) => (
+              <li key={i}>• {d}</li>
+            ))}
+          </ul>
+        </div>
+      )}
       <div className="mt-3 space-y-1 text-xs">
         {footer.map((f, i) => (
           <div key={i} className="flex justify-between">

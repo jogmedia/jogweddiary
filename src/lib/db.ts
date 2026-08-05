@@ -23,6 +23,7 @@ export type Project = {
   event_date: string;
   venue: string | null;
   package_name: string | null;
+  deliverables?: string[] | null;
   total_amount: number;
   advance_amount: number;
   advance_account?: string | null;
@@ -446,6 +447,11 @@ function sanitize(values: Record<string, unknown>) {
   for (const [k, v] of Object.entries(values)) {
     if (k === "created_at" || k === "updated_at") continue;
     // nested relation payloads (e.g. `clients`, `projects`, `staff`) are not columns
+    // plain arrays (e.g. `deliverables`) are real jsonb columns
+    if (Array.isArray(v)) {
+      out[k] = v;
+      continue;
+    }
     if (v !== null && typeof v === "object") continue;
     out[k] = v;
   }

@@ -19,6 +19,12 @@ import { todayISO } from "@/lib/format";
 import { TicketUpload } from "@/components/TicketUpload";
 import { BookingReceiptButton } from "@/components/BookingReceiptButton";
 import {
+  PRESET_PACKAGES,
+  findPackage,
+  packageByName,
+  toDeliverables,
+} from "@/lib/packages";
+import {
   useAssignments,
   useClients,
   usePayments,

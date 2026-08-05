@@ -1,5 +1,6 @@
 import { fmtDate, inr } from "@/lib/format";
 import { eventLabel, eventMeta, fmtTime, type EventLike } from "@/lib/whatsapp";
+import { toDeliverables } from "@/lib/packages";
 
 const BRAND = "#A56A2A";
 const TEXT = "#2D241D";

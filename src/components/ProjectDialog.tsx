@@ -213,6 +213,27 @@ export function ProjectDialog({
   const [rows, setRows] = useState<Record<string, Row>>(() => buildRows(events, assignments));
   const [customEvents, setCustomEvents] = useState<Row[]>(() => buildCustomRows(events, assignments));
   const [travel, setTravel] = useState<Travel>(() => buildTravel(initial));
+  const [deliverables, setDeliverables] = useState<string[]>(() =>
+    toDeliverables(initial?.deliverables),
+  );
+  const [packageId, setPackageId] = useState<string>(
+    () => packageByName(initial?.package_name)?.id ?? "",
+  );
+
+  const applyPackage = (id: string, set: (name: string, value: any) => void) => {
+    setPackageId(id);
+    const preset = findPackage(id);
+    if (!preset) return;
+    set("package_name", preset.label);
+    set("total_amount", preset.amount);
+    setDeliverables([...preset.items]);
+  };
+
+  const setItem = (index: number, value: string) =>
+    setDeliverables((prev) => prev.map((v, i) => (i === index ? value : v)));
+  const removeItem = (index: number) =>
+    setDeliverables((prev) => prev.filter((_, i) => i !== index));
+  const addItem = () => setDeliverables((prev) => [...prev, ""]);
 
   const setRow = (key: string, patch: Partial<Row>) =>
     setRows((p) => ({ ...p, [key]: { ...p[key], ...patch } }));

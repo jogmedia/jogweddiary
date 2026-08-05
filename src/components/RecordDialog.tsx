@@ -203,7 +203,7 @@ export function RecordDialog({
           ))}
         </div>
         {extra ? (
-          <div className="mt-2">{typeof extra === "function" ? extra(values) : extra}</div>
+          <div className="mt-2">{typeof extra === "function" ? extra(values, set) : extra}</div>
         ) : null}
         <DialogFooter>
           <Button variant="outline" onClick={() => setOpen(false)}>

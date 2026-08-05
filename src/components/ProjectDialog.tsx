@@ -17,8 +17,10 @@ import { CrewPicker, type CrewMember } from "@/components/CrewPicker";
 import { ADVANCE_REF, PAY_ACCOUNTS, modeForAccount } from "@/lib/accounts";
 import { todayISO } from "@/lib/format";
 import { TicketUpload } from "@/components/TicketUpload";
+import { BookingReceiptButton } from "@/components/BookingReceiptButton";
 import {
   useAssignments,
+  useClients,
   usePayments,
   useProjectEvents,
   useRemove,
@@ -191,6 +193,7 @@ export function ProjectDialog({
 }) {
   const { data: allEvents = [] } = useProjectEvents(projectId);
   const { data: staff = [] } = useStaff();
+  const { data: clientRows = [] } = useClients();
   const { data: allAssignments = [] } = useAssignments(projectId);
   const events = projectId ? allEvents : [];
   const assignments = projectId ? allAssignments : [];
@@ -219,6 +222,14 @@ export function ProjectDialog({
       await delEvent.mutateAsync(row.id);
     }
     setCustomEvents((prev) => prev.filter((_, i) => i !== index));
+  };
+
+  const firstEventDate = () => {
+    const all = [
+      ...Object.values(rows).filter((r) => r.enabled && r.date).map((r) => r.date),
+      ...customEvents.filter((r) => r.enabled && r.date).map((r) => r.date),
+    ].sort();
+    return all[0];
   };
 
   const activeDates = () =>
@@ -339,8 +350,32 @@ export function ProjectDialog({
         setTravel(buildTravel(initial));
       }}
       onSubmit={submit}
-      extra={
+      extra={(values) => {
+        const client = clientRows.find((c) => c.id === values.client_id);
+        const total = Number(values.total_amount ?? 0);
+        const advance = Number(values.advance_amount ?? 0);
+        return (
         <>
+        <div className="mb-3 rounded-xl border border-border bg-success/5 p-3">
+          <p className="mb-2 text-sm font-semibold">Booking confirmation &amp; receipt</p>
+          <p className="mb-2 text-xs text-muted-foreground">
+            Sends the client a formatted receipt with package amount, advance paid and balance payable.
+          </p>
+          <BookingReceiptButton
+            className="w-full"
+            data={{
+              clientName: client?.name,
+              clientPhone: client?.whatsapp ?? client?.phone,
+              projectName: values.project_name,
+              eventDate: firstEventDate() ?? initial?.event_date,
+              venue: values.venue,
+              total,
+              advance,
+              balance: Math.max(total - advance, 0),
+              packageName: values.package_name,
+            }}
+          />
+        </div>
         <div className="mb-3 rounded-xl border border-border bg-muted/30 p-3">
           <div className="mb-2 flex items-center gap-2">
             <Plane className="h-4 w-4 text-primary" />
@@ -548,7 +583,8 @@ export function ProjectDialog({
           </div>
         </div>
         </>
-      }
+        );
+      }}
     />
   );
 }

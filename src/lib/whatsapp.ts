@@ -147,3 +147,58 @@ export function openWhatsApp(phone: string | null | undefined, message: string) 
   window.open(url, "_blank", "noopener");
 }
 
+
+/** Booking confirmation + advance receipt message for the client. */
+export function buildBookingReceiptMessage(p: {
+  businessName?: string;
+  clientName?: string | null;
+  projectName?: string | null;
+  eventDate?: string | null;
+  venue?: string | null;
+  total?: number | string | null;
+  advance?: number | string | null;
+  balance?: number | string | null;
+  packageName?: string | null;
+  services?: string[];
+}) {
+  const business = (p.businessName ?? "JOG MEDIA").toUpperCase();
+  const total = Number(p.total ?? 0);
+  const advance = Number(p.advance ?? 0);
+  const balance = p.balance == null ? Math.max(total - advance, 0) : Number(p.balance);
+  const money = (n: number) => `₹${n.toLocaleString("en-IN")}`;
+
+  const services = (
+    p.services?.length
+      ? p.services
+      : (p.packageName ?? "")
+          .split(/[,/\n•]+/)
+          .map((s) => s.trim())
+          .filter(Boolean)
+  ).filter(Boolean);
+
+  return [
+    `🎉 *BOOKING CONFIRMATION & RECEIPT - ${business}* 🎉`,
+    "",
+    `Dear ${p.clientName?.trim() || "Client"}, ❤️`,
+    "",
+    `Thank you for choosing ${business} to capture your special moments! We are excited to confirm your booking.`,
+    "",
+    "📅 *Event Details:*",
+    `• Event Name: ${p.projectName?.trim() || "Wedding Coverage"}`,
+    `• Event Date: ${p.eventDate ? fmtDate(p.eventDate) : "To be confirmed"}`,
+    `• Venue: ${p.venue?.trim() || "To be confirmed"}`,
+    "",
+    "💰 *Payment Summary:*",
+    `• Total Package Amount: ${money(total)}`,
+    `• Advance Paid: ${money(advance)}`,
+    `• Balance Payable: ${money(balance)}`,
+    "",
+    "🎁 *Services Included in Your Package:*",
+    ...(services.length ? services.map((s) => `• ${s}`) : ["• As per the agreed package"]),
+    "",
+    "We look forward to creating timeless memories for you! If you have any questions, feel free to contact us.",
+    "",
+    "Warm regards,",
+    `Team ${business.charAt(0) + business.slice(1).toLowerCase()} 🌸`,
+  ].join("\n");
+}

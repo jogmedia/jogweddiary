@@ -387,6 +387,65 @@ export function ProjectDialog({
         const advance = Number(values.advance_amount ?? 0);
         return (
         <>
+        <div className="mb-3 rounded-xl border border-border bg-muted/30 p-3">
+          <div className="mb-2 flex items-center gap-2">
+            <PackageIcon className="h-4 w-4 text-primary" />
+            <p className="text-sm font-semibold">Package Details &amp; Deliverables</p>
+          </div>
+          <div className="mb-3">
+            <Label className="mb-1.5 block text-xs font-medium">Select package</Label>
+            <Select value={packageId} onValueChange={(v) => applyPackage(v, set)}>
+              <SelectTrigger>
+                <SelectValue placeholder="Choose a preset package" />
+              </SelectTrigger>
+              <SelectContent className="z-50 max-h-72">
+                {PRESET_PACKAGES.map((p) => (
+                  <SelectItem key={p.id} value={p.id}>
+                    {p.label}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+            <p className="mt-1 text-xs text-muted-foreground">
+              Selecting a package fills the total amount and the deliverables below — everything stays editable.
+            </p>
+          </div>
+          <div className="space-y-2">
+            {deliverables.length === 0 && (
+              <p className="text-xs text-muted-foreground">
+                No deliverables yet — pick a package or add items manually.
+              </p>
+            )}
+            {deliverables.map((item, index) => (
+              <div key={index} className="flex items-center gap-2">
+                <Input
+                  value={item}
+                  placeholder="e.g. 80 page album"
+                  onChange={(e) => setItem(index, e.target.value)}
+                />
+                <Button
+                  type="button"
+                  size="icon"
+                  variant="ghost"
+                  className="shrink-0 text-destructive"
+                  aria-label="Remove deliverable"
+                  onClick={() => removeItem(index)}
+                >
+                  <Trash2 className="h-4 w-4" />
+                </Button>
+              </div>
+            ))}
+            <Button
+              type="button"
+              variant="outline"
+              className="w-full gap-1 border-dashed text-primary hover:bg-primary/5 hover:text-primary"
+              onClick={addItem}
+            >
+              <Plus className="h-4 w-4" />
+              Add Extra Deliverable
+            </Button>
+          </div>
+        </div>
         <div className="mb-3 rounded-xl border border-border bg-success/5 p-3">
           <p className="mb-2 text-sm font-semibold">Booking confirmation &amp; receipt</p>
           <p className="mb-2 text-xs text-muted-foreground">

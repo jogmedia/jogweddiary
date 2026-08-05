@@ -1024,6 +1024,7 @@ export type Database = {
           balance_due: number
           client_id: string
           created_at: string
+          deliverables: Json
           delivery_status: string
           editing_status: string
           event_date: string
@@ -1061,6 +1062,7 @@ export type Database = {
           balance_due?: number
           client_id: string
           created_at?: string
+          deliverables?: Json
           delivery_status?: string
           editing_status?: string
           event_date: string
@@ -1098,6 +1100,7 @@ export type Database = {
           balance_due?: number
           client_id?: string
           created_at?: string
+          deliverables?: Json
           delivery_status?: string
           editing_status?: string
           event_date?: string

@@ -447,6 +447,11 @@ function sanitize(values: Record<string, unknown>) {
   for (const [k, v] of Object.entries(values)) {
     if (k === "created_at" || k === "updated_at") continue;
     // nested relation payloads (e.g. `clients`, `projects`, `staff`) are not columns
+    // plain arrays (e.g. `deliverables`) are real jsonb columns
+    if (Array.isArray(v)) {
+      out[k] = v;
+      continue;
+    }
     if (v !== null && typeof v === "object") continue;
     out[k] = v;
   }

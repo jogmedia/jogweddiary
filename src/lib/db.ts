@@ -23,6 +23,7 @@ export type Project = {
   event_date: string;
   venue: string | null;
   package_name: string | null;
+  deliverables?: string[] | null;
   total_amount: number;
   advance_amount: number;
   advance_account?: string | null;

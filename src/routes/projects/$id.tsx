@@ -245,6 +245,7 @@ function ProjectDetail() {
                 advance: totals.received,
                 balance: project.balance_due,
                 packageName: project.package_name,
+                services: toDeliverables((project as any).deliverables),
               }}
             />
           </>

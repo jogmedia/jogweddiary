@@ -293,8 +293,10 @@ export function ProjectDialog({
       .sort();
     const primaryDate = wedding?.date ?? allDates[0] ?? initial?.event_date ?? todayISO();
 
+    const cleanItems = deliverables.map((d) => d.trim()).filter(Boolean);
     const id = await saveProject.mutateAsync({
       ...values,
+      deliverables: cleanItems,
       travel_required: travel.travel_required,
       travel_booking_status: travel.travel_required ? travel.travel_booking_status : "not_needed",
       travel_mode: travel.travel_required ? travel.travel_mode || null : null,

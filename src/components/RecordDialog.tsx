@@ -58,7 +58,9 @@ export function RecordDialog({
   open?: boolean;
   onOpenChange?: (v: boolean) => void;
   /** Extra UI rendered below the standard fields (e.g. dynamic sub-sections). */
-  extra?: ReactNode | ((values: Record<string, any>) => ReactNode);
+  extra?:
+    | ReactNode
+    | ((values: Record<string, any>, set: (name: string, value: any) => void) => ReactNode);
   /** Called whenever the dialog opens, so parents can reset their own extra state. */
   onReset?: () => void;
 }) {

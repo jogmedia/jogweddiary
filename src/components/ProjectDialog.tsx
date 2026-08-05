@@ -463,6 +463,7 @@ export function ProjectDialog({
               advance,
               balance: Math.max(total - advance, 0),
               packageName: values.package_name,
+              services: deliverables.map((d) => d.trim()).filter(Boolean),
             }}
           />
         </div>

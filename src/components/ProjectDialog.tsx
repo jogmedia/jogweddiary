@@ -377,9 +377,11 @@ export function ProjectDialog({
         setRows(buildRows(events, assignments));
         setCustomEvents(buildCustomRows(events, assignments));
         setTravel(buildTravel(initial));
+        setDeliverables(toDeliverables(initial?.deliverables));
+        setPackageId(packageByName(initial?.package_name)?.id ?? "");
       }}
       onSubmit={submit}
-      extra={(values) => {
+      extra={(values, set) => {
         const client = clientRows.find((c) => c.id === values.client_id);
         const total = Number(values.total_amount ?? 0);
         const advance = Number(values.advance_amount ?? 0);

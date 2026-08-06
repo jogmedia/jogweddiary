@@ -3,6 +3,7 @@ import { AppShell } from "@/components/AppShell";
 import { EmptyState, PageHeader } from "@/components/ui-kit";
 import { RecordDialog } from "@/components/RecordDialog";
 import { Button } from "@/components/ui/button";
+import { LogoUpload } from "@/components/LogoUpload";
 import { useAuth } from "@/lib/auth";
 import { useActivity, useSettings, useUpsert } from "@/lib/db";
 import { fmtDate } from "@/lib/format";

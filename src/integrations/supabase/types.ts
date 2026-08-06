@@ -53,6 +53,7 @@ export type Database = {
           gstin: string | null
           id: string
           invoice_prefix: string
+          logo_url: string | null
           phone: string | null
           updated_at: string
         }
@@ -64,6 +65,7 @@ export type Database = {
           gstin?: string | null
           id?: string
           invoice_prefix?: string
+          logo_url?: string | null
           phone?: string | null
           updated_at?: string
         }
@@ -75,6 +77,7 @@ export type Database = {
           gstin?: string | null
           id?: string
           invoice_prefix?: string
+          logo_url?: string | null
           phone?: string | null
           updated_at?: string
         }

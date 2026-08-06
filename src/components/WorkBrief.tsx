@@ -88,7 +88,7 @@ export function WorkBrief({
       </div>
 
       {/* Event schedule */}
-      <PdfSection title="Project &amp; Event Schedule" />
+      <PdfSection title="Project && Event Schedule" />
       <table style={{ width: "100%", borderCollapse: "collapse", marginBottom: 22 }}>
         <thead>
           <tr>
@@ -161,7 +161,7 @@ export function WorkBrief({
       {/* Deliverables */}
       {deliverables.length > 0 && (
         <>
-          <PdfSection title="Package Details &amp; Deliverables" />
+          <PdfSection title="Package Details && Deliverables" />
           <div style={{ border: `1px solid ${DOC.line}`, marginBottom: 22 }}>
             {project.package_name ? (
               <div
@@ -217,7 +217,7 @@ export function WorkBrief({
       </table>
 
       {/* Notes */}
-      <PdfSection title="Notes &amp; Instructions" />
+      <PdfSection title="Notes && Instructions" />
       <div
         style={{
           border: `1px solid ${DOC.line}`,

@@ -1,128 +1,77 @@
 import { fmtDate, inr } from "@/lib/format";
-import { eventLabel, eventMeta, fmtTime, type EventLike } from "@/lib/whatsapp";
+import { eventLabel, fmtTime, type EventLike } from "@/lib/whatsapp";
 import { toDeliverables } from "@/lib/packages";
-
-const BRAND = "#A56A2A";
-const TEXT = "#2D241D";
-const MUTED = "#7A6E63";
-const BORDER = "#E7DFD5";
-const SOFT = "#F7F3EC";
+import { DOC, PdfFooter, PdfHeader, PdfSection } from "@/components/PdfDoc";
 
 type Ev = EventLike & { id: string };
 
-/** Print/PDF-ready branded work brief. Inline styles only (html2canvas safe). */
+/** Print/PDF-ready premium branded document. Inline styles only (html2canvas safe). */
 export function WorkBrief({
   settings,
   project,
   events,
   crew,
+  docTitle = "Wedding Event Brief",
 }: {
   settings: any;
   project: any;
   events: Ev[];
   crew: { name: string; role: string | null; eventId: string | null }[];
+  docTitle?: string;
 }) {
-  const business = settings?.business_name ?? "Jog Media";
   const sorted = [...events].sort((a, b) => (a.event_date < b.event_date ? -1 : 1));
+  const deliverables = toDeliverables(project.deliverables);
+  const received = Number(project.total_amount ?? 0) - Number(project.balance_due ?? 0);
 
   const th: React.CSSProperties = {
     textAlign: "left",
-    padding: "8px 6px",
-    fontSize: 11,
-    letterSpacing: 0.4,
+    padding: "9px 8px",
+    fontSize: 10,
+    fontWeight: 700,
+    letterSpacing: 0.8,
     textTransform: "uppercase",
-    color: "#FFFFFF",
-    background: BRAND,
+    color: DOC.paper,
+    background: DOC.charcoal,
+    borderRight: "1px solid #4F4F4F",
   };
   const td: React.CSSProperties = {
-    padding: "8px 6px",
-    fontSize: 11,
-    color: TEXT,
-    borderBottom: `1px solid ${BORDER}`,
+    padding: "9px 8px",
+    fontSize: 10.5,
+    color: DOC.ink,
+    border: `1px solid ${DOC.line}`,
     verticalAlign: "top",
+  };
+  const label: React.CSSProperties = {
+    fontSize: 9,
+    color: DOC.gray,
+    textTransform: "uppercase",
+    letterSpacing: 0.8,
   };
 
   return (
     <div
       style={{
         width: 720,
-        background: "#FFFFFF",
-        color: TEXT,
+        background: DOC.paper,
+        color: DOC.ink,
         fontFamily: "Inter, Arial, sans-serif",
-        padding: 28,
+        padding: 26,
         boxSizing: "border-box",
         overflow: "hidden",
       }}
     >
-      {/* Header */}
+      <PdfHeader settings={settings} docTitle={docTitle} />
+
+      {/* Client details */}
+      <PdfSection title="Client Details" />
       <div
         style={{
           display: "flex",
-          justifyContent: "space-between",
-          alignItems: "flex-start",
-          gap: 16,
-          borderBottom: `3px solid ${BRAND}`,
-          paddingBottom: 14,
-          marginBottom: 18,
-        }}
-      >
-        <div style={{ display: "flex", gap: 12, alignItems: "center", minWidth: 0, flex: "1 1 auto" }}>
-          <div
-            style={{
-              width: 54,
-              height: 54,
-              flexShrink: 0,
-              borderRadius: 12,
-              background: SOFT,
-              border: `1px solid ${BORDER}`,
-              color: BRAND,
-              fontSize: 18,
-              fontWeight: 700,
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-            }}
-          >
-            JM
-          </div>
-          <div style={{ minWidth: 0 }}>
-            <div style={{ fontSize: 20, fontWeight: 700, letterSpacing: 0.3 }}>{business}</div>
-            <div style={{ fontSize: 11, color: MUTED }}>
-              {settings?.address ?? "Kozhikode, Kerala, India"}
-            </div>
-            <div style={{ fontSize: 11, color: MUTED }}>
-              {[settings?.phone, settings?.email].filter(Boolean).join(" · ")}
-            </div>
-          </div>
-        </div>
-        <div
-          style={{
-            textAlign: "right",
-            flex: "0 0 auto",
-            flexShrink: 0,
-            whiteSpace: "nowrap",
-            minWidth: 200,
-            paddingRight: 2,
-          }}
-        >
-          <div style={{ fontSize: 12, fontWeight: 700, color: BRAND, letterSpacing: 0.6 }}>
-            WEDDING EVENT BRIEF
-          </div>
-          <div style={{ fontSize: 11, color: MUTED }}>Generated {fmtDate(new Date().toISOString())}</div>
-        </div>
-      </div>
-
-
-      {/* Client card */}
-      <div
-        style={{
-          display: "flex",
-          gap: 16,
-          background: SOFT,
-          border: `1px solid ${BORDER}`,
-          borderRadius: 10,
+          gap: 14,
+          background: DOC.soft,
+          border: `1px solid ${DOC.line}`,
           padding: 14,
-          marginBottom: 18,
+          marginBottom: 22,
         }}
       >
         {[
@@ -131,23 +80,23 @@ export function WorkBrief({
           ["Project", project.project_name],
           ["Package", project.package_name ?? "—"],
         ].map(([k, v]) => (
-          <div key={k as string} style={{ flex: 1 }}>
-            <div style={{ fontSize: 10, color: MUTED, textTransform: "uppercase", letterSpacing: 0.6 }}>{k}</div>
-            <div style={{ fontSize: 12, fontWeight: 600 }}>{v as string}</div>
+          <div key={k as string} style={{ flex: 1, minWidth: 0 }}>
+            <div style={label}>{k}</div>
+            <div style={{ fontSize: 11.5, fontWeight: 600, marginTop: 2 }}>{v as string}</div>
           </div>
         ))}
       </div>
 
-      {/* Events */}
-      <div style={{ fontSize: 13, fontWeight: 700, marginBottom: 8, color: BRAND }}>Event Schedule</div>
-      <table style={{ width: "100%", borderCollapse: "collapse", marginBottom: 20 }}>
+      {/* Event schedule */}
+      <PdfSection title="Project &amp; Event Schedule" />
+      <table style={{ width: "100%", borderCollapse: "collapse", marginBottom: 22 }}>
         <thead>
           <tr>
             <th style={th}>Event</th>
             <th style={th}>Date</th>
             <th style={th}>Team Arrival</th>
             <th style={th}>Event Time</th>
-            <th style={th}>Venue &amp; Location</th>
+            <th style={{ ...th, borderRight: "none" }}>Venue &amp; Location</th>
           </tr>
         </thead>
         <tbody>
@@ -158,8 +107,8 @@ export function WorkBrief({
               </td>
             </tr>
           )}
-          {sorted.map((e) => (
-            <tr key={e.id}>
+          {sorted.map((e, i) => (
+            <tr key={e.id} style={{ background: i % 2 ? DOC.soft : DOC.paper }}>
               <td style={{ ...td, fontWeight: 600 }}>{eventLabel(e)}</td>
               <td style={td}>{fmtDate(e.event_date)}</td>
               <td style={td}>{fmtTime(e.arrival_time)}</td>
@@ -167,70 +116,74 @@ export function WorkBrief({
               <td style={td}>
                 {e.location ?? "—"}
                 {e.google_maps_link ? (
-                  <div style={{ fontSize: 10, wordBreak: "break-all" }}>
-                    <a
-                      href={e.google_maps_link}
-                      style={{ color: BRAND, textDecoration: "underline" }}
-                    >
+                  <div style={{ fontSize: 9.5, wordBreak: "break-all", marginTop: 2 }}>
+                    <a href={e.google_maps_link} style={{ color: DOC.gold, textDecoration: "none" }}>
                       📍 Open in Google Maps
                     </a>
-                    <div style={{ color: MUTED, fontSize: 9 }}>{e.google_maps_link}</div>
+                    <div style={{ color: DOC.gray, fontSize: 8.5 }}>{e.google_maps_link}</div>
                   </div>
                 ) : null}
               </td>
-
             </tr>
           ))}
         </tbody>
       </table>
 
       {/* Crew */}
-      <div style={{ fontSize: 13, fontWeight: 700, marginBottom: 8, color: BRAND }}>Assigned Crew</div>
-      <div style={{ display: "flex", flexWrap: "wrap", gap: 8, marginBottom: 20 }}>
-        {crew.length === 0 && <div style={{ fontSize: 11, color: MUTED }}>No crew assigned yet.</div>}
+      <PdfSection title="Assigned Crew" />
+      <div style={{ display: "flex", flexWrap: "wrap", gap: 8, marginBottom: 22 }}>
+        {crew.length === 0 && <div style={{ fontSize: 10.5, color: DOC.gray }}>No crew assigned yet.</div>}
         {crew.map((c, i) => (
           <div
             key={i}
             style={{
-              border: `1px solid ${BORDER}`,
-              borderRadius: 8,
-              padding: "8px 10px",
-              minWidth: 160,
+              border: `1px solid ${DOC.line}`,
+              borderLeft: `3px solid ${DOC.gold}`,
+              padding: "8px 12px",
+              minWidth: 165,
+              background: DOC.paper,
             }}
           >
-            <div style={{ fontSize: 12, fontWeight: 600 }}>{c.name}</div>
-            <div style={{ fontSize: 10, color: MUTED }}>
+            <div style={{ fontSize: 11.5, fontWeight: 600 }}>{c.name}</div>
+            <div style={{ fontSize: 9.5, color: DOC.gray, marginTop: 1 }}>
               {c.role || "Crew"}
               {c.eventId
-                ? ` · ${(() => { const ev = sorted.find((e) => e.id === c.eventId); return ev ? eventLabel(ev) : "Custom event"; })()}`
+                ? ` · ${(() => {
+                    const ev = sorted.find((e) => e.id === c.eventId);
+                    return ev ? eventLabel(ev) : "Custom event";
+                  })()}`
                 : " · All events"}
             </div>
           </div>
         ))}
       </div>
 
-      {/* Package details & deliverables */}
-      {toDeliverables(project.deliverables).length > 0 && (
+      {/* Deliverables */}
+      {deliverables.length > 0 && (
         <>
-          <div style={{ fontSize: 13, fontWeight: 700, marginBottom: 8, color: BRAND }}>
-            PACKAGE DETAILS &amp; DELIVERABLES
-          </div>
-          <div
-            style={{
-              border: `1px solid ${BORDER}`,
-              borderRadius: 8,
-              padding: 12,
-              marginBottom: 20,
-              background: SOFT,
-            }}
-          >
+          <PdfSection title="Package Details &amp; Deliverables" />
+          <div style={{ border: `1px solid ${DOC.line}`, marginBottom: 22 }}>
             {project.package_name ? (
-              <div style={{ fontSize: 12, fontWeight: 700, marginBottom: 6 }}>{project.package_name}</div>
+              <div
+                style={{
+                  fontSize: 11.5,
+                  fontWeight: 700,
+                  padding: "9px 12px",
+                  background: DOC.goldSoft,
+                  borderBottom: `1px solid ${DOC.line}`,
+                  letterSpacing: 0.4,
+                }}
+              >
+                {project.package_name}
+              </div>
             ) : null}
-            <div style={{ display: "flex", flexWrap: "wrap" }}>
-              {toDeliverables(project.deliverables).map((d: string, i: number) => (
-                <div key={i} style={{ width: "50%", fontSize: 11, padding: "3px 0", color: TEXT }}>
-                  • {d}
+            <div style={{ display: "flex", flexWrap: "wrap", padding: "10px 12px" }}>
+              {deliverables.map((d: string, i: number) => (
+                <div
+                  key={i}
+                  style={{ width: "50%", fontSize: 10.5, padding: "4px 0", color: DOC.ink, boxSizing: "border-box", paddingRight: 10 }}
+                >
+                  <span style={{ color: DOC.gold, fontWeight: 700 }}>✓</span> {d}
                 </div>
               ))}
             </div>
@@ -239,40 +192,47 @@ export function WorkBrief({
       )}
 
       {/* Payment summary */}
-      <div style={{ fontSize: 13, fontWeight: 700, marginBottom: 8, color: BRAND }}>Payment Summary</div>
-      <div style={{ display: "flex", gap: 16, marginBottom: 20 }}>
-        {[
-          ["Total", inr(project.total_amount)],
-          ["Advance / Received", inr(Number(project.total_amount ?? 0) - Number(project.balance_due ?? 0))],
-          ["Balance", inr(project.balance_due)],
-          ["Due date", project.payment_due_date ? fmtDate(project.payment_due_date) : "—"],
-        ].map(([k, v]) => (
-          <div key={k as string} style={{ flex: 1, border: `1px solid ${BORDER}`, borderRadius: 8, padding: 10 }}>
-            <div style={{ fontSize: 10, color: MUTED, textTransform: "uppercase" }}>{k}</div>
-            <div style={{ fontSize: 13, fontWeight: 700 }}>{v as string}</div>
-          </div>
-        ))}
-      </div>
+      <PdfSection title="Payment Summary" />
+      <table style={{ width: "100%", borderCollapse: "collapse", marginBottom: 22 }}>
+        <thead>
+          <tr>
+            <th style={th}>Total Package Value</th>
+            <th style={th}>Received</th>
+            <th style={th}>Balance Due</th>
+            <th style={{ ...th, borderRight: "none" }}>Due Date</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td style={{ ...td, fontSize: 12, fontWeight: 700 }}>{inr(project.total_amount)}</td>
+            <td style={{ ...td, fontSize: 12, fontWeight: 700 }}>{inr(received)}</td>
+            <td style={{ ...td, fontSize: 12, fontWeight: 700, background: DOC.goldSoft }}>
+              {inr(project.balance_due)}
+            </td>
+            <td style={{ ...td, fontSize: 11 }}>
+              {project.payment_due_date ? fmtDate(project.payment_due_date) : "—"}
+            </td>
+          </tr>
+        </tbody>
+      </table>
 
       {/* Notes */}
-      <div style={{ fontSize: 13, fontWeight: 700, marginBottom: 8, color: BRAND }}>Notes &amp; Instructions</div>
+      <PdfSection title="Notes &amp; Instructions" />
       <div
         style={{
-          border: `1px solid ${BORDER}`,
-          borderRadius: 8,
+          border: `1px solid ${DOC.line}`,
+          background: DOC.soft,
           padding: 12,
-          fontSize: 11,
-          lineHeight: 1.6,
+          fontSize: 10.5,
+          lineHeight: 1.7,
           whiteSpace: "pre-wrap",
-          minHeight: 60,
+          minHeight: 56,
         }}
       >
         {project.notes || "— No special instructions recorded —"}
       </div>
 
-      <div style={{ marginTop: 24, fontSize: 10, color: MUTED, textAlign: "center" }}>
-        {business} · {settings?.phone ?? ""} · Thank you for trusting us with your celebration.
-      </div>
+      <PdfFooter settings={settings} />
     </div>
   );
 }

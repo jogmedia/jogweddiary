@@ -50,6 +50,7 @@ import { exportPdf } from "@/lib/exporters";
 import { downloadElementPdf } from "@/lib/pdf";
 import { EventSchedule } from "@/components/EventSchedule";
 import { WorkBrief } from "@/components/WorkBrief";
+import { BookingAgreement } from "@/components/BookingAgreement";
 import { buildScheduleMessage, openWhatsApp } from "@/lib/whatsapp";
 import { ProjectDialog } from "@/components/ProjectDialog";
 
@@ -218,6 +219,18 @@ function ProjectDetail() {
               }
             >
               <FileDown className="mr-1.5 h-4 w-4" /> Work Brief PDF
+            </Button>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() =>
+                downloadElementPdf(
+                  "booking-agreement",
+                  `Jog Media Booking Agreement - ${project.project_name}`,
+                )
+              }
+            >
+              <FileDown className="mr-1.5 h-4 w-4" /> Booking Agreement PDF
             </Button>
             <Button
               size="sm"
@@ -643,6 +656,15 @@ function ProjectDetail() {
             role: a.role_in_project,
             eventId: a.event_id ?? null,
           }))}
+        />
+      </div>
+
+      <div id="booking-agreement" className="hidden">
+        <BookingAgreement
+          settings={settings}
+          project={project}
+          events={events}
+          advance={totals.received}
         />
       </div>
 

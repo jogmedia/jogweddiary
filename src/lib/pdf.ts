@@ -9,7 +9,7 @@ export async function downloadElementPdf(elementId: string, filename: string) {
   holder.style.position = "fixed";
   holder.style.left = "-10000px";
   holder.style.top = "0";
-  holder.style.background = "#ffffff";
+  holder.style.background = "#FAF6EE";
   holder.appendChild(clone);
   document.body.appendChild(holder);
   try {
@@ -18,7 +18,7 @@ export async function downloadElementPdf(elementId: string, filename: string) {
         margin: [15, 12, 15, 12],
         filename: `${filename}.pdf`,
         image: { type: "jpeg", quality: 0.98 },
-        html2canvas: { scale: 2, useCORS: true, backgroundColor: "#ffffff", windowWidth: 780 },
+        html2canvas: { scale: 2, useCORS: true, backgroundColor: "#FAF6EE", windowWidth: 780 },
         jsPDF: { unit: "mm", format: "a4", orientation: "portrait" },
         pagebreak: { mode: ["css", "legacy"] },
       })

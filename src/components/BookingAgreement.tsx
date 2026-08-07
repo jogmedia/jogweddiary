@@ -1,7 +1,7 @@
 import { fmtDate, inr } from "@/lib/format";
 import { eventLabel, fmtTime, type EventLike } from "@/lib/whatsapp";
 import { toDeliverables } from "@/lib/packages";
-import { docLogoUrl } from "@/components/PdfDoc";
+import { PdfPage, docLogoUrl } from "@/components/PdfDoc";
 
 /** Premium cream + royal gold palette for the booking agreement. */
 const A = {
@@ -83,17 +83,7 @@ export function BookingAgreement({
   );
 
   return (
-    <div
-      style={{
-        width: 720,
-        background: A.cream,
-        color: A.ink,
-        fontFamily: "Inter, Arial, sans-serif",
-        padding: 26,
-        boxSizing: "border-box",
-        overflow: "hidden",
-      }}
-    >
+    <PdfPage>
       {/* Header */}
       <div style={{ textAlign: "center", marginBottom: 20 }}>
         <img
@@ -298,6 +288,6 @@ export function BookingAgreement({
           Thank you for trusting us with your celebration.
         </div>
       </div>
-    </div>
+    </PdfPage>
   );
 }

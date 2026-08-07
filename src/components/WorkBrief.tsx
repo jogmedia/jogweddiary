@@ -1,17 +1,18 @@
 import { fmtDate, inr } from "@/lib/format";
 import { eventLabel, fmtTime, type EventLike } from "@/lib/whatsapp";
 import { toDeliverables } from "@/lib/packages";
-import { DOC, PdfFooter, PdfHeader, PdfSection } from "@/components/PdfDoc";
+import { DOC, PdfFooter, PdfHeader, PdfPage, PdfSection } from "@/components/PdfDoc";
+import { AGREEMENT_TERMS } from "@/components/BookingAgreement";
 
 type Ev = EventLike & { id: string };
 
-/** Print/PDF-ready premium branded document. Inline styles only (html2canvas safe). */
+/** Print/PDF-ready premium cream & royal-gold branded document. Inline styles only (html2canvas safe). */
 export function WorkBrief({
   settings,
   project,
   events,
   crew,
-  docTitle = "Wedding Event Brief",
+  docTitle = "Booking Confirmation & Agreement",
 }: {
   settings: any;
   project: any;
@@ -25,14 +26,14 @@ export function WorkBrief({
 
   const th: React.CSSProperties = {
     textAlign: "left",
-    padding: "9px 8px",
-    fontSize: 10,
+    padding: "8px 9px",
+    fontSize: 9.5,
     fontWeight: 700,
     letterSpacing: 0.8,
     textTransform: "uppercase",
-    color: DOC.paper,
-    background: DOC.charcoal,
-    borderRight: "1px solid #4F4F4F",
+    color: DOC.ink,
+    background: DOC.goldSoft,
+    border: `1px solid ${DOC.line}`,
   };
   const td: React.CSSProperties = {
     padding: "9px 8px",
@@ -49,17 +50,7 @@ export function WorkBrief({
   };
 
   return (
-    <div
-      style={{
-        width: 720,
-        background: DOC.paper,
-        color: DOC.ink,
-        fontFamily: "Inter, Arial, sans-serif",
-        padding: 26,
-        boxSizing: "border-box",
-        overflow: "hidden",
-      }}
-    >
+    <PdfPage>
       <PdfHeader settings={settings} docTitle={docTitle} />
 
       {/* Client details */}
@@ -68,7 +59,7 @@ export function WorkBrief({
         style={{
           display: "flex",
           gap: 14,
-          background: DOC.soft,
+          background: DOC.paper,
           border: `1px solid ${DOC.line}`,
           padding: 14,
           marginBottom: 22,
@@ -96,7 +87,7 @@ export function WorkBrief({
             <th style={th}>Date</th>
             <th style={th}>Team Arrival</th>
             <th style={th}>Event Time</th>
-            <th style={{ ...th, borderRight: "none" }}>Venue &amp; Location</th>
+            <th style={th}>Venue &amp; Location</th>
           </tr>
         </thead>
         <tbody>
@@ -108,7 +99,7 @@ export function WorkBrief({
             </tr>
           )}
           {sorted.map((e, i) => (
-            <tr key={e.id} style={{ background: i % 2 ? DOC.soft : DOC.paper }}>
+            <tr key={e.id} style={{ background: i % 2 ? DOC.paper : "transparent" }}>
               <td style={{ ...td, fontWeight: 600 }}>{eventLabel(e)}</td>
               <td style={td}>{fmtDate(e.event_date)}</td>
               <td style={td}>{fmtTime(e.arrival_time)}</td>
@@ -162,7 +153,7 @@ export function WorkBrief({
       {deliverables.length > 0 && (
         <>
           <PdfSection title="Package Details & Deliverables" />
-          <div style={{ border: `1px solid ${DOC.line}`, marginBottom: 22 }}>
+          <div style={{ border: `1px solid ${DOC.line}`, background: DOC.paper, marginBottom: 22 }}>
             {project.package_name ? (
               <div
                 style={{
@@ -196,32 +187,49 @@ export function WorkBrief({
       <table style={{ width: "100%", borderCollapse: "collapse", marginBottom: 22 }}>
         <thead>
           <tr>
-            <th style={th}>Total Package Value</th>
+            <th style={th}>Total Agreed Amount</th>
             <th style={th}>Received</th>
-            <th style={th}>Balance Due</th>
-            <th style={{ ...th, borderRight: "none" }}>Due Date</th>
+            <th style={th}>Balance Amount Payable</th>
+            <th style={th}>Due Date</th>
           </tr>
         </thead>
         <tbody>
           <tr>
-            <td style={{ ...td, fontSize: 12, fontWeight: 700 }}>{inr(project.total_amount)}</td>
-            <td style={{ ...td, fontSize: 12, fontWeight: 700 }}>{inr(received)}</td>
+            <td style={{ ...td, fontSize: 12, fontWeight: 700, background: DOC.paper }}>{inr(project.total_amount)}</td>
+            <td style={{ ...td, fontSize: 12, fontWeight: 700, background: DOC.paper }}>{inr(received)}</td>
             <td style={{ ...td, fontSize: 12, fontWeight: 700, background: DOC.goldSoft }}>
               {inr(project.balance_due)}
             </td>
-            <td style={{ ...td, fontSize: 11 }}>
+            <td style={{ ...td, fontSize: 11, background: DOC.paper }}>
               {project.payment_due_date ? fmtDate(project.payment_due_date) : "—"}
             </td>
           </tr>
         </tbody>
       </table>
 
+      {/* Terms */}
+      <PdfSection title="Terms & Conditions, Payment Policy & Album Workflow" />
+      <div style={{ border: `2px solid ${DOC.gold}`, background: DOC.paper, padding: 14, marginBottom: 22 }}>
+        {AGREEMENT_TERMS.map((t, i) => {
+          const [head, ...rest] = t.split(":");
+          return (
+            <div key={i} style={{ display: "flex", gap: 8, marginBottom: i === AGREEMENT_TERMS.length - 1 ? 0 : 8 }}>
+              <span style={{ color: DOC.gold, fontWeight: 700, fontSize: 11 }}>•</span>
+              <div style={{ fontSize: 10.5, lineHeight: 1.65, flex: 1 }}>
+                <span style={{ fontWeight: 700 }}>{head}:</span>
+                {rest.join(":")}
+              </div>
+            </div>
+          );
+        })}
+      </div>
+
       {/* Notes */}
       <PdfSection title="Notes & Instructions" />
       <div
         style={{
           border: `1px solid ${DOC.line}`,
-          background: DOC.soft,
+          background: DOC.paper,
           padding: 12,
           fontSize: 10.5,
           lineHeight: 1.7,
@@ -232,7 +240,18 @@ export function WorkBrief({
         {project.notes || "— No special instructions recorded —"}
       </div>
 
+      {/* Signatures */}
+      <div style={{ display: "flex", gap: 30, marginTop: 22 }}>
+        {["Client Signature", `For ${settings?.business_name ?? "JOG MEDIA"}`].map((s) => (
+          <div key={s} style={{ flex: 1 }}>
+            <div style={{ height: 42 }} />
+            <div style={{ height: 1, background: DOC.ink }} />
+            <div style={{ ...label, marginTop: 5 }}>{s}</div>
+          </div>
+        ))}
+      </div>
+
       <PdfFooter settings={settings} />
-    </div>
+    </PdfPage>
   );
 }

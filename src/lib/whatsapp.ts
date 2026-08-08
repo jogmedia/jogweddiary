@@ -139,12 +139,16 @@ export function buildCrewMessage(
   ].join("\n");
 }
 
-export function openWhatsApp(phone: string | null | undefined, message: string) {
+export function whatsAppLink(phone: string | null | undefined, message: string) {
   const num = waNumber(phone);
-  const url = num
+  return num
     ? `https://wa.me/${num}?text=${encodeURIComponent(message)}`
     : `https://wa.me/?text=${encodeURIComponent(message)}`;
-  window.open(url, "_blank", "noopener");
+}
+
+/** Same-tab redirect — never blocked as a pop-up, even from async handlers. */
+export function openWhatsApp(phone: string | null | undefined, message: string) {
+  window.location.href = whatsAppLink(phone, message);
 }
 
 

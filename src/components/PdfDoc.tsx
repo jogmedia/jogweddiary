@@ -1,33 +1,41 @@
 import logoAsset from "@/assets/jog-media-logo.png.asset.json";
 import { fmtDate } from "@/lib/format";
 
-/** Premium cream + royal gold document palette (shared by every PDF export). */
+/** Luxury cream + royal gold document palette (shared by every PDF export). */
 export const DOC = {
-  ink: "#1C1A16",
+  ink: "#1F1A12",
   charcoal: "#3A342B",
   gray: "#6B6257",
   gold: "#D4AF37",
-  goldSoft: "#F3E7C4",
-  line: "#E3D8BE",
+  darkGold: "#8B6B23",
+  headGold: "#B8860B",
+  goldSoft: "#F8F1E3",
+  tint: "#F8F1E3",
+  line: "#E2D2B4",
   paper: "#FFFFFF",
   cream: "#FAF6EE",
   soft: "#FFFFFF",
+  green: "#1B7F4B",
+  red: "#B4442C",
 };
+
+/** Page geometry: 720px maps to A4 width minus 6mm margins. */
+export const PDF_WIDTH = 720;
+export const PDF_MIN_HEIGHT = 1036;
 
 export function docLogoUrl(settings: any): string {
   return settings?.logo_url || logoAsset.url;
 }
 
-/** Shared cream page shell with a royal-gold border frame. */
+/** Shared cream page shell with a royal-gold double border frame, locked to one A4 page. */
 export function PdfPage({ children }: { children: React.ReactNode }) {
   return (
     <div
       style={{
-        width: 720,
+        width: PDF_WIDTH,
         background: DOC.cream,
         color: DOC.ink,
         fontFamily: "Inter, Arial, sans-serif",
-        padding: 8,
         boxSizing: "border-box",
         overflow: "hidden",
       }}
@@ -35,9 +43,14 @@ export function PdfPage({ children }: { children: React.ReactNode }) {
       <div
         style={{
           border: `3px solid ${DOC.gold}`,
+          outline: `1px solid ${DOC.gold}`,
+          outlineOffset: 3,
           background: DOC.cream,
-          padding: 22,
+          padding: "18px 22px",
+          minHeight: PDF_MIN_HEIGHT,
           boxSizing: "border-box",
+          display: "flex",
+          flexDirection: "column",
         }}
       >
         {children}
@@ -46,7 +59,7 @@ export function PdfPage({ children }: { children: React.ReactNode }) {
   );
 }
 
-/** Centered branded header: high-res logo, business line, document title badge. */
+/** Centered branded header: logo, brand subtitle, gold-tinted document title box. */
 export function PdfHeader({
   settings,
   docTitle,
@@ -58,56 +71,61 @@ export function PdfHeader({
 }) {
   const business = settings?.business_name ?? "JOG MEDIA";
   return (
-    <div style={{ textAlign: "center", marginBottom: 20 }}>
-      <img
-        src={docLogoUrl(settings)}
-        alt={`${business} logo`}
-        style={{
-          width: 96,
-          height: 96,
-          objectFit: "contain",
-          background: DOC.paper,
-          borderRadius: 48,
-          border: `2px solid ${DOC.gold}`,
-        }}
-      />
+    <div style={{ textAlign: "center", marginBottom: 14 }}>
+      <div style={{ display: "flex", justifyContent: "center" }}>
+        <img
+          src={docLogoUrl(settings)}
+          alt={`${business} logo`}
+          style={{
+            width: 84,
+            height: 84,
+            objectFit: "contain",
+            display: "block",
+            background: DOC.paper,
+            borderRadius: 42,
+            border: `2px solid ${DOC.gold}`,
+          }}
+        />
+      </div>
       <div
         style={{
-          fontSize: 19,
+          fontSize: 16,
           fontWeight: 700,
-          letterSpacing: 2.4,
+          letterSpacing: 2.2,
           textTransform: "uppercase",
-          marginTop: 10,
+          color: DOC.darkGold,
+          marginTop: 8,
         }}
       >
         JOG MEDIA - WEDDING PHOTOGRAPHY
       </div>
-      <div style={{ fontSize: 10, color: DOC.gray, marginTop: 4 }}>
+      <div style={{ fontSize: 8.8, color: DOC.gray, marginTop: 3 }}>
         {settings?.address ?? "Kozhikode, Kerala, India"}
         {settings?.phone ? ` · ${settings.phone}` : ""}
         {settings?.email ? ` · ${settings.email}` : ""}
         {settings?.gstin ? ` · GSTIN ${settings.gstin}` : ""}
       </div>
-      <div style={{ display: "flex", justifyContent: "center", marginTop: 12 }}>
+      <div style={{ display: "flex", justifyContent: "center", marginTop: 10 }}>
         <div
           style={{
-            background: DOC.ink,
-            color: DOC.goldSoft,
-            padding: "8px 22px",
-            fontSize: 12.5,
+            background: DOC.tint,
+            border: `1px solid ${DOC.gold}`,
+            color: DOC.darkGold,
+            padding: "7px 22px",
+            fontSize: 11.5,
             fontWeight: 700,
-            letterSpacing: 2,
-            borderRadius: 3,
+            letterSpacing: 1.8,
+            borderRadius: 2,
             whiteSpace: "nowrap",
           }}
         >
           {docTitle.toUpperCase()}
         </div>
       </div>
-      <div style={{ fontSize: 9.5, color: DOC.gray, marginTop: 6 }}>
+      <div style={{ fontSize: 8.6, color: DOC.gray, marginTop: 5 }}>
         {docMeta ?? `Dated ${fmtDate(new Date().toISOString())}`}
       </div>
-      <div style={{ height: 3, background: DOC.gold, marginTop: 12, borderRadius: 2 }} />
+      <div style={{ height: 2, background: DOC.gold, marginTop: 9 }} />
     </div>
   );
 }
@@ -115,20 +133,20 @@ export function PdfHeader({
 /** Section heading with a clean gold-tipped dividing line. */
 export function PdfSection({ title }: { title: string }) {
   return (
-    <div style={{ marginBottom: 10 }}>
+    <div style={{ marginBottom: 7 }}>
       <div
         style={{
-          fontSize: 11.5,
+          fontSize: 10.5,
           fontWeight: 700,
-          letterSpacing: 1.4,
+          letterSpacing: 1.3,
           textTransform: "uppercase",
-          color: DOC.ink,
+          color: DOC.headGold,
         }}
       >
         {title}
       </div>
-      <div style={{ display: "flex", marginTop: 5 }}>
-        <div style={{ width: 46, height: 2, background: DOC.gold }} />
+      <div style={{ display: "flex", marginTop: 4 }}>
+        <div style={{ width: 44, height: 2, background: DOC.gold }} />
         <div style={{ flex: 1, height: 2, background: DOC.line }} />
       </div>
     </div>
@@ -138,12 +156,12 @@ export function PdfSection({ title }: { title: string }) {
 export function PdfFooter({ settings }: { settings: any }) {
   const business = settings?.business_name ?? "JOG MEDIA";
   return (
-    <div style={{ marginTop: 26 }}>
-      <div style={{ height: 1, background: DOC.line, marginBottom: 10 }} />
-      <div style={{ fontSize: 9.5, color: DOC.gray, textAlign: "center", lineHeight: 1.7 }}>
+    <div style={{ marginTop: "auto", paddingTop: 14 }}>
+      <div style={{ height: 1, background: DOC.line, marginBottom: 8 }} />
+      <div style={{ fontSize: 8.6, color: DOC.gray, textAlign: "center", lineHeight: 1.6 }}>
         {business} · {settings?.address ?? "Kozhikode, Kerala, India"}
         {settings?.phone ? ` · ${settings.phone}` : ""}
-        <div style={{ color: DOC.ink, letterSpacing: 1 }}>
+        <div style={{ color: DOC.darkGold, letterSpacing: 1 }}>
           Thank you for trusting us with your celebration.
         </div>
       </div>

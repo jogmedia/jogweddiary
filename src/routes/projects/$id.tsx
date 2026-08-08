@@ -50,7 +50,9 @@ import { exportPdf } from "@/lib/exporters";
 import { downloadElementPdf } from "@/lib/pdf";
 import { EventSchedule } from "@/components/EventSchedule";
 import { WorkBrief } from "@/components/WorkBrief";
-import { BookingAgreement } from "@/components/BookingAgreement";
+import { BookingAgreement, agreementShareText, agreementWaLink } from "@/components/BookingAgreement";
+import { sharePdfViaWhatsApp } from "@/lib/pdf-share";
+
 import { buildScheduleMessage, openWhatsApp } from "@/lib/whatsapp";
 import { ProjectDialog } from "@/components/ProjectDialog";
 
@@ -230,8 +232,30 @@ function ProjectDetail() {
                 )
               }
             >
-              <FileDown className="mr-1.5 h-4 w-4" /> Booking Agreement PDF
+              <FileDown className="mr-1.5 h-4 w-4" /> Download PDF
             </Button>
+            <Button
+              size="sm"
+              className="bg-[#25D366] text-white hover:bg-[#1EB855]"
+              onClick={() =>
+                sharePdfViaWhatsApp({
+                  elementId: "booking-agreement",
+                  filename: `Jog Media Booking Agreement - ${project.project_name}`,
+                  text: agreementShareText(
+                    project.clients?.name,
+                    settings?.business_name ?? "JOG MEDIA",
+                  ),
+                  waLink: agreementWaLink(
+                    project.clients?.whatsapp ?? project.clients?.phone,
+                    project.clients?.name,
+                    settings?.business_name ?? "JOG MEDIA",
+                  ),
+                })
+              }
+            >
+              <Send className="mr-1.5 h-4 w-4" /> Share via WhatsApp
+            </Button>
+
             <Button
               size="sm"
               onClick={() =>

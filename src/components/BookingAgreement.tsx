@@ -236,16 +236,6 @@ export function BookingAgreement({
         </div>
       </div>
 
-      {/* Signatures */}
-      <div style={{ display: "flex", gap: 28, marginTop: 16 }}>
-        {["Client Signature", `For ${business}`].map((s) => (
-          <div key={s} style={{ flex: 1 }}>
-            <div style={{ height: 34 }} />
-            <div style={{ height: 1, background: DOC.ink }} />
-            <div style={{ ...label, marginTop: 4 }}>{s}</div>
-          </div>
-        ))}
-      </div>
 
       <PdfFooter settings={settings} />
     </PdfPage>

@@ -200,3 +200,19 @@
     background: white;
   }
 }
+
+/* PDF / print page lock: single A4 portrait page on soft cream */
+@page {
+  size: A4 portrait;
+  margin: 6mm;
+}
+@media print {
+  html,
+  body {
+    background-color: #faf6ee;
+  }
+  .pdf-avoid-break {
+    break-inside: avoid;
+    page-break-inside: avoid;
+  }
+}

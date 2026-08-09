@@ -91,22 +91,31 @@ export function PdfHeader({
       </div>
       <div
         style={{
-          fontSize: 16,
+          fontSize: 30,
           fontWeight: 700,
-          letterSpacing: 2.2,
+          letterSpacing: 3,
           textTransform: "uppercase",
           color: DOC.darkGold,
-          marginTop: 8,
+          fontFamily: "Georgia, 'Times New Roman', serif",
+          marginTop: 10,
+          lineHeight: 1.1,
         }}
       >
-        JOG MEDIA - WEDDING PHOTOGRAPHY
+        {business}
       </div>
-      <div style={{ fontSize: 8.8, color: DOC.gray, marginTop: 3 }}>
-        {settings?.address ?? "Kozhikode, Kerala, India"}
-        {settings?.phone ? ` · ${settings.phone}` : ""}
-        {settings?.email ? ` · ${settings.email}` : ""}
-        {settings?.gstin ? ` · GSTIN ${settings.gstin}` : ""}
+      <div
+        style={{
+          fontSize: 11,
+          fontWeight: 600,
+          letterSpacing: 4.5,
+          textTransform: "uppercase",
+          color: DOC.gold,
+          marginTop: 4,
+        }}
+      >
+        WEDDING PHOTOGRAPHY
       </div>
+
       <div style={{ display: "flex", justifyContent: "center", marginTop: 10 }}>
         <div
           style={{

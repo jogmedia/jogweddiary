@@ -46,7 +46,7 @@ export function PdfPage({ children }: { children: React.ReactNode }) {
           outline: `1px solid ${DOC.gold}`,
           outlineOffset: 3,
           background: DOC.cream,
-          padding: "18px 22px",
+          padding: "20px 24px",
           minHeight: PDF_MIN_HEIGHT,
           boxSizing: "border-box",
           display: "flex",
@@ -71,7 +71,7 @@ export function PdfHeader({
 }) {
   const business = settings?.business_name ?? "JOG MEDIA";
   return (
-    <div style={{ textAlign: "center", marginBottom: 14 }}>
+    <div style={{ textAlign: "center", marginBottom: 16 }}>
       <div style={{ display: "flex", justifyContent: "center" }}>
         <img
           src={docLogoUrl(settings)}
@@ -133,7 +133,7 @@ export function PdfHeader({
 /** Section heading with a clean gold-tipped dividing line. */
 export function PdfSection({ title }: { title: string }) {
   return (
-    <div style={{ marginBottom: 7 }}>
+    <div style={{ marginBottom: 8, marginTop: 14 }}>
       <div
         style={{
           fontSize: 10.5,
@@ -154,17 +154,37 @@ export function PdfSection({ title }: { title: string }) {
 }
 
 export function PdfFooter({ settings }: { settings: any }) {
-  const business = settings?.business_name ?? "JOG MEDIA";
+  const phone = settings?.phone ?? "94469 98877";
+  const instagram = settings?.instagram ?? "@jog_media";
+  const website = settings?.website ?? "www.jogmedia.in";
   return (
-    <div style={{ marginTop: "auto", paddingTop: 14 }}>
-      <div style={{ height: 1, background: DOC.line, marginBottom: 8 }} />
-      <div style={{ fontSize: 8.6, color: DOC.gray, textAlign: "center", lineHeight: 1.6 }}>
-        {business} · {settings?.address ?? "Kozhikode, Kerala, India"}
-        {settings?.phone ? ` · ${settings.phone}` : ""}
-        <div style={{ color: DOC.darkGold, letterSpacing: 1 }}>
-          Thank you for trusting us with your celebration.
-        </div>
+    <div style={{ marginTop: "auto", paddingTop: 16 }}>
+      <div style={{ height: 1, background: DOC.line, marginBottom: 9 }} />
+      <div
+        style={{
+          fontSize: 8.8,
+          fontWeight: 700,
+          letterSpacing: 0.8,
+          color: DOC.darkGold,
+          textAlign: "center",
+          textTransform: "uppercase",
+        }}
+      >
+        CALL / WHATSAPP / GPAY: {phone} | INSTAGRAM: {instagram} | WEBSITE: {website}
+      </div>
+      <div
+        style={{
+          fontSize: 8.6,
+          fontStyle: "italic",
+          color: DOC.gray,
+          textAlign: "center",
+          marginTop: 4,
+          letterSpacing: 0.6,
+        }}
+      >
+        — WE DON'T JUST TAKE PHOTOS, WE TELL YOUR STORY —
       </div>
     </div>
   );
 }
+

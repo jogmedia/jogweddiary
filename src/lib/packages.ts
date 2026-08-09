@@ -197,12 +197,11 @@ export function toDeliverables(value: unknown): string[] {
 
 /** Fallback deliverables shown on PDFs when a project has none stored yet. */
 export const DEFAULT_DELIVERABLES: string[] = [
-  "Save the Date Shoot",
-  "60 Page Premium Albums (2 Nos)",
-  "Mini Books (2 Nos)",
-  "Table Calendar",
-  "Photo Frames",
-  "Album Carry Bags",
-  "Full HD Wedding Video",
-  "Cinematic Highlight Video",
+  "Save the date shoot included",
+  "Wedding day & Eve / Reception coverage",
+  "60 Page Premium Album (2 Nos) with Special Luster Pages",
+  "Mini Book (2 Nos) & Calendar (2 Nos)",
+  "Photo Frame (2 Nos) & Album Bag (2 Nos)",
+  "Full HD Video (2 Sets) & Highlight Video (2 Sets)",
 ];
+

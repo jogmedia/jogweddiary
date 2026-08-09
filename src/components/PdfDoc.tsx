@@ -77,15 +77,17 @@ export function PdfHeader({
           src={docLogoUrl(settings)}
           alt={`${business} logo`}
           style={{
-            width: 84,
-            height: 84,
+            width: 85,
+            height: 85,
             objectFit: "contain",
             display: "block",
+            margin: "0 auto",
             background: DOC.paper,
-            borderRadius: 42,
+            borderRadius: 43,
             border: `2px solid ${DOC.gold}`,
           }}
         />
+
       </div>
       <div
         style={{

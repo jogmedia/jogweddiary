@@ -46,7 +46,7 @@ export function PdfPage({ children }: { children: React.ReactNode }) {
           outline: `1px solid ${DOC.gold}`,
           outlineOffset: 3,
           background: DOC.cream,
-          padding: "18px 22px",
+          padding: "20px 24px",
           minHeight: PDF_MIN_HEIGHT,
           boxSizing: "border-box",
           display: "flex",
@@ -71,7 +71,7 @@ export function PdfHeader({
 }) {
   const business = settings?.business_name ?? "JOG MEDIA";
   return (
-    <div style={{ textAlign: "center", marginBottom: 14 }}>
+    <div style={{ textAlign: "center", marginBottom: 16 }}>
       <div style={{ display: "flex", justifyContent: "center" }}>
         <img
           src={docLogoUrl(settings)}
@@ -133,7 +133,7 @@ export function PdfHeader({
 /** Section heading with a clean gold-tipped dividing line. */
 export function PdfSection({ title }: { title: string }) {
   return (
-    <div style={{ marginBottom: 7 }}>
+    <div style={{ marginBottom: 8, marginTop: 14 }}>
       <div
         style={{
           fontSize: 10.5,

@@ -145,9 +145,10 @@ export function BookingAgreement({
                   borderBottom: `1px solid ${DOC.line}`,
                 }}
               >
-                {project.package_name}
+                Selected Package: {project.package_name} ({inr(total)})
               </div>
             ) : null}
+
             <div style={{ display: "flex", flexWrap: "wrap", padding: "7px 10px" }}>
               {deliverables.map((d, i) => (
                 <div

@@ -1,6 +1,6 @@
 import { fmtDate, inr } from "@/lib/format";
 import { eventLabel, fmtTime, type EventLike } from "@/lib/whatsapp";
-import { toDeliverables } from "@/lib/packages";
+import { DEFAULT_DELIVERABLES, toDeliverables } from "@/lib/packages";
 import { DOC, PdfFooter, PdfHeader, PdfPage, PdfSection } from "@/components/PdfDoc";
 import { AGREEMENT_TERMS } from "@/components/BookingAgreement";
 
@@ -23,7 +23,8 @@ export function WorkBrief({
   docTitle?: string;
 }) {
   const sorted = [...events].sort((a, b) => (a.event_date < b.event_date ? -1 : 1));
-  const deliverables = toDeliverables(project.deliverables);
+  const stored = toDeliverables(project.deliverables);
+  const deliverables = stored.length ? stored : DEFAULT_DELIVERABLES;
   const received = Number(project.total_amount ?? 0) - Number(project.balance_due ?? 0);
 
   const th: React.CSSProperties = {
@@ -65,7 +66,7 @@ export function WorkBrief({
             background: DOC.paper,
             border: `1px solid ${DOC.line}`,
             padding: "8px 10px",
-            marginBottom: 12,
+            marginBottom: 14,
           }}
         >
           {[
@@ -85,7 +86,7 @@ export function WorkBrief({
       {/* 2. Event schedule */}
       <div className="pdf-avoid-break">
         <PdfSection title="Project & Event Schedule" />
-        <table style={{ width: "100%", borderCollapse: "collapse", marginBottom: 12 }}>
+        <table style={{ width: "100%", borderCollapse: "collapse", marginBottom: 14 }}>
           <thead>
             <tr>
               <th style={th}>Event</th>
@@ -117,10 +118,10 @@ export function WorkBrief({
       </div>
 
       {/* 3. Deliverables */}
-      {deliverables.length > 0 && (
+      {true && (
         <div className="pdf-avoid-break">
           <PdfSection title="Package Details & Deliverables" />
-          <div style={{ border: `1px solid ${DOC.line}`, background: DOC.paper, marginBottom: 12 }}>
+          <div style={{ border: `1px solid ${DOC.line}`, background: DOC.paper, marginBottom: 14 }}>
             {project.package_name ? (
               <div
                 style={{
@@ -158,7 +159,7 @@ export function WorkBrief({
       {/* 4. Payment breakdown */}
       <div className="pdf-avoid-break">
         <PdfSection title="Payment Breakdown" />
-        <table style={{ width: "100%", borderCollapse: "collapse", marginBottom: 12 }}>
+        <table style={{ width: "100%", borderCollapse: "collapse", marginBottom: 14 }}>
           <thead>
             <tr>
               <th style={th}>Total Agreed Amount</th>

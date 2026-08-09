@@ -1,6 +1,6 @@
 import { fmtDate, inr, waNumber } from "@/lib/format";
 import { eventLabel, fmtTime, type EventLike } from "@/lib/whatsapp";
-import { toDeliverables } from "@/lib/packages";
+import { DEFAULT_DELIVERABLES, toDeliverables } from "@/lib/packages";
 import { DOC, PdfFooter, PdfHeader, PdfPage, PdfSection } from "@/components/PdfDoc";
 
 export const AGREEMENT_TERMS: string[] = [
@@ -42,7 +42,8 @@ export function BookingAgreement({
   const total = Number(project?.total_amount ?? 0);
   const received = Number(advance ?? 0);
   const balance = Math.max(0, total - received);
-  const deliverables = toDeliverables(project?.deliverables);
+  const stored = toDeliverables(project?.deliverables);
+  const deliverables = stored.length ? stored : DEFAULT_DELIVERABLES;
   const sorted = [...events].sort((a, b) => (a.event_date < b.event_date ? -1 : 1));
 
   const label: React.CSSProperties = {
@@ -84,7 +85,7 @@ export function BookingAgreement({
             background: DOC.paper,
             border: `1px solid ${DOC.line}`,
             padding: "8px 10px",
-            marginBottom: 12,
+            marginBottom: 14,
           }}
         >
           {[
@@ -105,7 +106,7 @@ export function BookingAgreement({
       {sorted.length > 0 && (
         <div className="pdf-avoid-break">
           <PdfSection title="Project & Event Schedule" />
-          <table style={{ width: "100%", borderCollapse: "collapse", marginBottom: 12 }}>
+          <table style={{ width: "100%", borderCollapse: "collapse", marginBottom: 14 }}>
             <thead>
               <tr>
                 <th style={th}>Event</th>
@@ -129,10 +130,10 @@ export function BookingAgreement({
       )}
 
       {/* Deliverables */}
-      {deliverables.length > 0 && (
+      {true && (
         <div className="pdf-avoid-break">
           <PdfSection title="Package Details & Deliverables" />
-          <div style={{ border: `1px solid ${DOC.line}`, background: DOC.paper, marginBottom: 12 }}>
+          <div style={{ border: `1px solid ${DOC.line}`, background: DOC.paper, marginBottom: 14 }}>
             {project?.package_name ? (
               <div
                 style={{
@@ -170,7 +171,7 @@ export function BookingAgreement({
       {/* Financials */}
       <div className="pdf-avoid-break">
         <PdfSection title="Payment Breakdown" />
-        <table style={{ width: "100%", borderCollapse: "collapse", marginBottom: 12 }}>
+        <table style={{ width: "100%", borderCollapse: "collapse", marginBottom: 14 }}>
           <thead>
             <tr>
               <th style={th}>Total Agreed Amount</th>

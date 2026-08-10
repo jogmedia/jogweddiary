@@ -362,7 +362,7 @@ function ProjectDetail() {
         </Button>
       </div>
 
-      <PostProduction project={project} onSave={(v) => saveProject.mutateAsync(v)} />
+      <PostProduction project={project} onSave={(v: Record<string, unknown>) => saveProject.mutateAsync(v)} />
 
       {/* Checklist */}
 

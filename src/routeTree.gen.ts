@@ -25,6 +25,7 @@ import { Route as AccountsRouteImport } from './routes/accounts'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as ProjectsIndexRouteImport } from './routes/projects/index'
 import { Route as ProjectsIdRouteImport } from './routes/projects/$id'
+import { Route as PortalIdRouteImport } from './routes/portal/$id'
 
 const TravelRoute = TravelRouteImport.update({
   id: '/travel',
@@ -106,6 +107,11 @@ const ProjectsIdRoute = ProjectsIdRouteImport.update({
   path: '/projects/$id',
   getParentRoute: () => rootRouteImport,
 } as any)
+const PortalIdRoute = PortalIdRouteImport.update({
+  id: '/portal/$id',
+  path: '/portal/$id',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -122,6 +128,7 @@ export interface FileRoutesByFullPath {
   '/staff': typeof StaffRoute
   '/tasks': typeof TasksRoute
   '/travel': typeof TravelRoute
+  '/portal/$id': typeof PortalIdRoute
   '/projects/$id': typeof ProjectsIdRoute
   '/projects/': typeof ProjectsIndexRoute
 }
@@ -140,6 +147,7 @@ export interface FileRoutesByTo {
   '/staff': typeof StaffRoute
   '/tasks': typeof TasksRoute
   '/travel': typeof TravelRoute
+  '/portal/$id': typeof PortalIdRoute
   '/projects/$id': typeof ProjectsIdRoute
   '/projects': typeof ProjectsIndexRoute
 }
@@ -159,6 +167,7 @@ export interface FileRoutesById {
   '/staff': typeof StaffRoute
   '/tasks': typeof TasksRoute
   '/travel': typeof TravelRoute
+  '/portal/$id': typeof PortalIdRoute
   '/projects/$id': typeof ProjectsIdRoute
   '/projects/': typeof ProjectsIndexRoute
 }
@@ -179,6 +188,7 @@ export interface FileRouteTypes {
     | '/staff'
     | '/tasks'
     | '/travel'
+    | '/portal/$id'
     | '/projects/$id'
     | '/projects/'
   fileRoutesByTo: FileRoutesByTo
@@ -197,6 +207,7 @@ export interface FileRouteTypes {
     | '/staff'
     | '/tasks'
     | '/travel'
+    | '/portal/$id'
     | '/projects/$id'
     | '/projects'
   id:
@@ -215,6 +226,7 @@ export interface FileRouteTypes {
     | '/staff'
     | '/tasks'
     | '/travel'
+    | '/portal/$id'
     | '/projects/$id'
     | '/projects/'
   fileRoutesById: FileRoutesById
@@ -234,6 +246,7 @@ export interface RootRouteChildren {
   StaffRoute: typeof StaffRoute
   TasksRoute: typeof TasksRoute
   TravelRoute: typeof TravelRoute
+  PortalIdRoute: typeof PortalIdRoute
   ProjectsIdRoute: typeof ProjectsIdRoute
   ProjectsIndexRoute: typeof ProjectsIndexRoute
 }
@@ -352,6 +365,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ProjectsIdRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/portal/$id': {
+      id: '/portal/$id'
+      path: '/portal/$id'
+      fullPath: '/portal/$id'
+      preLoaderRoute: typeof PortalIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -370,19 +390,10 @@ const rootRouteChildren: RootRouteChildren = {
   StaffRoute: StaffRoute,
   TasksRoute: TasksRoute,
   TravelRoute: TravelRoute,
+  PortalIdRoute: PortalIdRoute,
   ProjectsIdRoute: ProjectsIdRoute,
   ProjectsIndexRoute: ProjectsIndexRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { startInstance } from './start.ts'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-    config: Awaited<ReturnType<typeof startInstance.getOptions>>
-  }
-}

@@ -360,7 +360,10 @@ function ProjectDetail() {
         </Button>
       </div>
 
+      <PostProduction project={project} onSave={(v) => saveProject.mutateAsync(v)} />
+
       {/* Checklist */}
+
       <div className="surface mb-6 p-4">
         <p className="mb-3 text-sm font-semibold">Production checklist</p>
         <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">

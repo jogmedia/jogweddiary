@@ -23,6 +23,7 @@ import { cn } from "@/lib/utils";
 import { useAuth } from "@/lib/auth";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger, SheetTitle } from "@/components/ui/sheet";
+import { InstallAppButton } from "@/components/InstallAppButton";
 
 export const NAV = [
   { to: "/", label: "Dashboard", icon: LayoutDashboard, adminOnly: false },
@@ -112,9 +113,10 @@ export function AppShell({ children }: { children: ReactNode }) {
           <p className="px-3 pb-2 text-xs text-sidebar-foreground/60">
             {user.email} · {role ?? "no role"}
           </p>
+          <InstallAppButton className="mb-2 w-full justify-start bg-transparent text-sidebar-foreground/80 hover:bg-sidebar-accent hover:text-sidebar-foreground" />
           <Button
             variant="ghost"
-            className="w-full justify-start text-sidebar-foreground/80 hover:bg-sidebar-accent hover:text-sidebar-foreground"
+            className="h-11 w-full justify-start text-sidebar-foreground/80 hover:bg-sidebar-accent hover:text-sidebar-foreground"
             onClick={() => signOut()}
           >
             <LogOut className="mr-2 h-4 w-4" /> Sign out
@@ -122,10 +124,10 @@ export function AppShell({ children }: { children: ReactNode }) {
         </div>
       </aside>
 
-      <header className="sticky top-0 z-30 flex items-center gap-3 border-b border-border bg-card/90 px-4 py-3 backdrop-blur lg:hidden no-print">
+      <header className="sticky top-0 z-30 flex items-center gap-3 border-b border-border bg-card/90 px-4 py-2 backdrop-blur lg:hidden no-print">
         <Sheet open={open} onOpenChange={setOpen}>
           <SheetTrigger asChild>
-            <Button variant="ghost" size="icon">
+            <Button variant="ghost" size="icon" className="h-11 w-11">
               <Menu className="h-5 w-5" />
             </Button>
           </SheetTrigger>
@@ -136,7 +138,7 @@ export function AppShell({ children }: { children: ReactNode }) {
             <div className="border-t border-sidebar-border p-3">
               <Button
                 variant="ghost"
-                className="w-full justify-start text-sidebar-foreground/80"
+                className="h-11 w-full justify-start text-sidebar-foreground/80"
                 onClick={() => signOut()}
               >
                 <LogOut className="mr-2 h-4 w-4" /> Sign out
@@ -144,8 +146,10 @@ export function AppShell({ children }: { children: ReactNode }) {
             </div>
           </SheetContent>
         </Sheet>
-        <span className="font-display text-lg font-semibold">JOG MEDIA</span>
+        <span className="min-w-0 flex-1 truncate font-display text-lg font-semibold">JOG MEDIA</span>
+        <InstallAppButton className="shrink-0" />
       </header>
+
 
       <main className="lg:pl-64">
         <div className="mx-auto max-w-7xl px-4 py-6 lg:px-8">{children}</div>

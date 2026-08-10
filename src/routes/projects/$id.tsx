@@ -24,6 +24,8 @@ import {
 import { BookingReceiptButton } from "@/components/BookingReceiptButton";
 import { toDeliverables } from "@/lib/packages";
 import { AppShell } from "@/components/AppShell";
+import { PostProduction } from "@/components/PostProduction";
+
 import { EmptyState, PageHeader, StatCard, StatusBadge } from "@/components/ui-kit";
 import { RecordDialog, type Field } from "@/components/RecordDialog";
 import { Button } from "@/components/ui/button";

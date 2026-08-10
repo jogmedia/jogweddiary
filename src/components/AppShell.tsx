@@ -113,7 +113,10 @@ export function AppShell({ children }: { children: ReactNode }) {
           <p className="px-3 pb-2 text-xs text-sidebar-foreground/60">
             {user.email} · {role ?? "no role"}
           </p>
+          <InstallAppButton className="mb-2 w-full justify-start bg-transparent text-sidebar-foreground/80 hover:bg-sidebar-accent hover:text-sidebar-foreground" />
           <Button
+            variant="ghost"
+            className="h-11 w-full justify-start text-sidebar-foreground/80 hover:bg-sidebar-accent hover:text-sidebar-foreground"
             variant="ghost"
             className="w-full justify-start text-sidebar-foreground/80 hover:bg-sidebar-accent hover:text-sidebar-foreground"
             onClick={() => signOut()}

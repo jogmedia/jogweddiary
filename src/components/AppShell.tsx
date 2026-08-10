@@ -23,6 +23,7 @@ import { cn } from "@/lib/utils";
 import { useAuth } from "@/lib/auth";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger, SheetTitle } from "@/components/ui/sheet";
+import { InstallAppButton } from "@/components/InstallAppButton";
 
 export const NAV = [
   { to: "/", label: "Dashboard", icon: LayoutDashboard, adminOnly: false },

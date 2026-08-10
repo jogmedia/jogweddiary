@@ -51,7 +51,18 @@ export type Project = {
   travel_notes?: string | null;
   travel_ticket_path?: string | null;
   travel_ticket_name?: string | null;
+  raw_sent_date?: string | null;
+  raw_drive_link?: string | null;
+  selection_received_date?: string | null;
+  layout_status?: string | null;
+  album_proof_link?: string | null;
+  client_approval_status?: string | null;
+  client_revision_note?: string | null;
+  client_selection_note?: string | null;
+  sent_to_printing_date?: string | null;
+  courier_dispatched_date?: string | null;
   created_at: string;
+
   clients?: Client | null;
 };
 

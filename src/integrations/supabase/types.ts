@@ -1021,11 +1021,16 @@ export type Database = {
           advance_date: string | null
           album_editing_done: boolean
           album_printed: boolean
+          album_proof_link: string | null
           album_status: string
           backup_drive: string | null
           backup_folder: string | null
           balance_due: number
+          client_approval_status: string
           client_id: string
+          client_revision_note: string | null
+          client_selection_note: string | null
+          courier_dispatched_date: string | null
           created_at: string
           deliverables: Json
           delivery_status: string
@@ -1033,6 +1038,7 @@ export type Database = {
           event_date: string
           final_delivery_done: boolean
           id: string
+          layout_status: string
           notes: string | null
           package_name: string | null
           payment_due_date: string | null
@@ -1041,6 +1047,10 @@ export type Database = {
           project_name: string
           project_status: string
           raw_backup_done: boolean
+          raw_drive_link: string | null
+          raw_sent_date: string | null
+          selection_received_date: string | null
+          sent_to_printing_date: string | null
           shoot_status: string
           total_amount: number
           travel_booking_status: string | null
@@ -1059,11 +1069,16 @@ export type Database = {
           advance_date?: string | null
           album_editing_done?: boolean
           album_printed?: boolean
+          album_proof_link?: string | null
           album_status?: string
           backup_drive?: string | null
           backup_folder?: string | null
           balance_due?: number
+          client_approval_status?: string
           client_id: string
+          client_revision_note?: string | null
+          client_selection_note?: string | null
+          courier_dispatched_date?: string | null
           created_at?: string
           deliverables?: Json
           delivery_status?: string
@@ -1071,6 +1086,7 @@ export type Database = {
           event_date: string
           final_delivery_done?: boolean
           id?: string
+          layout_status?: string
           notes?: string | null
           package_name?: string | null
           payment_due_date?: string | null
@@ -1079,6 +1095,10 @@ export type Database = {
           project_name: string
           project_status?: string
           raw_backup_done?: boolean
+          raw_drive_link?: string | null
+          raw_sent_date?: string | null
+          selection_received_date?: string | null
+          sent_to_printing_date?: string | null
           shoot_status?: string
           total_amount?: number
           travel_booking_status?: string | null
@@ -1097,11 +1117,16 @@ export type Database = {
           advance_date?: string | null
           album_editing_done?: boolean
           album_printed?: boolean
+          album_proof_link?: string | null
           album_status?: string
           backup_drive?: string | null
           backup_folder?: string | null
           balance_due?: number
+          client_approval_status?: string
           client_id?: string
+          client_revision_note?: string | null
+          client_selection_note?: string | null
+          courier_dispatched_date?: string | null
           created_at?: string
           deliverables?: Json
           delivery_status?: string
@@ -1109,6 +1134,7 @@ export type Database = {
           event_date?: string
           final_delivery_done?: boolean
           id?: string
+          layout_status?: string
           notes?: string | null
           package_name?: string | null
           payment_due_date?: string | null
@@ -1117,6 +1143,10 @@ export type Database = {
           project_name?: string
           project_status?: string
           raw_backup_done?: boolean
+          raw_drive_link?: string | null
+          raw_sent_date?: string | null
+          selection_received_date?: string | null
+          sent_to_printing_date?: string | null
           shoot_status?: string
           total_amount?: number
           travel_booking_status?: string | null
@@ -1330,6 +1360,28 @@ export type Database = {
           total_amount: number
         }[]
       }
+      get_portal: {
+        Args: { _project_id: string }
+        Returns: {
+          album_proof_link: string
+          client_approval_status: string
+          client_name: string
+          client_revision_note: string
+          client_selection_note: string
+          courier_dispatched_date: string
+          delivery_status: string
+          event_date: string
+          layout_status: string
+          package_name: string
+          project_id: string
+          project_name: string
+          raw_drive_link: string
+          raw_sent_date: string
+          selection_received_date: string
+          sent_to_printing_date: string
+          venue: string
+        }[]
+      }
       get_profit_and_loss: {
         Args: { end_date: string; start_date: string }
         Returns: {
@@ -1360,6 +1412,14 @@ export type Database = {
       }
       is_admin: { Args: never; Returns: boolean }
       is_assigned: { Args: { _project_id: string }; Returns: boolean }
+      portal_set_approval: {
+        Args: { _note?: string; _project_id: string; _status: string }
+        Returns: undefined
+      }
+      portal_submit_selection: {
+        Args: { _note: string; _project_id: string }
+        Returns: undefined
+      }
       recalc_project_balance: {
         Args: { _project_id: string }
         Returns: undefined

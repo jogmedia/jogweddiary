@@ -131,7 +131,7 @@ function AccountsPage() {
             />
             <StatCard
               label="Owner withdrawals"
-              value={inr(ownerDraws.reduce((a, e: any) => a + Number(e.amount ?? 0), 0))}
+              value={inr(ownerDraws.reduce((a: number, e: any) => a + Number(e.amount ?? 0), 0))}
               tone="destructive"
             />
           </div>

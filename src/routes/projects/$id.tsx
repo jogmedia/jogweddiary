@@ -87,6 +87,7 @@ const EXPENSE_CATEGORIES = [
   "Travel Expense",
   "Equipment Rent",
   "Food",
+  "Owner Salary / Personal Draw",
   "Other",
 ].map((v) => ({ value: v, label: v }));
 
@@ -356,7 +357,26 @@ function ProjectDetail() {
             { name: "notes", label: "Notes", type: "textarea" },
           ]}
           initial={{ expense_date: todayISO(), payment_mode: "cash" }}
-          onSubmit={(v) => saveExpense.mutateAsync({ ...v, project_id: id })}
+          extra={(values, set) =>
+            needsBankAccount(values.payment_mode) ||
+            values.category === "Owner Salary / Personal Draw" ? (
+              <BankAccountField
+                label="Paid From Bank Account"
+                value={values.bank_account_id ?? null}
+                onChange={(v) => set("bank_account_id", v)}
+              />
+            ) : null
+          }
+          onSubmit={(v) =>
+            saveExpense.mutateAsync({
+              ...v,
+              project_id: id,
+              bank_account_id:
+                needsBankAccount(v.payment_mode) || v.category === "Owner Salary / Personal Draw"
+                  ? (v.bank_account_id ?? null)
+                  : null,
+            })
+          }
           trigger={
             <Button size="sm" variant="secondary">
               <Plus className="mr-1.5 h-4 w-4" /> Add expense

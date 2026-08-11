@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
-import { Plus } from "lucide-react";
+import { ArrowUpRight, Plus } from "lucide-react";
 import { AppShell } from "@/components/AppShell";
 import { EmptyState, PageHeader, StatCard } from "@/components/ui-kit";
 import { RecordDialog } from "@/components/RecordDialog";
@@ -18,6 +18,7 @@ import {
 import {
   useAccounts,
   useBankAccounts,
+  useExpenses,
 
   useAssets,
   useCreateJournalEntry,
@@ -30,6 +31,7 @@ import {
 } from "@/lib/db";
 import { fmtDate, inr, todayISO } from "@/lib/format";
 import { accountBalances } from "@/lib/accounts";
+import { BankAccountField } from "@/components/BankAccountField";
 
 export const Route = createFileRoute("/accounts")({
   head: () => ({
@@ -57,11 +59,14 @@ function AccountsPage() {
   const { data: projects = [] } = useProjects();
   const { data: payments = [] } = usePayments();
   const { data: banks = [] } = useBankAccounts();
+  const { data: expenses = [] } = useExpenses();
+  const ownerDraws = expenses.filter((e: any) => e.category === "Owner Salary / Personal Draw");
 
   const saveAccount = useUpsert("chart_of_accounts", "Account");
   const saveAsset = useUpsert("assets", "Asset");
   const saveLiability = useUpsert("liabilities", "Liability");
   const saveEquity = useUpsert("equity_transactions", "Equity transaction");
+  const saveExpense = useUpsert("project_expenses", "Owner withdrawal");
   const postEntry = useCreateJournalEntry();
 
   return (
@@ -79,6 +84,41 @@ function AccountsPage() {
         </TabsList>
 
         <TabsContent value="banks">
+          <div className="mb-3 flex justify-end">
+            <RecordDialog
+              title="Transfer to Personal Account"
+              fields={[
+                { name: "expense_date", label: "Transfer Date", type: "date", required: true },
+                { name: "amount", label: "Transfer Amount", type: "number", required: true },
+                { name: "notes", label: "Notes", type: "textarea", full: true },
+              ]}
+              initial={{ expense_date: todayISO() }}
+              extra={(values, set) => (
+                <BankAccountField
+                  label="From Bank Account"
+                  value={values.bank_account_id ?? null}
+                  onChange={(v) => set("bank_account_id", v)}
+                />
+              )}
+              onSubmit={(v) =>
+                saveExpense.mutateAsync({
+                  expense_date: v.expense_date,
+                  amount: Number(v.amount),
+                  category: "Owner Salary / Personal Draw",
+                  paid_to: "Owner (Personal Account)",
+                  payment_mode: "bank",
+                  bank_account_id: v.bank_account_id ?? null,
+                  notes: v.notes ?? "Owner Withdrawal",
+                })
+              }
+              trigger={
+                <Button size="sm" variant="outline">
+                  <ArrowUpRight className="mr-1.5 h-4 w-4" /> Transfer to Personal Account
+                </Button>
+              }
+            />
+          </div>
+
           <div className="mb-3 grid grid-cols-2 gap-3 lg:grid-cols-3">
             <StatCard
               label="Total money received"
@@ -89,7 +129,28 @@ function AccountsPage() {
               label="Bank accounts balance"
               value={inr(banks.reduce((a, b) => a + Number(b.current_balance ?? 0), 0))}
             />
+            <StatCard
+              label="Owner withdrawals"
+              value={inr(ownerDraws.reduce((a: number, e: any) => a + Number(e.amount ?? 0), 0))}
+              tone="destructive"
+            />
           </div>
+
+          {ownerDraws.length > 0 && (
+            <div className="surface mb-3 divide-y divide-border">
+              <p className="p-3 text-sm font-semibold">Owner withdrawals</p>
+              {ownerDraws.slice(0, 10).map((e: any) => (
+                <div key={e.id} className="flex items-center justify-between p-3">
+                  <div className="min-w-0">
+                    <p className="truncate text-sm font-medium">{e.notes ?? "Owner Withdrawal"}</p>
+                    <p className="text-xs text-muted-foreground">{fmtDate(e.expense_date)}</p>
+                  </div>
+                  <p className="text-sm font-semibold text-destructive">-{inr(e.amount)}</p>
+                </div>
+              ))}
+            </div>
+          )}
+
 
           {banks.length > 0 && (
             <div className="surface mb-3 divide-y divide-border">

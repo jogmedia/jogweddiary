@@ -99,7 +99,21 @@ function PaymentsPage() {
                 { name: "notes", label: "Notes", type: "textarea" },
               ]}
               initial={{ payment_date: todayISO(), payment_mode: "cash" }}
-              onSubmit={(v) => save.mutateAsync(v)}
+              extra={(values, set) =>
+                needsBankAccount(values.payment_mode) ? (
+                  <BankAccountField
+                    value={values.bank_account_id ?? null}
+                    onChange={(v) => set("bank_account_id", v)}
+                  />
+                ) : null
+              }
+              onSubmit={(v) =>
+                save.mutateAsync({
+                  ...v,
+                  bank_account_id: needsBankAccount(v.payment_mode) ? (v.bank_account_id ?? null) : null,
+                })
+              }
+
               trigger={
                 <Button size="sm">
                   <Plus className="mr-1.5 h-4 w-4" /> Add payment

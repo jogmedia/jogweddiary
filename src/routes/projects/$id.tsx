@@ -13,7 +13,9 @@ import {
   Send,
   HardDrive,
 } from "lucide-react";
+import { BankAccountField, needsBankAccount } from "@/components/BankAccountField";
 import { crewRoleOptions } from "@/lib/roles";
+
 import {
   buildDateBlockMessage,
   buildEventReminderMessage,

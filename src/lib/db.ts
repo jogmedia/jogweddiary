@@ -361,6 +361,22 @@ export const useAccounts = () =>
     queryFn: () => fetchList<Account>("chart_of_accounts", "*", { column: "account_code", ascending: true }),
   });
 
+export type BankAccount = {
+  id: string;
+  bank_name: string;
+  account_number: string | null;
+  opening_balance: number;
+  current_balance: number;
+  is_active: boolean;
+};
+
+export const useBankAccounts = () =>
+  useQuery({
+    queryKey: ["bank_accounts"],
+    queryFn: () => fetchList<BankAccount>("bank_accounts", "*", { column: "bank_name", ascending: true }),
+  });
+
+
 export const useJournalEntries = () =>
   useQuery({
     queryKey: ["journal_entries"],

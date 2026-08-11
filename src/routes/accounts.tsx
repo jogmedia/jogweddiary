@@ -54,6 +54,8 @@ function AccountsPage() {
   const { data: equity = [] } = useEquityTxns();
   const { data: projects = [] } = useProjects();
   const { data: payments = [] } = usePayments();
+  const { data: banks = [] } = useBankAccounts();
+
   const saveAccount = useUpsert("chart_of_accounts", "Account");
   const saveAsset = useUpsert("assets", "Asset");
   const saveLiability = useUpsert("liabilities", "Liability");

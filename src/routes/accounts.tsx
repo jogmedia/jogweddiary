@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
-import { Plus } from "lucide-react";
+import { ArrowUpRight, Plus } from "lucide-react";
 import { AppShell } from "@/components/AppShell";
 import { EmptyState, PageHeader, StatCard } from "@/components/ui-kit";
 import { RecordDialog } from "@/components/RecordDialog";
@@ -18,6 +18,7 @@ import {
 import {
   useAccounts,
   useBankAccounts,
+  useExpenses,
 
   useAssets,
   useCreateJournalEntry,
@@ -30,6 +31,7 @@ import {
 } from "@/lib/db";
 import { fmtDate, inr, todayISO } from "@/lib/format";
 import { accountBalances } from "@/lib/accounts";
+import { BankAccountField } from "@/components/BankAccountField";
 
 export const Route = createFileRoute("/accounts")({
   head: () => ({
@@ -57,11 +59,14 @@ function AccountsPage() {
   const { data: projects = [] } = useProjects();
   const { data: payments = [] } = usePayments();
   const { data: banks = [] } = useBankAccounts();
+  const { data: expenses = [] } = useExpenses();
+  const ownerDraws = expenses.filter((e: any) => e.category === "Owner Salary / Personal Draw");
 
   const saveAccount = useUpsert("chart_of_accounts", "Account");
   const saveAsset = useUpsert("assets", "Asset");
   const saveLiability = useUpsert("liabilities", "Liability");
   const saveEquity = useUpsert("equity_transactions", "Equity transaction");
+  const saveExpense = useUpsert("project_expenses", "Owner withdrawal");
   const postEntry = useCreateJournalEntry();
 
   return (

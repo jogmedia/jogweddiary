@@ -9,6 +9,7 @@ import { Input } from "@/components/ui/input";
 import { useExpenses, useProjects, useRemove, useUpsert } from "@/lib/db";
 import { fmtDate, inr, todayISO } from "@/lib/format";
 import { exportCsv, exportExcel } from "@/lib/exporters";
+import { BankAccountField, needsBankAccount } from "@/components/BankAccountField";
 
 export const Route = createFileRoute("/expenses")({
   head: () => ({

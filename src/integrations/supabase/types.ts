@@ -121,6 +121,39 @@ export type Database = {
           },
         ]
       }
+      bank_accounts: {
+        Row: {
+          account_number: string | null
+          bank_name: string
+          created_at: string
+          current_balance: number
+          id: string
+          is_active: boolean
+          opening_balance: number
+          updated_at: string
+        }
+        Insert: {
+          account_number?: string | null
+          bank_name: string
+          created_at?: string
+          current_balance?: number
+          id?: string
+          is_active?: boolean
+          opening_balance?: number
+          updated_at?: string
+        }
+        Update: {
+          account_number?: string | null
+          bank_name?: string
+          created_at?: string
+          current_balance?: number
+          id?: string
+          is_active?: boolean
+          opening_balance?: number
+          updated_at?: string
+        }
+        Relationships: []
+      }
       chart_of_accounts: {
         Row: {
           account_code: string | null
@@ -874,6 +907,7 @@ export type Database = {
         Row: {
           account: string | null
           amount: number
+          bank_account_id: string | null
           created_at: string
           id: string
           notes: string | null
@@ -886,6 +920,7 @@ export type Database = {
         Insert: {
           account?: string | null
           amount: number
+          bank_account_id?: string | null
           created_at?: string
           id?: string
           notes?: string | null
@@ -898,6 +933,7 @@ export type Database = {
         Update: {
           account?: string | null
           amount?: number
+          bank_account_id?: string | null
           created_at?: string
           id?: string
           notes?: string | null
@@ -908,6 +944,13 @@ export type Database = {
           reference_no?: string | null
         }
         Relationships: [
+          {
+            foreignKeyName: "project_payments_bank_account_id_fkey"
+            columns: ["bank_account_id"]
+            isOneToOne: false
+            referencedRelation: "bank_accounts"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "project_payments_project_id_fkey"
             columns: ["project_id"]
@@ -1418,6 +1461,10 @@ export type Database = {
       }
       portal_submit_selection: {
         Args: { _note: string; _project_id: string }
+        Returns: undefined
+      }
+      recalc_bank_balance: {
+        Args: { _bank_account_id: string }
         Returns: undefined
       }
       recalc_project_balance: {

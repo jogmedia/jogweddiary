@@ -10,6 +10,8 @@ import { usePayments, useProjects, useRemove, useUpsert } from "@/lib/db";
 import { fmtDate, inr, todayISO } from "@/lib/format";
 import { exportCsv, exportExcel } from "@/lib/exporters";
 import { PAY_ACCOUNTS, accountBalances, accountLabel } from "@/lib/accounts";
+import { BankAccountField, needsBankAccount } from "@/components/BankAccountField";
+
 
 export const Route = createFileRoute("/payments")({
   head: () => ({

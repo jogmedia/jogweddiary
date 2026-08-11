@@ -61,7 +61,7 @@ export function BankAccountField({
 
   return (
     <div>
-      <Label className="mb-1.5 block text-xs font-medium">Destination Bank Account</Label>
+      <Label className="mb-1.5 block text-xs font-medium">{label}</Label>
       <div className="flex gap-2">
         <Select value={value ?? ""} onValueChange={(v) => onChange(v || null)}>
           <SelectTrigger className="flex-1">

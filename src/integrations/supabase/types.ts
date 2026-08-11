@@ -764,6 +764,7 @@ export type Database = {
       project_expenses: {
         Row: {
           amount: number
+          bank_account_id: string | null
           category: string
           created_at: string
           expense_date: string
@@ -775,6 +776,7 @@ export type Database = {
         }
         Insert: {
           amount: number
+          bank_account_id?: string | null
           category: string
           created_at?: string
           expense_date?: string
@@ -786,6 +788,7 @@ export type Database = {
         }
         Update: {
           amount?: number
+          bank_account_id?: string | null
           category?: string
           created_at?: string
           expense_date?: string
@@ -796,6 +799,13 @@ export type Database = {
           project_id?: string | null
         }
         Relationships: [
+          {
+            foreignKeyName: "project_expenses_bank_account_id_fkey"
+            columns: ["bank_account_id"]
+            isOneToOne: false
+            referencedRelation: "bank_accounts"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "project_expenses_project_id_fkey"
             columns: ["project_id"]

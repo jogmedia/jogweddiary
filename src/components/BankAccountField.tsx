@@ -29,9 +29,11 @@ export const needsBankAccount = (mode?: string | null) =>
 export function BankAccountField({
   value,
   onChange,
+  label = "Destination Bank Account",
 }: {
   value?: string | null;
   onChange: (id: string | null) => void;
+  label?: string;
 }) {
   const { data: accounts = [] } = useBankAccounts();
   const saveBank = useUpsert("bank_accounts", "Bank account");

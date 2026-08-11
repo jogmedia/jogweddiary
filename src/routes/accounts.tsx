@@ -17,6 +17,8 @@ import {
 } from "@/components/ui/select";
 import {
   useAccounts,
+  useBankAccounts,
+
   useAssets,
   useCreateJournalEntry,
   useEquityTxns,

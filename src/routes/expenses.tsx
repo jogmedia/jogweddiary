@@ -31,6 +31,7 @@ const CATEGORIES = [
   "Rent Expense",
   "Marketing Expense",
   "Office Expense",
+  "Owner Salary / Personal Draw",
   "Other",
 ];
 

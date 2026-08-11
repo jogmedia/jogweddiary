@@ -17,6 +17,8 @@ import {
 } from "@/components/ui/select";
 import {
   useAccounts,
+  useBankAccounts,
+
   useAssets,
   useCreateJournalEntry,
   useEquityTxns,
@@ -54,6 +56,8 @@ function AccountsPage() {
   const { data: equity = [] } = useEquityTxns();
   const { data: projects = [] } = useProjects();
   const { data: payments = [] } = usePayments();
+  const { data: banks = [] } = useBankAccounts();
+
   const saveAccount = useUpsert("chart_of_accounts", "Account");
   const saveAsset = useUpsert("assets", "Asset");
   const saveLiability = useUpsert("liabilities", "Liability");
@@ -81,7 +85,29 @@ function AccountsPage() {
               value={inr(payments.reduce((a, p) => a + Number(p.amount ?? 0), 0))}
               tone="success"
             />
+            <StatCard
+              label="Bank accounts balance"
+              value={inr(banks.reduce((a, b) => a + Number(b.current_balance ?? 0), 0))}
+            />
           </div>
+
+          {banks.length > 0 && (
+            <div className="surface mb-3 divide-y divide-border">
+              <p className="p-3 text-sm font-semibold">Bank &amp; UPI accounts</p>
+              {banks.map((b) => (
+                <div key={b.id} className="flex items-center justify-between p-3">
+                  <div>
+                    <p className="text-sm font-medium">{b.bank_name}</p>
+                    <p className="text-xs text-muted-foreground">
+                      {b.account_number ?? "—"} · opening {inr(b.opening_balance)}
+                    </p>
+                  </div>
+                  <p className="text-sm font-semibold">{inr(b.current_balance)}</p>
+                </div>
+              ))}
+            </div>
+          )}
+
           <div className="surface divide-y divide-border">
             {accountBalances(payments).map((b) => (
               <div key={b.account} className="flex items-center justify-between p-3">
@@ -94,6 +120,7 @@ function AccountsPage() {
             ))}
           </div>
         </TabsContent>
+
 
         <TabsContent value="coa">
           <div className="mb-3">

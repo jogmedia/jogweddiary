@@ -361,6 +361,22 @@ export const useAccounts = () =>
     queryFn: () => fetchList<Account>("chart_of_accounts", "*", { column: "account_code", ascending: true }),
   });
 
+export type BankAccount = {
+  id: string;
+  bank_name: string;
+  account_number: string | null;
+  opening_balance: number;
+  current_balance: number;
+  is_active: boolean;
+};
+
+export const useBankAccounts = () =>
+  useQuery({
+    queryKey: ["bank_accounts"],
+    queryFn: () => fetchList<BankAccount>("bank_accounts", "*", { column: "bank_name", ascending: true }),
+  });
+
+
 export const useJournalEntries = () =>
   useQuery({
     queryKey: ["journal_entries"],
@@ -426,7 +442,9 @@ export const useSettings = () =>
 /* ------------------------------------------------------------------ */
 
 const RELATED: Record<string, string[]> = {
-  project_payments: ["payments", "projects", "project", "income_transactions", "activity_log"],
+  project_payments: ["payments", "projects", "project", "income_transactions", "bank_accounts", "activity_log"],
+  bank_accounts: ["bank_accounts", "payments", "activity_log"],
+
   project_expenses: ["expenses", "projects", "project", "expense_transactions", "activity_log"],
   projects: ["projects", "project", "activity_log"],
   clients: ["clients", "projects", "activity_log"],

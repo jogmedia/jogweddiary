@@ -87,6 +87,7 @@ const EXPENSE_CATEGORIES = [
   "Travel Expense",
   "Equipment Rent",
   "Food",
+  "Owner Salary / Personal Draw",
   "Other",
 ].map((v) => ({ value: v, label: v }));
 

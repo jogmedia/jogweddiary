@@ -3,14 +3,14 @@ import { Landmark, Wallet, PiggyBank } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useBankAccounts, useExpenses, usePayments } from "@/lib/db";
 import { inr, todayISO } from "@/lib/format";
+import { fullMonthLabel } from "@/lib/month-finance";
 
 const OWNER_DRAW = "Owner Salary / Personal Draw";
 
-function useMoney() {
+function useMoney(month = todayISO().slice(0, 7)) {
   const { data: banks = [] } = useBankAccounts();
   const { data: payments = [] } = usePayments();
   const { data: expenses = [] } = useExpenses();
-  const month = todayISO().slice(0, 7);
 
   const cashIn = payments
     .filter((p: any) => !p.bank_account_id)
@@ -97,9 +97,10 @@ export function BankBalancesWidget({ compact = false }: { compact?: boolean }) {
 }
 
 /** Flexible owner salary tracker — no fixed targets, current month only. */
-export function OwnerSalaryWidget({ compact = false }: { compact?: boolean }) {
-  const { monthIncome, monthProfit, monthDraw, retention } = useMoney();
-  const monthName = new Date().toLocaleDateString("en-IN", { month: "long", year: "numeric" });
+export function OwnerSalaryWidget({ compact = false, month }: { compact?: boolean; month?: string }) {
+  const key = month ?? todayISO().slice(0, 7);
+  const { monthIncome, monthProfit, monthDraw, retention } = useMoney(key);
+  const monthName = fullMonthLabel(key);
 
   const items = [
     { label: "Month income", value: monthIncome },

@@ -30,6 +30,8 @@ import { CrewReminders } from "@/components/CrewReminders";
 import { ShootDay } from "@/components/ShootDay";
 import { TravelBadge, travelState } from "@/components/TravelBadge";
 import { BankBalancesWidget, OwnerSalaryWidget } from "@/components/MoneyWidgets";
+import { MonthlyFinanceCard } from "@/components/MonthlyFinance";
+import { currentMonthKey } from "@/lib/month-finance";
 
 import { PageHeader, StatCard, StatusBadge } from "@/components/ui-kit";
 import {
@@ -165,6 +167,7 @@ function Dashboard() {
   const doneDeliveries = deliveries.slice(0, 6);
 
   const [travelOnly, setTravelOnly] = useState(false);
+  const [selMonth, setSelMonth] = useState(currentMonthKey());
   const pendingTravel = allShootRows
     .filter((r) => r.date >= today && ["pending", "urgent"].includes(travelState(r.travel as any, r.date)))
     .sort((a, b) => a.date.localeCompare(b.date));

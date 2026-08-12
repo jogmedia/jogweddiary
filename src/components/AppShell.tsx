@@ -108,8 +108,13 @@ export function AppShell({ children }: { children: ReactNode }) {
       <aside className="fixed inset-y-0 left-0 hidden w-64 flex-col bg-sidebar lg:flex">
         <Brand />
         <div className="flex-1 overflow-y-auto">
+          <div className="pt-3">
+            <BankBalancesWidget compact />
+            <OwnerSalaryWidget compact />
+          </div>
           <NavList />
         </div>
+
         <div className="border-t border-sidebar-border p-3">
           <p className="px-3 pb-2 text-xs text-sidebar-foreground/60">
             {user.email} · {role ?? "no role"}

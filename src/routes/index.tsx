@@ -176,10 +176,8 @@ function Dashboard() {
         subtitle={`Overview for ${new Date().toLocaleDateString("en-IN", { month: "long", year: "numeric" })}`}
       />
 
-      <div className="mb-4 grid gap-4 lg:grid-cols-2">
-        <BankBalancesWidget />
-        <OwnerSalaryWidget />
-      </div>
+
+
 
 
       {/* 1. Daily shoot widgets — very top */}
@@ -232,6 +230,13 @@ function Dashboard() {
           }))}
         />
       </div>
+
+      {/* Money widgets below shoots & upcoming events */}
+      <div className="mt-4 grid gap-4 lg:grid-cols-2">
+        <BankBalancesWidget />
+        <OwnerSalaryWidget />
+      </div>
+
 
       <div className="mt-4 grid gap-4 lg:grid-cols-2">
         <ListCard

@@ -26,14 +26,18 @@ function useMoney() {
     { id: "cash", name: "Cash in Hand", balance: cashIn - cashOut },
   ];
 
+  const inMonth = (d: any) => String(d ?? "").slice(0, 7) === month;
+
+  // Real-time month income = every payment actually logged this month, all projects.
   const monthIncome = payments
-    .filter((p: any) => (p.payment_date ?? "").startsWith(month))
+    .filter((p: any) => inMonth(p.payment_date))
     .reduce((a: number, p: any) => a + Number(p.amount ?? 0), 0);
-  const monthExpenses = expenses
-    .filter((e: any) => (e.expense_date ?? "").startsWith(month))
-    .reduce((a: number, e: any) => a + Number(e.amount ?? 0), 0);
   const monthDraw = expenses
-    .filter((e: any) => e.category === OWNER_DRAW && (e.expense_date ?? "").startsWith(month))
+    .filter((e: any) => e.category === OWNER_DRAW && inMonth(e.expense_date))
+    .reduce((a: number, e: any) => a + Number(e.amount ?? 0), 0);
+  // Business expenses only (owner draw is a withdrawal, not a cost).
+  const monthExpenses = expenses
+    .filter((e: any) => e.category !== OWNER_DRAW && inMonth(e.expense_date))
     .reduce((a: number, e: any) => a + Number(e.amount ?? 0), 0);
 
   return {

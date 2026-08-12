@@ -29,6 +29,7 @@ import { BackupAlert } from "@/components/BackupAlert";
 import { CrewReminders } from "@/components/CrewReminders";
 import { ShootDay } from "@/components/ShootDay";
 import { TravelBadge, travelState } from "@/components/TravelBadge";
+import { BankBalancesWidget, OwnerSalaryWidget } from "@/components/MoneyWidgets";
 
 import { PageHeader, StatCard, StatusBadge } from "@/components/ui-kit";
 import {

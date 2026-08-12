@@ -29,6 +29,7 @@ import { BackupAlert } from "@/components/BackupAlert";
 import { CrewReminders } from "@/components/CrewReminders";
 import { ShootDay } from "@/components/ShootDay";
 import { TravelBadge, travelState } from "@/components/TravelBadge";
+import { BankBalancesWidget, OwnerSalaryWidget } from "@/components/MoneyWidgets";
 
 import { PageHeader, StatCard, StatusBadge } from "@/components/ui-kit";
 import {
@@ -174,6 +175,12 @@ function Dashboard() {
         title="Studio Dashboard"
         subtitle={`Overview for ${new Date().toLocaleDateString("en-IN", { month: "long", year: "numeric" })}`}
       />
+
+      <div className="mb-4 grid gap-4 lg:grid-cols-2">
+        <BankBalancesWidget />
+        <OwnerSalaryWidget />
+      </div>
+
 
       {/* 1. Daily shoot widgets — very top */}
       <div className="grid gap-4">

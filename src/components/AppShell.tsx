@@ -24,6 +24,7 @@ import { useAuth } from "@/lib/auth";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger, SheetTitle } from "@/components/ui/sheet";
 import { InstallAppButton } from "@/components/InstallAppButton";
+import { BankBalancesWidget, OwnerSalaryWidget } from "@/components/MoneyWidgets";
 
 export const NAV = [
   { to: "/", label: "Dashboard", icon: LayoutDashboard, adminOnly: false },
@@ -107,8 +108,13 @@ export function AppShell({ children }: { children: ReactNode }) {
       <aside className="fixed inset-y-0 left-0 hidden w-64 flex-col bg-sidebar lg:flex">
         <Brand />
         <div className="flex-1 overflow-y-auto">
+          <div className="pt-3">
+            <BankBalancesWidget compact />
+            <OwnerSalaryWidget compact />
+          </div>
           <NavList />
         </div>
+
         <div className="border-t border-sidebar-border p-3">
           <p className="px-3 pb-2 text-xs text-sidebar-foreground/60">
             {user.email} · {role ?? "no role"}
@@ -131,10 +137,15 @@ export function AppShell({ children }: { children: ReactNode }) {
               <Menu className="h-5 w-5" />
             </Button>
           </SheetTrigger>
-          <SheetContent side="left" className="w-72 bg-sidebar p-0">
+          <SheetContent side="left" className="w-72 overflow-y-auto bg-sidebar p-0">
             <SheetTitle className="sr-only">Menu</SheetTitle>
             <Brand />
+            <div className="pt-3" onClick={() => setOpen(false)}>
+              <BankBalancesWidget compact />
+              <OwnerSalaryWidget compact />
+            </div>
             <NavList onNavigate={() => setOpen(false)} />
+
             <div className="border-t border-sidebar-border p-3">
               <Button
                 variant="ghost"

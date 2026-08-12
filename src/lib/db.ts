@@ -445,7 +445,7 @@ const RELATED: Record<string, string[]> = {
   project_payments: ["payments", "projects", "project", "income_transactions", "bank_accounts", "activity_log"],
   bank_accounts: ["bank_accounts", "payments", "activity_log"],
 
-  project_expenses: ["expenses", "projects", "project", "expense_transactions", "activity_log"],
+  project_expenses: ["expenses", "projects", "project", "expense_transactions", "bank_accounts", "activity_log"],
   projects: ["projects", "project", "activity_log"],
   clients: ["clients", "projects", "activity_log"],
   project_tasks: ["tasks", "activity_log"],

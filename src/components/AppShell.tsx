@@ -137,10 +137,15 @@ export function AppShell({ children }: { children: ReactNode }) {
               <Menu className="h-5 w-5" />
             </Button>
           </SheetTrigger>
-          <SheetContent side="left" className="w-72 bg-sidebar p-0">
+          <SheetContent side="left" className="w-72 overflow-y-auto bg-sidebar p-0">
             <SheetTitle className="sr-only">Menu</SheetTitle>
             <Brand />
+            <div className="pt-3" onClick={() => setOpen(false)}>
+              <BankBalancesWidget compact />
+              <OwnerSalaryWidget compact />
+            </div>
             <NavList onNavigate={() => setOpen(false)} />
+
             <div className="border-t border-sidebar-border p-3">
               <Button
                 variant="ghost"

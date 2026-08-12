@@ -231,6 +231,13 @@ function Dashboard() {
         />
       </div>
 
+      {/* Money widgets below shoots & upcoming events */}
+      <div className="mt-4 grid gap-4 lg:grid-cols-2">
+        <BankBalancesWidget />
+        <OwnerSalaryWidget />
+      </div>
+
+
       <div className="mt-4 grid gap-4 lg:grid-cols-2">
         <ListCard
           title="Overdue balances"

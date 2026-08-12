@@ -232,9 +232,12 @@ function Dashboard() {
       </div>
 
       {/* Money widgets below shoots & upcoming events */}
-      <div className="mt-4 grid gap-4 lg:grid-cols-2">
-        <BankBalancesWidget />
-        <OwnerSalaryWidget />
+      <div className="mt-4 grid gap-4">
+        <MonthlyFinanceCard month={selMonth} onMonthChange={setSelMonth} />
+        <div className="grid gap-4 lg:grid-cols-2">
+          <OwnerSalaryWidget month={selMonth} />
+          <BankBalancesWidget />
+        </div>
       </div>
 
 

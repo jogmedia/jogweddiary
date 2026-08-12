@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { createPortal } from "react-dom";
 import { Printer, Download, IndianRupee, PiggyBank, TrendingUp, TrendingDown, Wallet } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -191,6 +191,8 @@ export function MonthlyFinanceCard({ month, onMonthChange }: { month: string; on
   const { data: settings } = useSettings();
   const f = useMonthFinance(month);
   const [busy, setBusy] = useState(false);
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => setMounted(true), []);
   const months = monthOptions(24);
 
   const items = [
@@ -249,7 +251,7 @@ export function MonthlyFinanceCard({ month, onMonthChange }: { month: string; on
         {fullMonthLabel(month)} · {f.paymentRows.length} payments · {f.expenseRows.length} expense entries
       </p>
 
-      {typeof document !== "undefined" &&
+      {mounted &&
         createPortal(<PrintableReport month={month} settings={settings} />, document.body)}
     </div>
   );

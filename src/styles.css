@@ -239,3 +239,13 @@
     page-break-inside: avoid;
   }
 }
+
+/* A4 financial statement print isolation */
+@media print {
+  body > *:not(#fin-report) {
+    display: none !important;
+  }
+  #fin-report {
+    display: block !important;
+  }
+}

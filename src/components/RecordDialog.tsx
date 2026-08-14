@@ -244,6 +244,51 @@ export function RecordDialog({
           </Button>
         </DialogFooter>
       </DialogContent>
+
+      <Dialog open={!!addFor} onOpenChange={(v) => !v && setAddFor(null)}>
+        <DialogContent className="sm:max-w-sm">
+          <DialogHeader>
+            <DialogTitle className="font-display text-lg">
+              {addField?.addOptionTitle ?? "Add new option"}
+            </DialogTitle>
+          </DialogHeader>
+          <div>
+            <Label className="mb-1.5 block text-xs font-medium">
+              {addField?.addOptionLabel ?? "Name"}
+            </Label>
+            <Input
+              autoFocus
+              placeholder="e.g. Drone Charges"
+              value={addName}
+              onChange={(e) => setAddName(e.target.value)}
+              onKeyDown={(e) => {
+                if (e.key === "Enter") {
+                  e.preventDefault();
+                  const name = addField?.onAddOption?.(addName);
+                  if (addFor && addName.trim()) set(addFor, (name as string) || addName.trim());
+                  setAddFor(null);
+                }
+              }}
+            />
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setAddFor(null)}>
+              Cancel
+            </Button>
+            <Button
+              disabled={!addName.trim()}
+              onClick={() => {
+                const name = addField?.onAddOption?.(addName);
+                if (addFor) set(addFor, (name as string) || addName.trim());
+                setAddFor(null);
+              }}
+            >
+              Add category
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </Dialog>
   );
 }
+

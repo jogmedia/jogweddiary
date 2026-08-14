@@ -23,25 +23,14 @@ export const Route = createFileRoute("/expenses")({
   component: ExpensesPage,
 });
 
-const CATEGORIES = [
-  "Editing Expense",
-  "Album Cost",
-  "Staff Payment Expense",
-  "Travel Expense",
-  "Equipment Rent",
-  "Rent Expense",
-  "Marketing Expense",
-  "Office Expense",
-  "Owner Salary / Personal Draw",
-  "Other",
-];
-
 function ExpensesPage() {
   const { data: expenses = [], isLoading } = useExpenses();
   const { data: projects = [] } = useProjects();
+  const { options: categoryOptions, addCategory } = useExpenseCategories();
   const save = useUpsert("project_expenses", "Expense");
   const remove = useRemove("project_expenses", "Expense");
   const [q, setQ] = useState("");
+
   const [from, setFrom] = useState("");
   const [to, setTo] = useState("");
 

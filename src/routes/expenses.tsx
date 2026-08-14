@@ -88,7 +88,11 @@ function ExpensesPage() {
                   label: "Category",
                   type: "select",
                   required: true,
-                  options: CATEGORIES.map((v) => ({ value: v, label: v })),
+                  options: categoryOptions,
+                  onAddOption: addCategory,
+                  addOptionTitle: "Add expense category",
+                  addOptionLabel: "Category name",
+
                 },
                 { name: "amount", label: "Amount", type: "number", required: true },
                 { name: "paid_to", label: "Paid to" },

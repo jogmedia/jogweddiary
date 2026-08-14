@@ -14,6 +14,8 @@ import {
   HardDrive,
 } from "lucide-react";
 import { BankAccountField, needsBankAccount } from "@/components/BankAccountField";
+import { useExpenseCategories } from "@/lib/expense-categories";
+
 import { crewRoleOptions } from "@/lib/roles";
 
 import {

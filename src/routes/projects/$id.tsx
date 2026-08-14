@@ -80,16 +80,8 @@ export const Route = createFileRoute("/projects/$id")({
 });
 
 const PAY_MODES = ["cash", "upi", "bank", "cheque", "card"].map((v) => ({ value: v, label: v }));
-const EXPENSE_CATEGORIES = [
-  "Editing Expense",
-  "Album Cost",
-  "Staff Payment Expense",
-  "Travel Expense",
-  "Equipment Rent",
-  "Food",
-  "Owner Salary / Personal Draw",
-  "Other",
-].map((v) => ({ value: v, label: v }));
+
+
 
 const WORKFLOW = [
   { key: "raw_backup_done", label: "Raw data backed up" },

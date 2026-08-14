@@ -1,4 +1,6 @@
 import { useEffect, useState, type ReactNode } from "react";
+import { Plus } from "lucide-react";
+
 import {
   Dialog,
   DialogContent,

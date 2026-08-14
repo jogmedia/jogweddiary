@@ -40,11 +40,13 @@ function useMoney(month = todayISO().slice(0, 7)) {
     .filter((e: any) => e.category !== OWNER_DRAW && inMonth(e.expense_date))
     .reduce((a: number, e: any) => a + Number(e.amount ?? 0), 0);
 
+  const monthProfit = monthIncome - monthExpenses;
+
   return {
     rows,
     total: rows.reduce((a, r) => a + r.balance, 0),
     monthIncome,
-    monthProfit: monthIncome - monthExpenses,
+    monthProfit,
     monthDraw,
     retention: monthProfit - monthDraw,
   };

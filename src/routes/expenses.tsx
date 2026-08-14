@@ -10,6 +10,8 @@ import { useExpenses, useProjects, useRemove, useUpsert } from "@/lib/db";
 import { fmtDate, inr, todayISO } from "@/lib/format";
 import { exportCsv, exportExcel } from "@/lib/exporters";
 import { BankAccountField, needsBankAccount } from "@/components/BankAccountField";
+import { useExpenseCategories } from "@/lib/expense-categories";
+
 
 export const Route = createFileRoute("/expenses")({
   head: () => ({

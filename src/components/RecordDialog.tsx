@@ -34,7 +34,14 @@ export type Field = {
   transform?: (value: any) => any;
   /** Select fields only: adds a "Custom…" option that reveals a free-text input. */
   allowCustom?: boolean;
+  /** Select fields only: shows a "+" button that opens a create-new-option prompt. */
+  onAddOption?: (name: string) => string | null | void;
+  /** Title of the create-new-option dialog. */
+  addOptionTitle?: string;
+  /** Label of the create-new-option input. */
+  addOptionLabel?: string;
 };
+
 
 
 export function RecordDialog({

@@ -342,7 +342,17 @@ function ProjectDetail() {
           title="Add expense"
           fields={[
             { name: "expense_date", label: "Date", type: "date", required: true },
-            { name: "category", label: "Category", type: "select", options: EXPENSE_CATEGORIES, required: true },
+            {
+              name: "category",
+              label: "Category",
+              type: "select",
+              options: categoryOptions,
+              required: true,
+              onAddOption: addCategory,
+              addOptionTitle: "Add expense category",
+              addOptionLabel: "Category name",
+            },
+
             { name: "amount", label: "Amount", type: "number", required: true },
             { name: "paid_to", label: "Paid to" },
             { name: "payment_mode", label: "Mode", type: "select", options: PAY_MODES },

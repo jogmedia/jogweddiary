@@ -153,6 +153,7 @@ export function RecordDialog({
                     !!f.allowCustom && (customMode[f.name] || (!!current && !known));
                   return (
                     <div className="space-y-2">
+                      <div className="flex gap-2">
                       <Select
                         value={isCustom ? "__custom__" : current}
                         onValueChange={(v) => {
@@ -165,7 +166,7 @@ export function RecordDialog({
                           }
                         }}
                       >
-                        <SelectTrigger id={f.name}>
+                        <SelectTrigger id={f.name} className="flex-1">
                           <SelectValue placeholder={f.placeholder ?? "Select"} />
                         </SelectTrigger>
                         <SelectContent>
@@ -177,6 +178,22 @@ export function RecordDialog({
                           {f.allowCustom && <SelectItem value="__custom__">Custom Role…</SelectItem>}
                         </SelectContent>
                       </Select>
+                      {f.onAddOption && (
+                        <Button
+                          type="button"
+                          variant="outline"
+                          size="icon"
+                          aria-label={f.addOptionTitle ?? `Add new ${f.label}`}
+                          onClick={() => {
+                            setAddName("");
+                            setAddFor(f.name);
+                          }}
+                        >
+                          <Plus className="h-4 w-4" />
+                        </Button>
+                      )}
+                      </div>
+
                       {isCustom && (
                         <Input
                           autoFocus

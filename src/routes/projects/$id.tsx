@@ -14,6 +14,8 @@ import {
   HardDrive,
 } from "lucide-react";
 import { BankAccountField, needsBankAccount } from "@/components/BankAccountField";
+import { useExpenseCategories } from "@/lib/expense-categories";
+
 import { crewRoleOptions } from "@/lib/roles";
 
 import {
@@ -80,16 +82,8 @@ export const Route = createFileRoute("/projects/$id")({
 });
 
 const PAY_MODES = ["cash", "upi", "bank", "cheque", "card"].map((v) => ({ value: v, label: v }));
-const EXPENSE_CATEGORIES = [
-  "Editing Expense",
-  "Album Cost",
-  "Staff Payment Expense",
-  "Travel Expense",
-  "Equipment Rent",
-  "Food",
-  "Owner Salary / Personal Draw",
-  "Other",
-].map((v) => ({ value: v, label: v }));
+
+
 
 const WORKFLOW = [
   { key: "raw_backup_done", label: "Raw data backed up" },
@@ -154,6 +148,8 @@ function ProjectDetail() {
   const saveProject = useUpsert("projects", "Project");
   const savePayment = useUpsert("project_payments", "Payment");
   const saveExpense = useUpsert("project_expenses", "Expense");
+  const { options: categoryOptions, addCategory } = useExpenseCategories();
+
   const saveTask = useUpsert("project_tasks", "Task");
   const saveAssignment = useUpsert("project_assignments", "Crew assignment");
   const saveDelivery = useUpsert("delivery_records", "Delivery");
@@ -350,7 +346,17 @@ function ProjectDetail() {
           title="Add expense"
           fields={[
             { name: "expense_date", label: "Date", type: "date", required: true },
-            { name: "category", label: "Category", type: "select", options: EXPENSE_CATEGORIES, required: true },
+            {
+              name: "category",
+              label: "Category",
+              type: "select",
+              options: categoryOptions,
+              required: true,
+              onAddOption: addCategory,
+              addOptionTitle: "Add expense category",
+              addOptionLabel: "Category name",
+            },
+
             { name: "amount", label: "Amount", type: "number", required: true },
             { name: "paid_to", label: "Paid to" },
             { name: "payment_mode", label: "Mode", type: "select", options: PAY_MODES },

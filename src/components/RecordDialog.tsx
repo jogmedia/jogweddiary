@@ -1,4 +1,6 @@
 import { useEffect, useState, type ReactNode } from "react";
+import { Plus } from "lucide-react";
+
 import {
   Dialog,
   DialogContent,
@@ -34,7 +36,14 @@ export type Field = {
   transform?: (value: any) => any;
   /** Select fields only: adds a "Custom…" option that reveals a free-text input. */
   allowCustom?: boolean;
+  /** Select fields only: shows a "+" button that opens a create-new-option prompt. */
+  onAddOption?: (name: string) => string | null | void;
+  /** Title of the create-new-option dialog. */
+  addOptionTitle?: string;
+  /** Label of the create-new-option input. */
+  addOptionLabel?: string;
 };
+
 
 
 export function RecordDialog({
@@ -71,6 +80,10 @@ export function RecordDialog({
   const [busy, setBusy] = useState(false);
   const [customMode, setCustomMode] = useState<Record<string, boolean>>({});
   const [errors, setErrors] = useState<Record<string, string>>({});
+  const [addFor, setAddFor] = useState<string | null>(null);
+  const [addName, setAddName] = useState("");
+  const addField = fields.find((f) => f.name === addFor);
+
 
   useEffect(() => {
     if (open) {
@@ -146,6 +159,7 @@ export function RecordDialog({
                     !!f.allowCustom && (customMode[f.name] || (!!current && !known));
                   return (
                     <div className="space-y-2">
+                      <div className="flex gap-2">
                       <Select
                         value={isCustom ? "__custom__" : current}
                         onValueChange={(v) => {
@@ -158,7 +172,7 @@ export function RecordDialog({
                           }
                         }}
                       >
-                        <SelectTrigger id={f.name}>
+                        <SelectTrigger id={f.name} className="flex-1">
                           <SelectValue placeholder={f.placeholder ?? "Select"} />
                         </SelectTrigger>
                         <SelectContent>
@@ -170,6 +184,22 @@ export function RecordDialog({
                           {f.allowCustom && <SelectItem value="__custom__">Custom Role…</SelectItem>}
                         </SelectContent>
                       </Select>
+                      {f.onAddOption && (
+                        <Button
+                          type="button"
+                          variant="outline"
+                          size="icon"
+                          aria-label={f.addOptionTitle ?? `Add new ${f.label}`}
+                          onClick={() => {
+                            setAddName("");
+                            setAddFor(f.name);
+                          }}
+                        >
+                          <Plus className="h-4 w-4" />
+                        </Button>
+                      )}
+                      </div>
+
                       {isCustom && (
                         <Input
                           autoFocus
@@ -214,6 +244,51 @@ export function RecordDialog({
           </Button>
         </DialogFooter>
       </DialogContent>
+
+      <Dialog open={!!addFor} onOpenChange={(v) => !v && setAddFor(null)}>
+        <DialogContent className="sm:max-w-sm">
+          <DialogHeader>
+            <DialogTitle className="font-display text-lg">
+              {addField?.addOptionTitle ?? "Add new option"}
+            </DialogTitle>
+          </DialogHeader>
+          <div>
+            <Label className="mb-1.5 block text-xs font-medium">
+              {addField?.addOptionLabel ?? "Name"}
+            </Label>
+            <Input
+              autoFocus
+              placeholder="e.g. Drone Charges"
+              value={addName}
+              onChange={(e) => setAddName(e.target.value)}
+              onKeyDown={(e) => {
+                if (e.key === "Enter") {
+                  e.preventDefault();
+                  const name = addField?.onAddOption?.(addName);
+                  if (addFor && addName.trim()) set(addFor, (name as string) || addName.trim());
+                  setAddFor(null);
+                }
+              }}
+            />
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setAddFor(null)}>
+              Cancel
+            </Button>
+            <Button
+              disabled={!addName.trim()}
+              onClick={() => {
+                const name = addField?.onAddOption?.(addName);
+                if (addFor) set(addFor, (name as string) || addName.trim());
+                setAddFor(null);
+              }}
+            >
+              Add category
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </Dialog>
   );
 }
+

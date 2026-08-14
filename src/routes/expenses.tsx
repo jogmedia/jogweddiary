@@ -10,6 +10,8 @@ import { useExpenses, useProjects, useRemove, useUpsert } from "@/lib/db";
 import { fmtDate, inr, todayISO } from "@/lib/format";
 import { exportCsv, exportExcel } from "@/lib/exporters";
 import { BankAccountField, needsBankAccount } from "@/components/BankAccountField";
+import { useExpenseCategories } from "@/lib/expense-categories";
+
 
 export const Route = createFileRoute("/expenses")({
   head: () => ({
@@ -23,25 +25,14 @@ export const Route = createFileRoute("/expenses")({
   component: ExpensesPage,
 });
 
-const CATEGORIES = [
-  "Editing Expense",
-  "Album Cost",
-  "Staff Payment Expense",
-  "Travel Expense",
-  "Equipment Rent",
-  "Rent Expense",
-  "Marketing Expense",
-  "Office Expense",
-  "Owner Salary / Personal Draw",
-  "Other",
-];
-
 function ExpensesPage() {
   const { data: expenses = [], isLoading } = useExpenses();
   const { data: projects = [] } = useProjects();
+  const { options: categoryOptions, addCategory } = useExpenseCategories();
   const save = useUpsert("project_expenses", "Expense");
   const remove = useRemove("project_expenses", "Expense");
   const [q, setQ] = useState("");
+
   const [from, setFrom] = useState("");
   const [to, setTo] = useState("");
 
@@ -97,7 +88,11 @@ function ExpensesPage() {
                   label: "Category",
                   type: "select",
                   required: true,
-                  options: CATEGORIES.map((v) => ({ value: v, label: v })),
+                  options: categoryOptions,
+                  onAddOption: addCategory,
+                  addOptionTitle: "Add expense category",
+                  addOptionLabel: "Category name",
+
                 },
                 { name: "amount", label: "Amount", type: "number", required: true },
                 { name: "paid_to", label: "Paid to" },

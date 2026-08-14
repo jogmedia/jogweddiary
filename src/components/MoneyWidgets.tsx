@@ -46,7 +46,7 @@ function useMoney(month = todayISO().slice(0, 7)) {
     monthIncome,
     monthProfit: monthIncome - monthExpenses,
     monthDraw,
-    retention: monthIncome - monthDraw,
+    retention: monthProfit - monthDraw,
   };
 }
 

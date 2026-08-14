@@ -146,6 +146,8 @@ function ProjectDetail() {
   const saveProject = useUpsert("projects", "Project");
   const savePayment = useUpsert("project_payments", "Payment");
   const saveExpense = useUpsert("project_expenses", "Expense");
+  const { options: categoryOptions, addCategory } = useExpenseCategories();
+
   const saveTask = useUpsert("project_tasks", "Task");
   const saveAssignment = useUpsert("project_assignments", "Crew assignment");
   const saveDelivery = useUpsert("delivery_records", "Delivery");

@@ -80,6 +80,10 @@ export function RecordDialog({
   const [busy, setBusy] = useState(false);
   const [customMode, setCustomMode] = useState<Record<string, boolean>>({});
   const [errors, setErrors] = useState<Record<string, string>>({});
+  const [addFor, setAddFor] = useState<string | null>(null);
+  const [addName, setAddName] = useState("");
+  const addField = fields.find((f) => f.name === addFor);
+
 
   useEffect(() => {
     if (open) {

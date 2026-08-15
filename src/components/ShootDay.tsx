@@ -118,10 +118,10 @@ export function ShootDay({ date, title, empty = "No shoots scheduled for Today /
         <div className="grid gap-3">
           {items.map((it) => (
             <div key={it.key} className="rounded-xl border border-border p-3">
-              <div className="flex items-start justify-between gap-2">
+              <div className="grid grid-cols-[minmax(0,1fr)_auto] items-start gap-2 sm:flex sm:items-start sm:justify-between">
                 <Link to="/projects/$id" params={{ id: it.projectId }} className="block min-w-0">
-                  <p className="text-sm font-semibold">{it.title}</p>
-                  <p className="text-xs text-muted-foreground">Client: {it.client}</p>
+                  <p className="line-clamp-2 text-sm font-semibold">{it.title}</p>
+                  <p className="truncate text-xs text-muted-foreground">Client: {it.client}</p>
                   <TravelBadge project={it.travel} eventDate={date} className="mt-1" />
                 </Link>
                 <EditCrewDialog
@@ -149,17 +149,17 @@ export function ShootDay({ date, title, empty = "No shoots scheduled for Today /
                 ) : (
                   <ul className="divide-y divide-border">
                     {it.crew.map((c) => (
-                      <li key={c.id} className="flex items-center justify-between gap-3 py-2">
+                      <li key={c.id} className="grid grid-cols-[minmax(0,1fr)_auto] items-start gap-3 py-2 sm:flex sm:items-center sm:justify-between">
                         <div className="min-w-0">
                           <p className="truncate text-sm font-medium">{c.name}</p>
                           <p className="truncate text-xs capitalize text-muted-foreground">{c.role}</p>
                         </div>
-                        <div className="flex shrink-0 items-center gap-1.5">
+                        <div className="flex shrink-0 flex-col items-stretch gap-1.5 sm:flex-row sm:items-center">
                           {hasTicketInfo(it.travel) && (
                             <Button
                               size="sm"
                               variant="outline"
-                              className="h-8 text-xs"
+                              className="h-8 w-full text-xs sm:w-auto"
                               onClick={() =>
                                 void sendTicketWhatsApp({
                                   phone: c.phone,
@@ -176,7 +176,7 @@ export function ShootDay({ date, title, empty = "No shoots scheduled for Today /
                           )}
                           <Button
                             size="sm"
-                            className="bg-[hsl(142_70%_35%)] text-white hover:bg-[hsl(142_70%_29%)]"
+                            className="w-full bg-[hsl(142_70%_35%)] text-white hover:bg-[hsl(142_70%_29%)] sm:w-auto"
                             onClick={() => openWhatsApp(c.phone, c.message)}
                           >
                             WhatsApp

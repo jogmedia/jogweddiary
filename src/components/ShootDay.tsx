@@ -118,10 +118,10 @@ export function ShootDay({ date, title, empty = "No shoots scheduled for Today /
         <div className="grid gap-3">
           {items.map((it) => (
             <div key={it.key} className="rounded-xl border border-border p-3">
-              <div className="flex items-start justify-between gap-2">
+              <div className="grid grid-cols-[minmax(0,1fr)_auto] items-start gap-2 sm:flex sm:items-start sm:justify-between">
                 <Link to="/projects/$id" params={{ id: it.projectId }} className="block min-w-0">
-                  <p className="text-sm font-semibold">{it.title}</p>
-                  <p className="text-xs text-muted-foreground">Client: {it.client}</p>
+                  <p className="line-clamp-2 text-sm font-semibold">{it.title}</p>
+                  <p className="truncate text-xs text-muted-foreground">Client: {it.client}</p>
                   <TravelBadge project={it.travel} eventDate={date} className="mt-1" />
                 </Link>
                 <EditCrewDialog

@@ -407,9 +407,27 @@ export function ProjectDialog({
               </SelectContent>
             </Select>
             <p className="mt-1 text-xs text-muted-foreground">
-              Selecting a package fills the total amount and the deliverables below — everything stays editable.
+              Selecting a package fills the deliverables below — everything stays editable.
             </p>
           </div>
+          <div className="mb-3">
+            <Label htmlFor="pkg-price" className="mb-1.5 block text-xs font-medium">
+              Agreed package price / total amount
+            </Label>
+            <Input
+              id="pkg-price"
+              type="number"
+              step="0.01"
+              inputMode="decimal"
+              value={values.total_amount ?? ""}
+              placeholder="e.g. 70000"
+              onChange={(e) => set("total_amount", e.target.value)}
+            />
+            <p className="mt-1 text-xs text-muted-foreground">
+              Pre-filled from the selected package — edit freely for negotiated prices. Deliverables stay intact.
+            </p>
+          </div>
+
           <div className="space-y-2">
             {deliverables.length === 0 && (
               <p className="text-xs text-muted-foreground">

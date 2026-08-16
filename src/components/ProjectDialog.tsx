@@ -393,40 +393,56 @@ export function ProjectDialog({
             <p className="text-sm font-semibold">Package Details &amp; Deliverables</p>
           </div>
           <div className="mb-3">
-            <Label className="mb-1.5 block text-xs font-medium">Select package</Label>
-            <Select value={packageId} onValueChange={(v) => applyPackage(v, set)}>
-              <SelectTrigger>
-                <SelectValue placeholder="Choose a preset package" />
-              </SelectTrigger>
-              <SelectContent className="z-50 max-h-72">
-                {PRESET_PACKAGES.map((p) => (
-                  <SelectItem key={p.id} value={p.id}>
-                    {p.label}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-            <p className="mt-1 text-xs text-muted-foreground">
-              Selecting a package fills the deliverables below — everything stays editable.
-            </p>
-          </div>
-          <div className="mb-3">
-            <Label htmlFor="pkg-price" className="mb-1.5 block text-xs font-medium">
-              Agreed package price / total amount
+            <Label htmlFor="pkg-combo" className="mb-1.5 block text-xs font-medium">
+              Package
             </Label>
-            <Input
-              id="pkg-price"
-              type="number"
-              step="0.01"
-              inputMode="decimal"
-              value={values.total_amount ?? ""}
-              placeholder="e.g. 70000"
-              onChange={(e) => set("total_amount", e.target.value)}
-            />
+            <div className="relative">
+              <Input
+                id="pkg-combo"
+                autoComplete="off"
+                value={values.package_name ?? ""}
+                placeholder="Choose or type a package e.g. ₹70,000 — Photography"
+                onChange={(e) => {
+                  const text = e.target.value;
+                  set("package_name", text);
+                  setPkgOpen(true);
+                  const amount = parseAmount(text);
+                  if (amount !== null) set("total_amount", amount);
+                }}
+                onFocus={() => setPkgOpen(true)}
+                onBlur={() => window.setTimeout(() => setPkgOpen(false), 150)}
+              />
+              {pkgOpen && (
+                <div className="absolute left-0 right-0 top-full z-50 mt-1 max-h-60 overflow-y-auto rounded-xl border border-border bg-popover p-1 shadow-lg">
+                  {matchPackages(values.package_name).length === 0 ? (
+                    <p className="px-2 py-1.5 text-xs text-muted-foreground">
+                      No preset match — your typed package is kept as-is.
+                    </p>
+                  ) : (
+                    matchPackages(values.package_name).map((p) => (
+                      <button
+                        key={p.id}
+                        type="button"
+                        className="block w-full rounded-lg px-2 py-1.5 text-left text-sm hover:bg-accent"
+                        onMouseDown={(e) => e.preventDefault()}
+                        onClick={() => {
+                          applyPackage(p.id, set);
+                          setPkgOpen(false);
+                        }}
+                      >
+                        {p.label}
+                      </button>
+                    ))
+                  )}
+                </div>
+              )}
+            </div>
             <p className="mt-1 text-xs text-muted-foreground">
-              Pre-filled from the selected package — edit freely for negotiated prices. Deliverables stay intact.
+              Pick a package to fill deliverables, then edit the text (e.g. ₹80,000) right here — the
+              amount saved follows what you type.
             </p>
           </div>
+
 
           <div className="space-y-2">
             {deliverables.length === 0 && (

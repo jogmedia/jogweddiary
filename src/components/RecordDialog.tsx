@@ -267,42 +267,51 @@ export function RecordDialog({
               {addField?.addOptionTitle ?? "Add new option"}
             </DialogTitle>
           </DialogHeader>
-          <div>
-            <Label className="mb-1.5 block text-xs font-medium">
-              {addField?.addOptionLabel ?? "Name"}
-            </Label>
-            <Input
-              autoFocus
-              placeholder="e.g. Drone Charges"
-              value={addName}
-              onChange={(e) => setAddName(e.target.value)}
-              onKeyDown={(e) => {
-                if (e.key === "Enter") {
-                  e.preventDefault();
-                  const name = addField?.onAddOption?.(addName);
-                  if (addFor && addName.trim()) set(addFor, (name as string) || addName.trim());
-                  setAddFor(null);
-                }
-              }}
-            />
+          <div className="space-y-3">
+            <div>
+              <Label className="mb-1.5 block text-xs font-medium">
+                {addField?.addOptionLabel ?? "Name"}
+                <span className="text-destructive"> *</span>
+              </Label>
+              <Input
+                autoFocus
+                placeholder={addField?.addOptionPlaceholder ?? "e.g. Drone Charges"}
+                value={addName}
+                onChange={(e) => setAddName(e.target.value)}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter") {
+                    e.preventDefault();
+                    void submitAddOption();
+                  }
+                }}
+              />
+            </div>
+            {(addField?.addOptionFields ?? []).map((ef) => (
+              <div key={ef.name}>
+                <Label className="mb-1.5 block text-xs font-medium">{ef.label}</Label>
+                <Input
+                  type={ef.type ?? "text"}
+                  placeholder={ef.placeholder}
+                  value={addExtra[ef.name] ?? ""}
+                  onChange={(e) => setAddExtra((p) => ({ ...p, [ef.name]: e.target.value }))}
+                />
+              </div>
+            ))}
           </div>
           <DialogFooter>
             <Button variant="outline" onClick={() => setAddFor(null)}>
               Cancel
             </Button>
             <Button
-              disabled={!addName.trim()}
-              onClick={() => {
-                const name = addField?.onAddOption?.(addName);
-                if (addFor) set(addFor, (name as string) || addName.trim());
-                setAddFor(null);
-              }}
+              disabled={!addName.trim() || addBusy}
+              onClick={() => void submitAddOption()}
             >
-              Add category
+              {addBusy ? "Saving…" : (addField?.addOptionSubmitLabel ?? "Add")}
             </Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
+
     </Dialog>
   );
 }

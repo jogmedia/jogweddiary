@@ -219,6 +219,7 @@ export function ProjectDialog({
   const [packageId, setPackageId] = useState<string>(
     () => packageByName(initial?.package_name)?.id ?? "",
   );
+  const [pkgOpen, setPkgOpen] = useState(false);
 
   const applyPackage = (id: string, set: (name: string, value: any) => void) => {
     setPackageId(id);
@@ -228,6 +229,7 @@ export function ProjectDialog({
     set("total_amount", preset.amount);
     setDeliverables([...preset.items]);
   };
+
 
   const setItem = (index: number, value: string) =>
     setDeliverables((prev) => prev.map((v, i) => (i === index ? value : v)));

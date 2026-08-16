@@ -117,6 +117,22 @@ export function RecordDialog({
     setErrors((p) => (p[name] ? { ...p, [name]: "" } : p));
   };
 
+  const submitAddOption = async () => {
+    if (!addFor || !addName.trim() || addBusy) return;
+    setAddBusy(true);
+    try {
+      const result = await addField?.onAddOption?.(addName, addExtra);
+      set(addFor, (result as string) || addName.trim());
+      setAddFor(null);
+      setAddName("");
+      setAddExtra({});
+    } finally {
+      setAddBusy(false);
+    }
+  };
+
+
+
   const submit = async () => {
     const next: Record<string, string> = {};
     for (const f of fields) {

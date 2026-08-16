@@ -254,6 +254,22 @@ export function ProjectDialog({
   const events = projectId ? allEvents : [];
   const assignments = projectId ? allAssignments : [];
   const saveProject = useUpsert("projects", "Project");
+  const saveClient = useUpsert("clients", "Client");
+
+  /** Quick-add a client from the project form and select them immediately. */
+  const addClient = async (name: string, extra: Record<string, any>) => {
+    const clean = name.trim();
+    if (!clean) return null;
+    const phone = String(extra.phone ?? "").trim();
+    const id = await saveClient.mutateAsync({
+      name: clean,
+      phone: phone || null,
+      whatsapp: phone ? waNumber(phone) : null,
+      address: String(extra.address ?? "").trim() || null,
+    });
+    return (id as string) ?? null;
+  };
+
   const saveEvent = useUpsert("project_events", "Event");
   const delEvent = useRemove("project_events", "Event");
   const saveAssignment = useUpsert("project_assignments", "Crew assignment");

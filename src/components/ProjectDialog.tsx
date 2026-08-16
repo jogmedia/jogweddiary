@@ -68,7 +68,10 @@ const matchPackages = (query: string | null | undefined) => {
 export const ADVANCE_ACCOUNTS = PAY_ACCOUNTS.map(({ value, label }) => ({ value, label }));
 
 /** Project fields — the single event date is replaced by the sub-events section. */
-export function projectFields(clients: { id: string; name: string }[]): Field[] {
+export function projectFields(
+  clients: { id: string; name: string }[],
+  addClient?: (name: string, extra: Record<string, any>) => Promise<string | null>,
+): Field[] {
   return [
     {
       name: "client_id",
@@ -76,10 +79,38 @@ export function projectFields(clients: { id: string; name: string }[]): Field[] 
       type: "select",
       required: true,
       options: clients.map((c) => ({ value: c.id, label: c.name })),
+      ...(addClient
+        ? {
+            onAddOption: addClient,
+            addOptionTitle: "Add new client",
+            addOptionLabel: "Client name",
+            addOptionPlaceholder: "e.g. Arun & Meera",
+            addOptionSubmitLabel: "Add client",
+            addOptionFields: [
+              { name: "phone", label: "Phone number", type: "tel" as const, placeholder: "98765 43210" },
+              { name: "address", label: "City / Location", placeholder: "e.g. Kozhikode" },
+            ],
+          }
+        : {}),
     },
     { name: "project_name", label: "Project name", required: true },
     { name: "venue", label: "Main venue" },
+    { name: "place_district", label: "Place / District", placeholder: "e.g. Kozhikode, Thalassery" },
+    {
+      name: "nearest_railway_station",
+      label: "Nearest railway station",
+      placeholder: "e.g. Thalassery Railway Station",
+    },
+    {
+      name: "google_maps_link",
+      label: "Google Maps location link",
+      type: "url",
+      full: true,
+      placeholder: "https://maps.app.goo.gl/…",
+      validate: (v) => (isMapsUrl(v) ? null : "Enter a valid https link"),
+    },
     { name: "package_name", label: "Package" },
+
     { name: "total_amount", label: "Total agreed amount", type: "number" },
     { name: "advance_amount", label: "Advance amount", type: "number" },
     {

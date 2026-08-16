@@ -37,11 +37,26 @@ export type Field = {
   /** Select fields only: adds a "Custom…" option that reveals a free-text input. */
   allowCustom?: boolean;
   /** Select fields only: shows a "+" button that opens a create-new-option prompt. */
-  onAddOption?: (name: string) => string | null | void;
+  onAddOption?: (
+    name: string,
+    extra: Record<string, any>,
+  ) => string | null | void | Promise<string | null | void>;
   /** Title of the create-new-option dialog. */
   addOptionTitle?: string;
   /** Label of the create-new-option input. */
   addOptionLabel?: string;
+  /** Placeholder of the create-new-option name input. */
+  addOptionPlaceholder?: string;
+  /** Submit label of the create-new-option dialog. */
+  addOptionSubmitLabel?: string;
+  /** Extra inputs shown in the create-new-option dialog. */
+  addOptionFields?: {
+    name: string;
+    label: string;
+    placeholder?: string;
+    type?: "text" | "tel" | "email";
+  }[];
+
 };
 
 

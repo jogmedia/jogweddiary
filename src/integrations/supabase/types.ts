@@ -1090,13 +1090,16 @@ export type Database = {
           editing_status: string
           event_date: string
           final_delivery_done: boolean
+          google_maps_link: string | null
           id: string
           layout_status: string
+          nearest_railway_station: string | null
           notes: string | null
           package_name: string | null
           payment_due_date: string | null
           payment_status: string
           photo_selection_done: boolean
+          place_district: string | null
           project_name: string
           project_status: string
           raw_backup_done: boolean
@@ -1138,13 +1141,16 @@ export type Database = {
           editing_status?: string
           event_date: string
           final_delivery_done?: boolean
+          google_maps_link?: string | null
           id?: string
           layout_status?: string
+          nearest_railway_station?: string | null
           notes?: string | null
           package_name?: string | null
           payment_due_date?: string | null
           payment_status?: string
           photo_selection_done?: boolean
+          place_district?: string | null
           project_name: string
           project_status?: string
           raw_backup_done?: boolean
@@ -1186,13 +1192,16 @@ export type Database = {
           editing_status?: string
           event_date?: string
           final_delivery_done?: boolean
+          google_maps_link?: string | null
           id?: string
           layout_status?: string
+          nearest_railway_station?: string | null
           notes?: string | null
           package_name?: string | null
           payment_due_date?: string | null
           payment_status?: string
           photo_selection_done?: boolean
+          place_district?: string | null
           project_name?: string
           project_status?: string
           raw_backup_done?: boolean

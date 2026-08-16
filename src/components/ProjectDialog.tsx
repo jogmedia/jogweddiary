@@ -46,6 +46,25 @@ export const STATUS_OPTIONS = {
 
 const opts = (list: string[]) => list.map((v) => ({ value: v, label: v.replace(/_/g, " ") }));
 
+/** Pull the first money-looking number out of typed package text (e.g. "₹80,000 — ..." → 80000). */
+const parseAmount = (text: string | null | undefined): number | null => {
+  const m = (text ?? "").match(/[\d][\d,.]*/);
+  if (!m) return null;
+  const n = Number(m[0].replace(/,/g, ""));
+  return Number.isFinite(n) && n > 0 ? n : null;
+};
+
+const matchPackages = (query: string | null | undefined) => {
+  const q = (query ?? "").trim().toLowerCase();
+  if (!q) return PRESET_PACKAGES;
+  const terms = q.split(/\s+/);
+  return PRESET_PACKAGES.filter((p) => {
+    const hay = `${p.label} ${p.category} ${p.amount}`.toLowerCase();
+    return terms.every((t) => hay.includes(t));
+  });
+};
+
+
 export const ADVANCE_ACCOUNTS = PAY_ACCOUNTS.map(({ value, label }) => ({ value, label }));
 
 /** Project fields — the single event date is replaced by the sub-events section. */

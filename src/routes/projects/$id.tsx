@@ -12,6 +12,7 @@ import {
   FileDown,
   Send,
   HardDrive,
+  MapPin,
 } from "lucide-react";
 import { BankAccountField, needsBankAccount } from "@/components/BankAccountField";
 import { useExpenseCategories } from "@/lib/expense-categories";

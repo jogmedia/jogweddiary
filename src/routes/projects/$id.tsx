@@ -12,6 +12,7 @@ import {
   FileDown,
   Send,
   HardDrive,
+  MapPin,
 } from "lucide-react";
 import { BankAccountField, needsBankAccount } from "@/components/BankAccountField";
 import { useExpenseCategories } from "@/lib/expense-categories";
@@ -297,6 +298,49 @@ function ProjectDetail() {
         <StatCard label="Balance due" value={inr(project.balance_due)} tone={Number(project.balance_due) > 0 ? "destructive" : "success"} />
         <StatCard label="Project profit" value={inr(totals.profit)} tone={totals.profit >= 0 ? "success" : "destructive"} hint={`Expenses ${inr(totals.spent)}`} />
       </div>
+
+      {/* Venue, place & travel navigation details for the crew */}
+      <div className="mb-6 rounded-2xl border border-border bg-card p-4">
+        <div className="mb-3 flex items-center gap-2">
+          <MapPin className="h-4 w-4 text-primary" />
+          <p className="text-sm font-semibold">Venue &amp; travel details</p>
+        </div>
+        <div className="grid gap-3 sm:grid-cols-3">
+          <div className="min-w-0">
+            <p className="text-xs text-muted-foreground">Main venue</p>
+            <p className="text-sm font-medium break-words">{project.venue || "—"}</p>
+          </div>
+          <div className="min-w-0">
+            <p className="text-xs text-muted-foreground">Place / District</p>
+            <p className="text-sm font-medium break-words">
+              {(project as any).place_district || "—"}
+            </p>
+          </div>
+          <div className="min-w-0">
+            <p className="text-xs text-muted-foreground">Nearest railway station</p>
+            <p className="text-sm font-medium break-words">
+              {(project as any).nearest_railway_station || "—"}
+            </p>
+          </div>
+        </div>
+        {(project as any).google_maps_link ? (
+          <Button size="sm" variant="outline" className="mt-3" asChild>
+            <a
+              href={(project as any).google_maps_link}
+              target="_blank"
+              rel="noreferrer"
+            >
+              <MapPin className="mr-1.5 h-4 w-4" /> Open venue in Google Maps
+            </a>
+          </Button>
+        ) : (
+          <p className="mt-3 text-xs text-muted-foreground">
+            No Google Maps link added yet — add one from Edit for easy crew navigation.
+          </p>
+        )}
+      </div>
+
+
 
       {/* Quick actions */}
       <div className="mb-8 grid grid-cols-2 gap-2 sm:flex sm:flex-wrap [&_button]:w-full [&_button]:h-11 sm:[&_button]:w-auto sm:[&_button]:h-9">

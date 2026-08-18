@@ -24,14 +24,15 @@ import {
 } from "@/lib/whatsapp";
 import type { Assignment, ProjectEvent, Staff } from "@/lib/db";
 
-const eventFields: Field[] = [
+const buildEventFields = (typeOptions: { value: string; label: string }[]): Field[] => [
   {
     name: "event_type",
     label: "Event",
     type: "select",
     required: true,
-    options: EVENT_TYPES.map((t) => ({ value: t.value, label: t.label })),
+    options: typeOptions.length ? typeOptions : EVENT_TYPES.map((t) => ({ value: t.value, label: t.label })),
   },
+
   { name: "event_date", label: "Date", type: "date", required: true },
   { name: "arrival_time", label: "Team arrival time", type: "time" },
   { name: "event_time", label: "Event time", type: "time" },

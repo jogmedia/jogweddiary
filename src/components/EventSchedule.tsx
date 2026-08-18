@@ -91,6 +91,17 @@ export function EventSchedule({
 }) {
   const [editing, setEditing] = useState<ProjectEvent | null>(null);
   const [newCrew, setNewCrew] = useState<CrewMember[]>([]);
+  const { data: eventTypes = [] } = useEventTypes();
+  const eventFields = useMemo(
+    () =>
+      buildEventFields(
+        eventTypes
+          .filter((t) => t.is_active)
+          .map((t) => ({ value: t.slug, label: `${t.emoji ?? "✨"} ${t.label}` })),
+      ),
+    [eventTypes],
+  );
+
   const clientName = project.clients?.name ?? "Client";
   const clientPhone = project.clients?.whatsapp ?? project.clients?.phone;
   const business = settings?.business_name ?? "JOG MEDIA";

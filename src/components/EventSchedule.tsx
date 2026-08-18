@@ -24,14 +24,15 @@ import {
 } from "@/lib/whatsapp";
 import type { Assignment, ProjectEvent, Staff } from "@/lib/db";
 
-const eventFields: Field[] = [
+const buildEventFields = (typeOptions: { value: string; label: string }[]): Field[] => [
   {
     name: "event_type",
     label: "Event",
     type: "select",
     required: true,
-    options: EVENT_TYPES.map((t) => ({ value: t.value, label: t.label })),
+    options: typeOptions.length ? typeOptions : EVENT_TYPES.map((t) => ({ value: t.value, label: t.label })),
   },
+
   { name: "event_date", label: "Date", type: "date", required: true },
   { name: "arrival_time", label: "Team arrival time", type: "time" },
   { name: "event_time", label: "Event time", type: "time" },
@@ -90,6 +91,17 @@ export function EventSchedule({
 }) {
   const [editing, setEditing] = useState<ProjectEvent | null>(null);
   const [newCrew, setNewCrew] = useState<CrewMember[]>([]);
+  const { data: eventTypes = [] } = useEventTypes();
+  const eventFields = useMemo(
+    () =>
+      buildEventFields(
+        eventTypes
+          .filter((t) => t.is_active)
+          .map((t) => ({ value: t.slug, label: `${t.emoji ?? "✨"} ${t.label}` })),
+      ),
+    [eventTypes],
+  );
+
   const clientName = project.clients?.name ?? "Client";
   const clientPhone = project.clients?.whatsapp ?? project.clients?.phone;
   const business = settings?.business_name ?? "JOG MEDIA";

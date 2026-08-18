@@ -239,6 +239,22 @@ export function logActivity(action: string, entityType: string, entityId?: strin
 /* Queries                                                             */
 /* ------------------------------------------------------------------ */
 
+export type EventType = {
+  id: string;
+  slug: string;
+  label: string;
+  emoji: string | null;
+  sort_order: number;
+  is_active: boolean;
+};
+
+/** Shared, editable list of wedding functions used everywhere in the app. */
+export const useEventTypes = () =>
+  useQuery({
+    queryKey: ["event_types"],
+    queryFn: () => fetchList<EventType>("event_types", "*", { column: "sort_order" }),
+  });
+
 export const useClients = () =>
   useQuery({
     queryKey: ["clients"],

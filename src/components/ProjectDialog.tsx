@@ -302,7 +302,24 @@ export function ProjectDialog({
   const delAssignment = useRemove("project_assignments", "Crew assignment");
   const savePayment = useUpsert("project_payments", "Payment");
   const { data: existingPayments = [] } = usePayments(projectId);
-  const [rows, setRows] = useState<Record<string, Row>>(() => buildRows(events, assignments));
+  const { data: eventTypes = [] } = useEventTypes();
+  const subEvents = subEventTypes(eventTypes, events);
+  const [rows, setRows] = useState<Record<string, Row>>(() =>
+    buildRows(subEvents, events, assignments),
+  );
+
+  // Keep a row for every event type as the shared list loads or changes.
+  useEffect(() => {
+    setRows((prev) => {
+      const next = buildRows(subEvents, events, assignments);
+      for (const [slug, row] of Object.entries(next)) {
+        if (prev[slug]) next[slug] = prev[slug].id || prev[slug].enabled ? prev[slug] : row;
+      }
+      return next;
+    });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [eventTypes.length, events.length]);
+
   const [customEvents, setCustomEvents] = useState<Row[]>(() => buildCustomRows(events, assignments));
   const [travel, setTravel] = useState<Travel>(() => buildTravel(initial));
   const [deliverables, setDeliverables] = useState<string[]>(() =>

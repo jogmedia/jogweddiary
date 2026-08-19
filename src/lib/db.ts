@@ -1,6 +1,7 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
+import { registerEventTypes } from "@/lib/whatsapp";
 
 /* ------------------------------------------------------------------ */
 /* Row shapes                                                          */
@@ -252,7 +253,11 @@ export type EventType = {
 export const useEventTypes = () =>
   useQuery({
     queryKey: ["event_types"],
-    queryFn: () => fetchList<EventType>("event_types", "*", { column: "sort_order" }),
+    queryFn: async () => {
+      const list = await fetchList<EventType>("event_types", "*", { column: "sort_order" });
+      registerEventTypes(list);
+      return list;
+    },
   });
 
 export const useClients = () =>

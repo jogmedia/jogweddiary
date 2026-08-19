@@ -22,7 +22,9 @@ import {
   fmtTime,
   openWhatsApp,
 } from "@/lib/whatsapp";
-import type { Assignment, ProjectEvent, Staff } from "@/lib/db";
+import { useEventTypes, type Assignment, type ProjectEvent, type Staff } from "@/lib/db";
+import { EventTypesManager } from "@/components/EventTypesManager";
+
 
 const buildEventFields = (typeOptions: { value: string; label: string }[]): Field[] => [
   {
@@ -192,6 +194,14 @@ export function EventSchedule({
             </Button>
           }
         />
+        <EventTypesManager
+          trigger={
+            <Button size="sm" variant="outline">
+              <Plus className="mr-1.5 h-4 w-4" /> Event types
+            </Button>
+          }
+        />
+
         <Button
           size="sm"
           variant="secondary"

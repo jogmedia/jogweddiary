@@ -1,4 +1,4 @@
-import { useState, type ReactNode } from "react";
+import { useEffect, useState, type ReactNode } from "react";
 import { CalendarDays, Package as PackageIcon, Plane, Plus, Trash2 } from "lucide-react";
 import { RecordDialog, type Field } from "@/components/RecordDialog";
 import { Input } from "@/components/ui/input";
@@ -24,17 +24,21 @@ import {
   packageByName,
   toDeliverables,
 } from "@/lib/packages";
+import { EventTypesManager } from "@/components/EventTypesManager";
 import {
   useAssignments,
   useClients,
+  useEventTypes,
   usePayments,
   useProjectEvents,
   useRemove,
   useStaff,
   useUpsert,
   type Assignment,
+  type EventType,
   type ProjectEvent,
 } from "@/lib/db";
+
 
 export const STATUS_OPTIONS = {
   project: ["open", "ongoing", "completed", "cancelled"],
@@ -162,14 +166,18 @@ const buildTravel = (initial?: Record<string, any>): Travel => ({
   travel_ticket_name: initial?.travel_ticket_name ?? null,
 });
 
-const SUB_EVENTS = [
-  { type: "save_the_date", label: "Save the Date" },
-  { type: "engagement", label: "Engagement" },
-  { type: "haldi", label: "Haldi / Mehendi" },
-  { type: "wedding_eve", label: "Wedding Eve / Sangeeth" },
-  { type: "wedding_day", label: "Wedding Day / Muhurtham" },
-  { type: "reception", label: "Reception" },
-] as const;
+/** Used only until the shared `event_types` list loads. */
+const FALLBACK_SUB_EVENTS = [
+  { slug: "save_the_date", label: "Save The Date", emoji: "📅" },
+  { slug: "engagement", label: "Engagement", emoji: "💐" },
+  { slug: "haldi", label: "Haldi", emoji: "🌼" },
+  { slug: "wedding_eve", label: "Wedding Eve / Sangeeth", emoji: "🌙" },
+  { slug: "wedding_day", label: "Wedding Day / Muhurtham", emoji: "💍" },
+  { slug: "reception", label: "Reception", emoji: "🎉" },
+];
+
+type SubEventType = { slug: string; label: string; emoji?: string | null };
+
 
 type Row = {
   enabled: boolean;
@@ -198,11 +206,15 @@ const crewFor = (assignments: Assignment[], eventId?: string): CrewMember[] =>
         .map((a) => ({ staffId: a.staff_id, role: a.role_in_project ?? a.staff?.role ?? null }))
     : [];
 
-function buildRows(events: ProjectEvent[], assignments: Assignment[] = []) {
+function buildRows(
+  types: SubEventType[],
+  events: ProjectEvent[],
+  assignments: Assignment[] = [],
+) {
   const rows: Record<string, Row> = {};
-  SUB_EVENTS.forEach(({ type }) => {
-    const e = events.find((ev) => ev.event_type === type);
-    rows[type] = e
+  types.forEach(({ slug }) => {
+    const e = events.find((ev) => ev.event_type === slug);
+    rows[slug] = e
       ? {
           enabled: true,
           date: e.event_date ?? "",
@@ -215,6 +227,20 @@ function buildRows(events: ProjectEvent[], assignments: Assignment[] = []) {
   });
   return rows;
 }
+
+/** Event types shown as sub-event rows: the shared list plus any legacy types already saved. */
+function subEventTypes(types: EventType[], events: ProjectEvent[]): SubEventType[] {
+  const base: SubEventType[] = (types.length ? types : FALLBACK_SUB_EVENTS)
+    .filter((t: any) => t.is_active !== false)
+    .map((t) => ({ slug: t.slug, label: t.label, emoji: t.emoji }));
+  events.forEach((ev) => {
+    if (ev.event_type === "custom") return;
+    if (base.some((t) => t.slug === ev.event_type)) return;
+    base.push({ slug: ev.event_type, label: ev.event_type.replace(/_/g, " "), emoji: "✨" });
+  });
+  return base;
+}
+
 
 function buildCustomRows(events: ProjectEvent[], assignments: Assignment[] = []) {
   return events
@@ -276,7 +302,24 @@ export function ProjectDialog({
   const delAssignment = useRemove("project_assignments", "Crew assignment");
   const savePayment = useUpsert("project_payments", "Payment");
   const { data: existingPayments = [] } = usePayments(projectId);
-  const [rows, setRows] = useState<Record<string, Row>>(() => buildRows(events, assignments));
+  const { data: eventTypes = [] } = useEventTypes();
+  const subEvents = subEventTypes(eventTypes, events);
+  const [rows, setRows] = useState<Record<string, Row>>(() =>
+    buildRows(subEvents, events, assignments),
+  );
+
+  // Keep a row for every event type as the shared list loads or changes.
+  useEffect(() => {
+    setRows((prev) => {
+      const next = buildRows(subEvents, events, assignments);
+      for (const [slug, row] of Object.entries(next)) {
+        if (prev[slug]) next[slug] = prev[slug].id || prev[slug].enabled ? prev[slug] : row;
+      }
+      return next;
+    });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [eventTypes.length, events.length]);
+
   const [customEvents, setCustomEvents] = useState<Row[]>(() => buildCustomRows(events, assignments));
   const [travel, setTravel] = useState<Travel>(() => buildTravel(initial));
   const [deliverables, setDeliverables] = useState<string[]>(() =>
@@ -428,7 +471,7 @@ export function ProjectDialog({
     }
 
     if (!projectId) {
-      setRows(buildRows([]));
+      setRows(buildRows(subEvents, []));
       setCustomEvents([]);
     }
   };
@@ -442,7 +485,7 @@ export function ProjectDialog({
       open={open}
       onOpenChange={onOpenChange}
       onReset={() => {
-        setRows(buildRows(events, assignments));
+        setRows(buildRows(subEvents, events, assignments));
         setCustomEvents(buildCustomRows(events, assignments));
         setTravel(buildTravel(initial));
         setDeliverables(toDeliverables(initial?.deliverables));
@@ -645,51 +688,60 @@ export function ProjectDialog({
           </div>
         </div>
         <div className="rounded-xl border border-border bg-muted/30 p-3">
-          <div className="mb-2 flex items-center gap-2">
-            <CalendarDays className="h-4 w-4 text-primary" />
-            <p className="text-sm font-semibold">Sub-events &amp; dates</p>
+          <div className="mb-2 flex items-center justify-between gap-2">
+            <div className="flex min-w-0 items-center gap-2">
+              <CalendarDays className="h-4 w-4 shrink-0 text-primary" />
+              <p className="truncate text-sm font-semibold">Sub-events &amp; dates</p>
+            </div>
+            <EventTypesManager
+              onCreated={(slug) =>
+                setRows((p) => ({ ...p, [slug]: { ...(p[slug] ?? emptyRow()), enabled: true } }))
+              }
+            />
           </div>
           <p className="mb-3 text-xs text-muted-foreground">
             Turn on each function and set its own date — every one appears on the dashboard and calendar.
           </p>
           <div className="space-y-2">
-            {SUB_EVENTS.map((s) => {
-              const row = rows[s.type] ?? emptyRow();
+            {subEvents.map((s) => {
+              const row = rows[s.slug] ?? emptyRow();
               return (
-                <div key={s.type} className="rounded-lg border border-border bg-card p-2.5">
+                <div key={s.slug} className="rounded-lg border border-border bg-card p-2.5">
                   <div className="flex items-center justify-between gap-2">
-                    <Label htmlFor={`ev-${s.type}`} className="text-xs font-medium">
+                    <Label htmlFor={`ev-${s.slug}`} className="text-xs font-medium">
+                      {s.emoji ? `${s.emoji} ` : ""}
                       {s.label}
                     </Label>
                     <Switch
-                      id={`ev-${s.type}`}
+                      id={`ev-${s.slug}`}
                       checked={row.enabled}
-                      onCheckedChange={(v) => setRow(s.type, { enabled: v })}
+                      onCheckedChange={(v) => setRow(s.slug, { enabled: v })}
                     />
                   </div>
+
                   {row.enabled && (
                     <div className="mt-2 grid gap-2 sm:grid-cols-2">
                       <Input
                         type="date"
                         value={row.date}
-                        onChange={(e) => setRow(s.type, { date: e.target.value })}
+                        onChange={(e) => setRow(s.slug, { date: e.target.value })}
                       />
                       <Input
                         type="time"
                         value={row.time}
-                        onChange={(e) => setRow(s.type, { time: e.target.value })}
+                        onChange={(e) => setRow(s.slug, { time: e.target.value })}
                       />
                       <Input
                         className="sm:col-span-2"
                         placeholder="Venue / location"
                         value={row.location}
-                        onChange={(e) => setRow(s.type, { location: e.target.value })}
+                        onChange={(e) => setRow(s.slug, { location: e.target.value })}
                       />
                       <div className="sm:col-span-2">
                         <CrewPicker
                           staff={staff}
                           value={row.crew ?? []}
-                          onChange={(crew) => setRow(s.type, { crew })}
+                          onChange={(crew) => setRow(s.slug, { crew })}
                           date={row.date}
                           time={row.time}
                           eventId={row.id}

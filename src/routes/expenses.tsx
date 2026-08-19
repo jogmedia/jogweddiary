@@ -162,8 +162,12 @@ function ExpensesPage() {
       ) : (
         <div className="surface divide-y divide-border">
           {rows.map((e) => (
-            <div key={e.id} className="flex items-center justify-between gap-3 p-3">
-              <div className="min-w-0">
+            <div key={e.id} className="flex items-center justify-between gap-2 p-3">
+              <button
+                type="button"
+                className="min-w-0 flex-1 text-left"
+                onClick={() => setEditing(e)}
+              >
                 <p className="truncate text-sm font-medium">
                   {e.category} · {inr(e.amount)}
                 </p>
@@ -171,14 +175,50 @@ function ExpensesPage() {
                   {e.projects?.project_name ?? "Studio overhead"} · {fmtDate(e.expense_date)}
                   {e.paid_to ? ` · ${e.paid_to}` : ""}
                 </p>
+              </button>
+              <div className="flex shrink-0 items-center gap-1">
+                <Button
+                  size="icon"
+                  variant="ghost"
+                  className="h-11 w-11"
+                  aria-label="Edit expense"
+                  title="Edit expense"
+                  onClick={() => setEditing(e)}
+                >
+                  <Pencil className="h-4 w-4" />
+                </Button>
+                <Button
+                  size="icon"
+                  variant="ghost"
+                  className="h-11 w-11"
+                  aria-label="Delete expense"
+                  title="Delete expense"
+                  onClick={() => remove.mutate(e.id)}
+                >
+                  <Trash2 className="h-4 w-4 text-destructive" />
+                </Button>
               </div>
-              <Button size="sm" variant="ghost" onClick={() => remove.mutate(e.id)}>
-                <Trash2 className="h-4 w-4 text-destructive" />
-              </Button>
             </div>
           ))}
         </div>
       )}
+
+      {editing && (
+        <RecordDialog
+          title="Edit expense"
+          submitLabel="Update expense"
+          fields={expenseFields}
+          initial={editing as any}
+          open={!!editing}
+          onOpenChange={(v) => !v && setEditing(null)}
+          extra={bankExtra}
+          onSubmit={async (v) => {
+            await submitExpense({ ...v, id: editing.id });
+            setEditing(null);
+          }}
+        />
+      )}
+
     </AppShell>
   );
 }

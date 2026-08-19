@@ -166,14 +166,18 @@ const buildTravel = (initial?: Record<string, any>): Travel => ({
   travel_ticket_name: initial?.travel_ticket_name ?? null,
 });
 
-const SUB_EVENTS = [
-  { type: "save_the_date", label: "Save the Date" },
-  { type: "engagement", label: "Engagement" },
-  { type: "haldi", label: "Haldi / Mehendi" },
-  { type: "wedding_eve", label: "Wedding Eve / Sangeeth" },
-  { type: "wedding_day", label: "Wedding Day / Muhurtham" },
-  { type: "reception", label: "Reception" },
-] as const;
+/** Used only until the shared `event_types` list loads. */
+const FALLBACK_SUB_EVENTS = [
+  { slug: "save_the_date", label: "Save The Date", emoji: "📅" },
+  { slug: "engagement", label: "Engagement", emoji: "💐" },
+  { slug: "haldi", label: "Haldi", emoji: "🌼" },
+  { slug: "wedding_eve", label: "Wedding Eve / Sangeeth", emoji: "🌙" },
+  { slug: "wedding_day", label: "Wedding Day / Muhurtham", emoji: "💍" },
+  { slug: "reception", label: "Reception", emoji: "🎉" },
+];
+
+type SubEventType = { slug: string; label: string; emoji?: string | null };
+
 
 type Row = {
   enabled: boolean;

@@ -1,4 +1,4 @@
-import { useState, type ReactNode } from "react";
+import { useEffect, useState, type ReactNode } from "react";
 import { CalendarDays, Package as PackageIcon, Plane, Plus, Trash2 } from "lucide-react";
 import { RecordDialog, type Field } from "@/components/RecordDialog";
 import { Input } from "@/components/ui/input";

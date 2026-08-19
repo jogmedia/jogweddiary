@@ -24,17 +24,21 @@ import {
   packageByName,
   toDeliverables,
 } from "@/lib/packages";
+import { EventTypesManager } from "@/components/EventTypesManager";
 import {
   useAssignments,
   useClients,
+  useEventTypes,
   usePayments,
   useProjectEvents,
   useRemove,
   useStaff,
   useUpsert,
   type Assignment,
+  type EventType,
   type ProjectEvent,
 } from "@/lib/db";
+
 
 export const STATUS_OPTIONS = {
   project: ["open", "ongoing", "completed", "cancelled"],

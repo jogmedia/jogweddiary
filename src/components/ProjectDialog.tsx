@@ -206,11 +206,15 @@ const crewFor = (assignments: Assignment[], eventId?: string): CrewMember[] =>
         .map((a) => ({ staffId: a.staff_id, role: a.role_in_project ?? a.staff?.role ?? null }))
     : [];
 
-function buildRows(events: ProjectEvent[], assignments: Assignment[] = []) {
+function buildRows(
+  types: SubEventType[],
+  events: ProjectEvent[],
+  assignments: Assignment[] = [],
+) {
   const rows: Record<string, Row> = {};
-  SUB_EVENTS.forEach(({ type }) => {
-    const e = events.find((ev) => ev.event_type === type);
-    rows[type] = e
+  types.forEach(({ slug }) => {
+    const e = events.find((ev) => ev.event_type === slug);
+    rows[slug] = e
       ? {
           enabled: true,
           date: e.event_date ?? "",
@@ -223,6 +227,20 @@ function buildRows(events: ProjectEvent[], assignments: Assignment[] = []) {
   });
   return rows;
 }
+
+/** Event types shown as sub-event rows: the shared list plus any legacy types already saved. */
+function subEventTypes(types: EventType[], events: ProjectEvent[]): SubEventType[] {
+  const base: SubEventType[] = (types.length ? types : FALLBACK_SUB_EVENTS)
+    .filter((t: any) => t.is_active !== false)
+    .map((t) => ({ slug: t.slug, label: t.label, emoji: t.emoji }));
+  events.forEach((ev) => {
+    if (ev.event_type === "custom") return;
+    if (base.some((t) => t.slug === ev.event_type)) return;
+    base.push({ slug: ev.event_type, label: ev.event_type.replace(/_/g, " "), emoji: "✨" });
+  });
+  return base;
+}
+
 
 function buildCustomRows(events: ProjectEvent[], assignments: Assignment[] = []) {
   return events

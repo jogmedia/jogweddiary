@@ -33,9 +33,60 @@ function ExpensesPage() {
   const save = useUpsert("project_expenses", "Expense");
   const remove = useRemove("project_expenses", "Expense");
   const [q, setQ] = useState("");
+  const [editing, setEditing] = useState<Expense | null>(null);
 
   const [from, setFrom] = useState("");
   const [to, setTo] = useState("");
+
+  const expenseFields: Field[] = [
+    {
+      name: "project_id",
+      label: "Project (leave blank for studio overhead)",
+      type: "select",
+      options: projects.map((p) => ({ value: p.id, label: p.project_name })),
+      full: true,
+    },
+    { name: "expense_date", label: "Date", type: "date", required: true },
+    {
+      name: "category",
+      label: "Category",
+      type: "select",
+      required: true,
+      options: categoryOptions,
+      onAddOption: addCategory,
+      addOptionTitle: "Add expense category",
+      addOptionLabel: "Category name",
+    },
+    { name: "amount", label: "Amount", type: "number", required: true },
+    { name: "paid_to", label: "Paid to" },
+    {
+      name: "payment_mode",
+      label: "Mode",
+      type: "select",
+      options: ["cash", "upi", "bank", "cheque", "card"].map((v) => ({ value: v, label: v })),
+    },
+    { name: "notes", label: "Notes", type: "textarea" },
+  ];
+
+  const bankExtra = (values: Record<string, any>, set: (n: string, v: any) => void) =>
+    needsBankAccount(values.payment_mode) ||
+    values.category === "Owner Salary / Personal Draw" ? (
+      <BankAccountField
+        label="Paid From Bank Account"
+        value={values.bank_account_id ?? null}
+        onChange={(v) => set("bank_account_id", v)}
+      />
+    ) : null;
+
+  const submitExpense = (v: Record<string, any>) =>
+    save.mutateAsync({
+      ...v,
+      bank_account_id:
+        needsBankAccount(v.payment_mode) || v.category === "Owner Salary / Personal Draw"
+          ? (v.bank_account_id ?? null)
+          : null,
+    });
+
 
   const rows = useMemo(
     () =>

@@ -252,7 +252,11 @@ export type EventType = {
 export const useEventTypes = () =>
   useQuery({
     queryKey: ["event_types"],
-    queryFn: () => fetchList<EventType>("event_types", "*", { column: "sort_order" }),
+    queryFn: async () => {
+      const list = await fetchList<EventType>("event_types", "*", { column: "sort_order" });
+      registerEventTypes(list);
+      return list;
+    },
   });
 
 export const useClients = () =>

@@ -24,8 +24,23 @@ export const EVENT_TYPES = [
   { value: "custom", label: "Other / Custom event", emoji: "✨" },
 ];
 
+/** Labels loaded from the shared `event_types` table (kept in sync by useEventTypes). */
+let dynamicTypes: { value: string; label: string; emoji: string }[] = [];
+
+export const registerEventTypes = (
+  list: { slug: string; label: string; emoji?: string | null }[],
+) => {
+  dynamicTypes = list.map((t) => ({ value: t.slug, label: t.label, emoji: t.emoji ?? "✨" }));
+};
+
+const prettify = (slug: string) =>
+  slug
+    .replace(/_/g, " ")
+    .replace(/\b\w/g, (c) => c.toUpperCase());
+
 export const eventMeta = (type: string) =>
-  EVENT_TYPES.find((t) => t.value === type) ?? { value: type, label: type, emoji: "✨" };
+  dynamicTypes.find((t) => t.value === type) ??
+  EVENT_TYPES.find((t) => t.value === type) ?? { value: type, label: prettify(type), emoji: "✨" };
 
 /** Label for an event — custom events use their own name (stored in notes). */
 export const eventLabel = (e: { event_type: string; notes?: string | null }) => {

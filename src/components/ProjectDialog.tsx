@@ -688,28 +688,37 @@ export function ProjectDialog({
           </div>
         </div>
         <div className="rounded-xl border border-border bg-muted/30 p-3">
-          <div className="mb-2 flex items-center gap-2">
-            <CalendarDays className="h-4 w-4 text-primary" />
-            <p className="text-sm font-semibold">Sub-events &amp; dates</p>
+          <div className="mb-2 flex items-center justify-between gap-2">
+            <div className="flex min-w-0 items-center gap-2">
+              <CalendarDays className="h-4 w-4 shrink-0 text-primary" />
+              <p className="truncate text-sm font-semibold">Sub-events &amp; dates</p>
+            </div>
+            <EventTypesManager
+              onCreated={(slug) =>
+                setRows((p) => ({ ...p, [slug]: { ...(p[slug] ?? emptyRow()), enabled: true } }))
+              }
+            />
           </div>
           <p className="mb-3 text-xs text-muted-foreground">
             Turn on each function and set its own date — every one appears on the dashboard and calendar.
           </p>
           <div className="space-y-2">
-            {SUB_EVENTS.map((s) => {
-              const row = rows[s.type] ?? emptyRow();
+            {subEvents.map((s) => {
+              const row = rows[s.slug] ?? emptyRow();
               return (
-                <div key={s.type} className="rounded-lg border border-border bg-card p-2.5">
+                <div key={s.slug} className="rounded-lg border border-border bg-card p-2.5">
                   <div className="flex items-center justify-between gap-2">
-                    <Label htmlFor={`ev-${s.type}`} className="text-xs font-medium">
+                    <Label htmlFor={`ev-${s.slug}`} className="text-xs font-medium">
+                      {s.emoji ? `${s.emoji} ` : ""}
                       {s.label}
                     </Label>
                     <Switch
-                      id={`ev-${s.type}`}
+                      id={`ev-${s.slug}`}
                       checked={row.enabled}
-                      onCheckedChange={(v) => setRow(s.type, { enabled: v })}
+                      onCheckedChange={(v) => setRow(s.slug, { enabled: v })}
                     />
                   </div>
+
                   {row.enabled && (
                     <div className="mt-2 grid gap-2 sm:grid-cols-2">
                       <Input

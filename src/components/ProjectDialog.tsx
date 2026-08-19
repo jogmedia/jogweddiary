@@ -724,24 +724,24 @@ export function ProjectDialog({
                       <Input
                         type="date"
                         value={row.date}
-                        onChange={(e) => setRow(s.type, { date: e.target.value })}
+                        onChange={(e) => setRow(s.slug, { date: e.target.value })}
                       />
                       <Input
                         type="time"
                         value={row.time}
-                        onChange={(e) => setRow(s.type, { time: e.target.value })}
+                        onChange={(e) => setRow(s.slug, { time: e.target.value })}
                       />
                       <Input
                         className="sm:col-span-2"
                         placeholder="Venue / location"
                         value={row.location}
-                        onChange={(e) => setRow(s.type, { location: e.target.value })}
+                        onChange={(e) => setRow(s.slug, { location: e.target.value })}
                       />
                       <div className="sm:col-span-2">
                         <CrewPicker
                           staff={staff}
                           value={row.crew ?? []}
-                          onChange={(crew) => setRow(s.type, { crew })}
+                          onChange={(crew) => setRow(s.slug, { crew })}
                           date={row.date}
                           time={row.time}
                           eventId={row.id}

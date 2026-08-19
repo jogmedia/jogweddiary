@@ -471,7 +471,7 @@ export function ProjectDialog({
     }
 
     if (!projectId) {
-      setRows(buildRows([]));
+      setRows(buildRows(subEvents, []));
       setCustomEvents([]);
     }
   };

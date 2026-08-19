@@ -194,6 +194,14 @@ export function EventSchedule({
             </Button>
           }
         />
+        <EventTypesManager
+          trigger={
+            <Button size="sm" variant="outline">
+              <Plus className="mr-1.5 h-4 w-4" /> Event types
+            </Button>
+          }
+        />
+
         <Button
           size="sm"
           variant="secondary"

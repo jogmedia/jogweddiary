@@ -485,7 +485,7 @@ export function ProjectDialog({
       open={open}
       onOpenChange={onOpenChange}
       onReset={() => {
-        setRows(buildRows(events, assignments));
+        setRows(buildRows(subEvents, events, assignments));
         setCustomEvents(buildCustomRows(events, assignments));
         setTravel(buildTravel(initial));
         setDeliverables(toDeliverables(initial?.deliverables));

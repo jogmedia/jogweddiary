@@ -22,7 +22,9 @@ import {
   fmtTime,
   openWhatsApp,
 } from "@/lib/whatsapp";
-import type { Assignment, ProjectEvent, Staff } from "@/lib/db";
+import { useEventTypes, type Assignment, type ProjectEvent, type Staff } from "@/lib/db";
+import { EventTypesManager } from "@/components/EventTypesManager";
+
 
 const buildEventFields = (typeOptions: { value: string; label: string }[]): Field[] => [
   {

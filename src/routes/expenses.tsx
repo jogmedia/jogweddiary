@@ -1,16 +1,17 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
-import { Download, Plus, Search, Trash2 } from "lucide-react";
+import { Download, Pencil, Plus, Search, Trash2 } from "lucide-react";
 import { AppShell } from "@/components/AppShell";
 import { EmptyState, PageHeader, StatCard } from "@/components/ui-kit";
-import { RecordDialog } from "@/components/RecordDialog";
+import { RecordDialog, type Field } from "@/components/RecordDialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { useExpenses, useProjects, useRemove, useUpsert } from "@/lib/db";
+import { useExpenses, useProjects, useRemove, useUpsert, type Expense } from "@/lib/db";
 import { fmtDate, inr, todayISO } from "@/lib/format";
 import { exportCsv, exportExcel } from "@/lib/exporters";
 import { BankAccountField, needsBankAccount } from "@/components/BankAccountField";
 import { useExpenseCategories } from "@/lib/expense-categories";
+
 
 
 export const Route = createFileRoute("/expenses")({
@@ -32,9 +33,60 @@ function ExpensesPage() {
   const save = useUpsert("project_expenses", "Expense");
   const remove = useRemove("project_expenses", "Expense");
   const [q, setQ] = useState("");
+  const [editing, setEditing] = useState<Expense | null>(null);
 
   const [from, setFrom] = useState("");
   const [to, setTo] = useState("");
+
+  const expenseFields: Field[] = [
+    {
+      name: "project_id",
+      label: "Project (leave blank for studio overhead)",
+      type: "select",
+      options: projects.map((p) => ({ value: p.id, label: p.project_name })),
+      full: true,
+    },
+    { name: "expense_date", label: "Date", type: "date", required: true },
+    {
+      name: "category",
+      label: "Category",
+      type: "select",
+      required: true,
+      options: categoryOptions,
+      onAddOption: addCategory,
+      addOptionTitle: "Add expense category",
+      addOptionLabel: "Category name",
+    },
+    { name: "amount", label: "Amount", type: "number", required: true },
+    { name: "paid_to", label: "Paid to" },
+    {
+      name: "payment_mode",
+      label: "Mode",
+      type: "select",
+      options: ["cash", "upi", "bank", "cheque", "card"].map((v) => ({ value: v, label: v })),
+    },
+    { name: "notes", label: "Notes", type: "textarea" },
+  ];
+
+  const bankExtra = (values: Record<string, any>, set: (n: string, v: any) => void) =>
+    needsBankAccount(values.payment_mode) ||
+    values.category === "Owner Salary / Personal Draw" ? (
+      <BankAccountField
+        label="Paid From Bank Account"
+        value={values.bank_account_id ?? null}
+        onChange={(v) => set("bank_account_id", v)}
+      />
+    ) : null;
+
+  const submitExpense = (v: Record<string, any>) =>
+    save.mutateAsync({
+      ...v,
+      bank_account_id:
+        needsBankAccount(v.payment_mode) || v.category === "Owner Salary / Personal Draw"
+          ? (v.bank_account_id ?? null)
+          : null,
+    });
+
 
   const rows = useMemo(
     () =>
@@ -74,62 +126,17 @@ function ExpensesPage() {
             </Button>
             <RecordDialog
               title="Record expense"
-              fields={[
-                {
-                  name: "project_id",
-                  label: "Project (leave blank for studio overhead)",
-                  type: "select",
-                  options: projects.map((p) => ({ value: p.id, label: p.project_name })),
-                  full: true,
-                },
-                { name: "expense_date", label: "Date", type: "date", required: true },
-                {
-                  name: "category",
-                  label: "Category",
-                  type: "select",
-                  required: true,
-                  options: categoryOptions,
-                  onAddOption: addCategory,
-                  addOptionTitle: "Add expense category",
-                  addOptionLabel: "Category name",
-
-                },
-                { name: "amount", label: "Amount", type: "number", required: true },
-                { name: "paid_to", label: "Paid to" },
-                {
-                  name: "payment_mode",
-                  label: "Mode",
-                  type: "select",
-                  options: ["cash", "upi", "bank", "cheque", "card"].map((v) => ({ value: v, label: v })),
-                },
-                { name: "notes", label: "Notes", type: "textarea" },
-              ]}
+              fields={expenseFields}
               initial={{ expense_date: todayISO(), payment_mode: "cash" }}
-              extra={(values, set) =>
-                needsBankAccount(values.payment_mode) ||
-                values.category === "Owner Salary / Personal Draw" ? (
-                  <BankAccountField
-                    label="Paid From Bank Account"
-                    value={values.bank_account_id ?? null}
-                    onChange={(v) => set("bank_account_id", v)}
-                  />
-                ) : null
-              }
-              onSubmit={(v) =>
-                save.mutateAsync({
-                  ...v,
-                  bank_account_id:
-                    needsBankAccount(v.payment_mode) || v.category === "Owner Salary / Personal Draw"
-                      ? (v.bank_account_id ?? null)
-                      : null,
-                })
-              }
+              extra={bankExtra}
+              onSubmit={submitExpense}
               trigger={
                 <Button size="sm">
                   <Plus className="mr-1.5 h-4 w-4" /> Add expense
                 </Button>
               }
             />
+
           </>
         }
       />
@@ -155,8 +162,12 @@ function ExpensesPage() {
       ) : (
         <div className="surface divide-y divide-border">
           {rows.map((e) => (
-            <div key={e.id} className="flex items-center justify-between gap-3 p-3">
-              <div className="min-w-0">
+            <div key={e.id} className="flex items-center justify-between gap-2 p-3">
+              <button
+                type="button"
+                className="min-w-0 flex-1 text-left"
+                onClick={() => setEditing(e)}
+              >
                 <p className="truncate text-sm font-medium">
                   {e.category} · {inr(e.amount)}
                 </p>
@@ -164,14 +175,50 @@ function ExpensesPage() {
                   {e.projects?.project_name ?? "Studio overhead"} · {fmtDate(e.expense_date)}
                   {e.paid_to ? ` · ${e.paid_to}` : ""}
                 </p>
+              </button>
+              <div className="flex shrink-0 items-center gap-1">
+                <Button
+                  size="icon"
+                  variant="ghost"
+                  className="h-11 w-11"
+                  aria-label="Edit expense"
+                  title="Edit expense"
+                  onClick={() => setEditing(e)}
+                >
+                  <Pencil className="h-4 w-4" />
+                </Button>
+                <Button
+                  size="icon"
+                  variant="ghost"
+                  className="h-11 w-11"
+                  aria-label="Delete expense"
+                  title="Delete expense"
+                  onClick={() => remove.mutate(e.id)}
+                >
+                  <Trash2 className="h-4 w-4 text-destructive" />
+                </Button>
               </div>
-              <Button size="sm" variant="ghost" onClick={() => remove.mutate(e.id)}>
-                <Trash2 className="h-4 w-4 text-destructive" />
-              </Button>
             </div>
           ))}
         </div>
       )}
+
+      {editing && (
+        <RecordDialog
+          title="Edit expense"
+          submitLabel="Update expense"
+          fields={expenseFields}
+          initial={editing as any}
+          open={!!editing}
+          onOpenChange={(v) => !v && setEditing(null)}
+          extra={bankExtra}
+          onSubmit={async (v) => {
+            await submitExpense({ ...v, id: editing.id });
+            setEditing(null);
+          }}
+        />
+      )}
+
     </AppShell>
   );
 }

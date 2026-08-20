@@ -16,6 +16,7 @@ import {
 } from "lucide-react";
 import { BankAccountField, needsBankAccount } from "@/components/BankAccountField";
 import { useExpenseCategories } from "@/lib/expense-categories";
+import { ProjectExpensesCard, ProjectExpensesDialog } from "@/components/ProjectExpenses";
 
 import { crewRoleOptions } from "@/lib/roles";
 

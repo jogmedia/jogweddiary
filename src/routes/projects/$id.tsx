@@ -164,6 +164,7 @@ function ProjectDetail() {
   const delDelivery = useRemove("delivery_records", "Delivery");
 
   const [editOpen, setEditOpen] = useState(false);
+  const [expensesOpen, setExpensesOpen] = useState(false);
   const [receipt, setReceipt] = useState<any | null>(null);
   const [driveEdit, setDriveEdit] = useState<string | null>(null);
   const drive = driveEdit ?? project?.backup_drive ?? "";

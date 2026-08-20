@@ -296,7 +296,19 @@ function ProjectDetail() {
         <StatCard label="Agreed amount" value={inr(project.total_amount)} />
         <StatCard label="Received" value={inr(totals.received)} tone="success" />
         <StatCard label="Balance due" value={inr(project.balance_due)} tone={Number(project.balance_due) > 0 ? "destructive" : "success"} />
-        <StatCard label="Project profit" value={inr(totals.profit)} tone={totals.profit >= 0 ? "success" : "destructive"} hint={`Expenses ${inr(totals.spent)}`} />
+        <ProjectExpensesCard
+          profit={totals.profit}
+          total={totals.spent}
+          onClick={() => setExpensesOpen(true)}
+        />
+      </div>
+
+      <ProjectExpensesDialog
+        projectId={id}
+        expenses={expenses}
+        open={expensesOpen}
+        onOpenChange={setExpensesOpen}
+      />
       </div>
 
       {/* Venue, place & travel navigation details for the crew */}

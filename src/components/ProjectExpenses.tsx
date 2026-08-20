@@ -45,8 +45,22 @@ export function ProjectExpensesDialog({
   const [editing, setEditing] = useState<Expense | null>(null);
   const [adding, setAdding] = useState(false);
   const [deleteId, setDeleteId] = useState<string | null>(null);
+  const [filter, setFilter] = useState<string>("__all__");
 
   const total = expenses.reduce((a, e) => a + Number(e.amount ?? 0), 0);
+
+  const byCategory = Array.from(
+    expenses.reduce((m, e) => {
+      const key = e.category ?? "Uncategorised";
+      m.set(key, (m.get(key) ?? 0) + Number(e.amount ?? 0));
+      return m;
+    }, new Map<string, number>()),
+  ).sort((a, b) => b[1] - a[1]);
+
+  const activeFilter = filter !== "__all__" && byCategory.some(([c]) => c === filter) ? filter : "__all__";
+  const rows = activeFilter === "__all__" ? expenses : expenses.filter((e) => e.category === activeFilter);
+  const filteredTotal = rows.reduce((a, e) => a + Number(e.amount ?? 0), 0);
+
 
   const fields: Field[] = [
     { name: "expense_date", label: "Date", type: "date", required: true },

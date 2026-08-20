@@ -309,7 +309,6 @@ function ProjectDetail() {
         open={expensesOpen}
         onOpenChange={setExpensesOpen}
       />
-      </div>
 
       {/* Venue, place & travel navigation details for the crew */}
       <div className="mb-6 rounded-2xl border border-border bg-card p-4">

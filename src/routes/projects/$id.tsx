@@ -16,6 +16,7 @@ import {
 } from "lucide-react";
 import { BankAccountField, needsBankAccount } from "@/components/BankAccountField";
 import { useExpenseCategories } from "@/lib/expense-categories";
+import { ProjectExpensesCard, ProjectExpensesDialog } from "@/components/ProjectExpenses";
 
 import { crewRoleOptions } from "@/lib/roles";
 
@@ -163,6 +164,7 @@ function ProjectDetail() {
   const delDelivery = useRemove("delivery_records", "Delivery");
 
   const [editOpen, setEditOpen] = useState(false);
+  const [expensesOpen, setExpensesOpen] = useState(false);
   const [receipt, setReceipt] = useState<any | null>(null);
   const [driveEdit, setDriveEdit] = useState<string | null>(null);
   const drive = driveEdit ?? project?.backup_drive ?? "";
@@ -296,8 +298,19 @@ function ProjectDetail() {
         <StatCard label="Agreed amount" value={inr(project.total_amount)} />
         <StatCard label="Received" value={inr(totals.received)} tone="success" />
         <StatCard label="Balance due" value={inr(project.balance_due)} tone={Number(project.balance_due) > 0 ? "destructive" : "success"} />
-        <StatCard label="Project profit" value={inr(totals.profit)} tone={totals.profit >= 0 ? "success" : "destructive"} hint={`Expenses ${inr(totals.spent)}`} />
+        <ProjectExpensesCard
+          profit={totals.profit}
+          total={totals.spent}
+          onClick={() => setExpensesOpen(true)}
+        />
       </div>
+
+      <ProjectExpensesDialog
+        projectId={id}
+        expenses={expenses}
+        open={expensesOpen}
+        onOpenChange={setExpensesOpen}
+      />
 
       {/* Venue, place & travel navigation details for the crew */}
       <div className="mb-6 rounded-2xl border border-border bg-card p-4">

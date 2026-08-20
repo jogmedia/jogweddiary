@@ -123,13 +123,71 @@ export function ProjectExpensesDialog({
             </Button>
           </div>
 
-          <div className="mt-2 space-y-2">
-            {expenses.length === 0 ? (
+          {byCategory.length > 0 && (
+            <div className="mt-3">
+              <p className="mb-2 text-xs font-medium uppercase tracking-wide text-muted-foreground">
+                Category-wise spend
+              </p>
+              <div className="-mx-1 flex gap-2 overflow-x-auto px-1 pb-1">
+                <button
+                  type="button"
+                  onClick={() => setFilter("__all__")}
+                  className={`min-h-11 shrink-0 rounded-full border px-3 py-2 text-xs font-medium transition-colors ${
+                    activeFilter === "__all__"
+                      ? "border-primary bg-primary text-primary-foreground"
+                      : "border-border bg-card text-foreground hover:bg-accent/50"
+                  }`}
+                >
+                  All · {inr(total)}
+                </button>
+                {byCategory.map(([cat, amt]) => (
+                  <button
+                    key={cat}
+                    type="button"
+                    onClick={() => setFilter(activeFilter === cat ? "__all__" : cat)}
+                    className={`min-h-11 shrink-0 whitespace-nowrap rounded-full border px-3 py-2 text-xs font-medium transition-colors ${
+                      activeFilter === cat
+                        ? "border-primary bg-primary text-primary-foreground"
+                        : "border-border bg-card text-foreground hover:bg-accent/50"
+                    }`}
+                  >
+                    {cat} · {inr(amt)}
+                  </button>
+                ))}
+              </div>
+
+              <div className="mt-3 flex flex-wrap items-center gap-2">
+                <Select value={activeFilter} onValueChange={setFilter}>
+                  <SelectTrigger className="h-11 w-full sm:w-[220px]">
+                    <SelectValue placeholder="Filter by category" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="__all__">All categories</SelectItem>
+                    {byCategory.map(([cat]) => (
+                      <SelectItem key={cat} value={cat}>
+                        {cat}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+                <p className="text-xs font-medium text-primary">
+                  Showing {activeFilter === "__all__" ? "all expenses" : activeFilter} total:{" "}
+                  {inr(filteredTotal)} · {rows.length} {rows.length === 1 ? "entry" : "entries"}
+                </p>
+              </div>
+            </div>
+          )}
+
+          <div className="mt-3 space-y-2">
+            {rows.length === 0 ? (
               <p className="p-6 text-center text-sm text-muted-foreground">
-                No expenses tagged to this project yet.
+                {expenses.length === 0
+                  ? "No expenses tagged to this project yet."
+                  : "No expenses in this category."}
               </p>
             ) : (
-              expenses.map((e) => (
+              rows.map((e) => (
+
                 <div key={e.id} className="surface flex items-start justify-between gap-2 p-3">
                   <div className="min-w-0 flex-1">
                     <p className="truncate text-sm font-medium">

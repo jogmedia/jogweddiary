@@ -45,6 +45,7 @@ import {
   useClients,
   useDeliveries,
   useExpenses,
+  useReimbursables,
   usePayments,
   useProject,
   useProjectEvents,

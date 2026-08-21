@@ -17,6 +17,7 @@ import {
 import { BankAccountField, needsBankAccount } from "@/components/BankAccountField";
 import { useExpenseCategories } from "@/lib/expense-categories";
 import { ProjectExpensesCard, ProjectExpensesDialog } from "@/components/ProjectExpenses";
+import { ClientReimbursablesCard, ClientReimbursablesDialog } from "@/components/ClientReimbursables";
 
 import { crewRoleOptions } from "@/lib/roles";
 
@@ -165,6 +166,8 @@ function ProjectDetail() {
 
   const [editOpen, setEditOpen] = useState(false);
   const [expensesOpen, setExpensesOpen] = useState(false);
+  const [reimbOpen, setReimbOpen] = useState(false);
+  const { data: reimbursables = [] } = useReimbursables(id);
   const [receipt, setReceipt] = useState<any | null>(null);
   const [driveEdit, setDriveEdit] = useState<string | null>(null);
   const drive = driveEdit ?? project?.backup_drive ?? "";

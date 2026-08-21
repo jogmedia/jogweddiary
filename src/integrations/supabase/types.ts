@@ -1052,6 +1052,66 @@ export type Database = {
           },
         ]
       }
+      project_reimbursables: {
+        Row: {
+          amount: number
+          bank_account_id: string | null
+          created_at: string
+          entry_date: string
+          id: string
+          item_name: string
+          kind: string
+          notes: string | null
+          payment_mode: string
+          project_id: string
+          reference_no: string | null
+          updated_at: string
+        }
+        Insert: {
+          amount?: number
+          bank_account_id?: string | null
+          created_at?: string
+          entry_date?: string
+          id?: string
+          item_name: string
+          kind?: string
+          notes?: string | null
+          payment_mode?: string
+          project_id: string
+          reference_no?: string | null
+          updated_at?: string
+        }
+        Update: {
+          amount?: number
+          bank_account_id?: string | null
+          created_at?: string
+          entry_date?: string
+          id?: string
+          item_name?: string
+          kind?: string
+          notes?: string | null
+          payment_mode?: string
+          project_id?: string
+          reference_no?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "project_reimbursables_bank_account_id_fkey"
+            columns: ["bank_account_id"]
+            isOneToOne: false
+            referencedRelation: "bank_accounts"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "project_reimbursables_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "projects"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       project_tasks: {
         Row: {
           assigned_to: string | null

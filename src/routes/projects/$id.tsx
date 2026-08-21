@@ -17,6 +17,7 @@ import {
 import { BankAccountField, needsBankAccount } from "@/components/BankAccountField";
 import { useExpenseCategories } from "@/lib/expense-categories";
 import { ProjectExpensesCard, ProjectExpensesDialog } from "@/components/ProjectExpenses";
+import { ClientReimbursablesCard, ClientReimbursablesDialog } from "@/components/ClientReimbursables";
 
 import { crewRoleOptions } from "@/lib/roles";
 
@@ -44,6 +45,7 @@ import {
   useClients,
   useDeliveries,
   useExpenses,
+  useReimbursables,
   usePayments,
   useProject,
   useProjectEvents,
@@ -165,6 +167,8 @@ function ProjectDetail() {
 
   const [editOpen, setEditOpen] = useState(false);
   const [expensesOpen, setExpensesOpen] = useState(false);
+  const [reimbOpen, setReimbOpen] = useState(false);
+  const { data: reimbursables = [] } = useReimbursables(id);
   const [receipt, setReceipt] = useState<any | null>(null);
   const [driveEdit, setDriveEdit] = useState<string | null>(null);
   const drive = driveEdit ?? project?.backup_drive ?? "";
@@ -305,12 +309,27 @@ function ProjectDetail() {
         />
       </div>
 
+      <div className="mb-6">
+        <ClientReimbursablesCard rows={reimbursables} onClick={() => setReimbOpen(true)} />
+      </div>
+
       <ProjectExpensesDialog
         projectId={id}
         expenses={expenses}
         open={expensesOpen}
         onOpenChange={setExpensesOpen}
       />
+
+      <ClientReimbursablesDialog
+        projectId={id}
+        projectName={project.project_name}
+        clientName={project.clients?.name}
+        clientPhone={wa}
+        rows={reimbursables}
+        open={reimbOpen}
+        onOpenChange={setReimbOpen}
+      />
+
 
       {/* Venue, place & travel navigation details for the crew */}
       <div className="mb-6 rounded-2xl border border-border bg-card p-4">

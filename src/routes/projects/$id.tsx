@@ -305,12 +305,27 @@ function ProjectDetail() {
         />
       </div>
 
+      <div className="mb-6">
+        <ClientReimbursablesCard rows={reimbursables} onClick={() => setReimbOpen(true)} />
+      </div>
+
       <ProjectExpensesDialog
         projectId={id}
         expenses={expenses}
         open={expensesOpen}
         onOpenChange={setExpensesOpen}
       />
+
+      <ClientReimbursablesDialog
+        projectId={id}
+        projectName={project.project_name}
+        clientName={project.clients?.name}
+        clientPhone={wa}
+        rows={reimbursables}
+        open={reimbOpen}
+        onOpenChange={setReimbOpen}
+      />
+
 
       {/* Venue, place & travel navigation details for the crew */}
       <div className="mb-6 rounded-2xl border border-border bg-card p-4">

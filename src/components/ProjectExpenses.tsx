@@ -18,6 +18,13 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 import { Button } from "@/components/ui/button";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { RecordDialog, type Field } from "@/components/RecordDialog";
 import { BankAccountField, needsBankAccount } from "@/components/BankAccountField";
 import { useExpenseCategories } from "@/lib/expense-categories";

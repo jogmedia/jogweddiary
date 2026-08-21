@@ -376,6 +376,35 @@ export const useDeliveries = (projectId?: string) =>
     },
   });
 
+export type Reimbursable = {
+  id: string;
+  project_id: string;
+  kind: "claim" | "settlement";
+  item_name: string;
+  amount: number;
+  entry_date: string;
+  payment_mode: string;
+  bank_account_id: string | null;
+  reference_no: string | null;
+  notes: string | null;
+};
+
+/** Client reimbursables (travel tickets, tolls, fuel) kept out of project profit. */
+export const useReimbursables = (projectId?: string) =>
+  useQuery({
+    queryKey: ["reimbursables", projectId ?? "all"],
+    queryFn: async () => {
+      let q = anyDb
+        .from("project_reimbursables")
+        .select("*")
+        .order("entry_date", { ascending: false });
+      if (projectId) q = q.eq("project_id", projectId);
+      const { data, error } = await q;
+      if (error) throw error;
+      return (data ?? []) as Reimbursable[];
+    },
+  });
+
 export const useAccounts = () =>
   useQuery({
     queryKey: ["accounts"],
@@ -464,6 +493,7 @@ export const useSettings = () =>
 
 const RELATED: Record<string, string[]> = {
   project_payments: ["payments", "projects", "project", "income_transactions", "bank_accounts", "activity_log"],
+  project_reimbursables: ["reimbursables", "bank_accounts", "activity_log"],
   bank_accounts: ["bank_accounts", "payments", "activity_log"],
 
   project_expenses: ["expenses", "projects", "project", "expense_transactions", "bank_accounts", "activity_log"],

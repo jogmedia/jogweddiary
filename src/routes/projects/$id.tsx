@@ -17,6 +17,7 @@ import {
 import { BankAccountField, needsBankAccount } from "@/components/BankAccountField";
 import { useExpenseCategories } from "@/lib/expense-categories";
 import { ProjectExpensesCard, ProjectExpensesDialog } from "@/components/ProjectExpenses";
+import { ProjectPaymentsDialog } from "@/components/ProjectPayments";
 import { ClientReimbursablesCard, ClientReimbursablesDialog } from "@/components/ClientReimbursables";
 
 import { crewRoleOptions } from "@/lib/roles";
@@ -33,7 +34,7 @@ import { toDeliverables } from "@/lib/packages";
 import { AppShell } from "@/components/AppShell";
 import { PostProduction } from "@/components/PostProduction";
 
-import { EmptyState, PageHeader, StatCard, StatusBadge } from "@/components/ui-kit";
+import { ClickableStatCard, EmptyState, PageHeader, StatusBadge } from "@/components/ui-kit";
 import { RecordDialog, type Field } from "@/components/RecordDialog";
 import { Button } from "@/components/ui/button";
 
@@ -168,6 +169,8 @@ function ProjectDetail() {
   const [editOpen, setEditOpen] = useState(false);
   const [expensesOpen, setExpensesOpen] = useState(false);
   const [reimbOpen, setReimbOpen] = useState(false);
+  const [agreedOpen, setAgreedOpen] = useState(false);
+  const [paymentsOpen, setPaymentsOpen] = useState(false);
   const { data: reimbursables = [] } = useReimbursables(id);
   const [receipt, setReceipt] = useState<any | null>(null);
   const [driveEdit, setDriveEdit] = useState<string | null>(null);
@@ -299,9 +302,29 @@ function ProjectDetail() {
       />
 
       <div className="mb-6 grid grid-cols-2 gap-4 lg:grid-cols-4">
-        <StatCard label="Agreed amount" value={inr(project.total_amount)} />
-        <StatCard label="Received" value={inr(totals.received)} tone="success" />
-        <StatCard label="Balance due" value={inr(project.balance_due)} tone={Number(project.balance_due) > 0 ? "destructive" : "success"} />
+        <ClickableStatCard
+          label="Agreed amount"
+          value={inr(project.total_amount)}
+          hint={`${project.package_name ?? "No package"} · tap to edit`}
+          ariaLabel="Edit agreed amount and package"
+          onClick={() => setAgreedOpen(true)}
+        />
+        <ClickableStatCard
+          label="Received"
+          value={inr(totals.received)}
+          tone="success"
+          hint={`${payments.length} ${payments.length === 1 ? "payment" : "payments"} · tap to manage`}
+          ariaLabel="View payment milestones and history"
+          onClick={() => setPaymentsOpen(true)}
+        />
+        <ClickableStatCard
+          label="Balance due"
+          value={inr(project.balance_due)}
+          tone={Number(project.balance_due) > 0 ? "destructive" : "success"}
+          hint="Tap to record payment"
+          ariaLabel="View payment milestones and history"
+          onClick={() => setPaymentsOpen(true)}
+        />
         <ProjectExpensesCard
           profit={totals.profit}
           total={totals.spent}
@@ -312,6 +335,41 @@ function ProjectDetail() {
       <div className="mb-6">
         <ClientReimbursablesCard rows={reimbursables} onClick={() => setReimbOpen(true)} />
       </div>
+
+      <RecordDialog
+        title="Edit agreed amount & package"
+        submitLabel="Save changes"
+        fields={[
+          { name: "total_amount", label: "Total agreed amount", type: "number", required: true },
+          { name: "package_name", label: "Package name", full: true },
+          { name: "notes", label: "Notes", type: "textarea", full: true },
+        ]}
+        initial={{
+          total_amount: project.total_amount,
+          package_name: project.package_name ?? "",
+          notes: project.notes ?? "",
+        }}
+        open={agreedOpen}
+        onOpenChange={setAgreedOpen}
+        onSubmit={async (v) => {
+          await saveProject.mutateAsync({
+            id,
+            total_amount: Number(v.total_amount || 0),
+            package_name: String(v.package_name ?? "").trim() || null,
+            notes: String(v.notes ?? "").trim() || null,
+          });
+          setAgreedOpen(false);
+        }}
+      />
+
+      <ProjectPaymentsDialog
+        projectId={id}
+        payments={payments as any}
+        total={Number(project.total_amount ?? 0)}
+        balance={Number(project.balance_due ?? 0)}
+        open={paymentsOpen}
+        onOpenChange={setPaymentsOpen}
+      />
 
       <ProjectExpensesDialog
         projectId={id}

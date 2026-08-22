@@ -88,6 +88,50 @@ export function StatCard({
   );
 }
 
+/** Same look as StatCard, but tappable with a chevron affordance. */
+export function ClickableStatCard({
+  label,
+  value,
+  hint,
+  tone = "default",
+  onClick,
+  ariaLabel,
+}: {
+  label: string;
+  value: string;
+  hint?: string;
+  tone?: "default" | "success" | "warning" | "destructive";
+  onClick: () => void;
+  ariaLabel?: string;
+}) {
+  const toneClass =
+    tone === "success"
+      ? "text-success"
+      : tone === "warning"
+        ? "text-warning"
+        : tone === "destructive"
+          ? "text-destructive"
+          : "text-foreground";
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      aria-label={ariaLabel ?? label}
+      className="surface flex h-full min-h-[112px] w-full cursor-pointer flex-col justify-between p-4 text-left transition-colors hover:border-primary/60 hover:bg-accent/40 sm:p-5"
+    >
+      <div className="flex items-start justify-between gap-2">
+        <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">{label}</p>
+        <ChevronRight className="h-4 w-4 text-muted-foreground" />
+      </div>
+      <div className="mt-3">
+        <p className={cn("stat-value", toneClass)}>{value}</p>
+        {hint && <p className="mt-1 text-xs font-medium text-primary">{hint}</p>}
+      </div>
+    </button>
+  );
+}
+
+
 export function EmptyState({ message }: { message: string }) {
   return (
     <div className="surface flex items-center justify-center p-10 text-sm text-muted-foreground">

@@ -1,4 +1,5 @@
 import type { ReactNode } from "react";
+import { ChevronRight } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 const TONE: Record<string, string> = {

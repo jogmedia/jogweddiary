@@ -17,6 +17,7 @@ import {
 import { BankAccountField, needsBankAccount } from "@/components/BankAccountField";
 import { useExpenseCategories } from "@/lib/expense-categories";
 import { ProjectExpensesCard, ProjectExpensesDialog } from "@/components/ProjectExpenses";
+import { ProjectPaymentsDialog } from "@/components/ProjectPayments";
 import { ClientReimbursablesCard, ClientReimbursablesDialog } from "@/components/ClientReimbursables";
 
 import { crewRoleOptions } from "@/lib/roles";

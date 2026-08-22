@@ -168,6 +168,8 @@ function ProjectDetail() {
   const [editOpen, setEditOpen] = useState(false);
   const [expensesOpen, setExpensesOpen] = useState(false);
   const [reimbOpen, setReimbOpen] = useState(false);
+  const [agreedOpen, setAgreedOpen] = useState(false);
+  const [paymentsOpen, setPaymentsOpen] = useState(false);
   const { data: reimbursables = [] } = useReimbursables(id);
   const [receipt, setReceipt] = useState<any | null>(null);
   const [driveEdit, setDriveEdit] = useState<string | null>(null);

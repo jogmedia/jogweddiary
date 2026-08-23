@@ -1210,6 +1210,8 @@ export type Database = {
           travel_ticket_path: string | null
           updated_at: string
           venue: string | null
+          venue_contact_name: string | null
+          venue_contact_phone: string | null
           video_editing_done: boolean
         }
         Insert: {
@@ -1261,6 +1263,8 @@ export type Database = {
           travel_ticket_path?: string | null
           updated_at?: string
           venue?: string | null
+          venue_contact_name?: string | null
+          venue_contact_phone?: string | null
           video_editing_done?: boolean
         }
         Update: {
@@ -1312,6 +1316,8 @@ export type Database = {
           travel_ticket_path?: string | null
           updated_at?: string
           venue?: string | null
+          venue_contact_name?: string | null
+          venue_contact_phone?: string | null
           video_editing_done?: boolean
         }
         Relationships: [

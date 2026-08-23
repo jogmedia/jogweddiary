@@ -375,7 +375,7 @@ export function EventSchedule({
                   onClick={() =>
                     openWhatsApp(
                       clientPhone,
-                      buildScheduleMessage(clientName, [e], business, settings?.phone),
+                      buildScheduleMessage(clientName, [e], business, settings?.phone, project),
                     )
                   }
                 >

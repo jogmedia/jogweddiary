@@ -167,6 +167,7 @@ function ProjectDetail() {
   const delDelivery = useRemove("delivery_records", "Delivery");
 
   const [editOpen, setEditOpen] = useState(false);
+  const [venueOpen, setVenueOpen] = useState(false);
   const [expensesOpen, setExpensesOpen] = useState(false);
   const [reimbOpen, setReimbOpen] = useState(false);
   const [agreedOpen, setAgreedOpen] = useState(false);

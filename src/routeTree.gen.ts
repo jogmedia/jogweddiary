@@ -14,6 +14,7 @@ import { Route as TasksRouteImport } from './routes/tasks'
 import { Route as StaffRouteImport } from './routes/staff'
 import { Route as SettingsRouteImport } from './routes/settings'
 import { Route as ReportsRouteImport } from './routes/reports'
+import { Route as ReimbursablesRouteImport } from './routes/reimbursables'
 import { Route as RawDataRouteImport } from './routes/raw-data'
 import { Route as PaymentsRouteImport } from './routes/payments'
 import { Route as ExpensesRouteImport } from './routes/expenses'
@@ -50,6 +51,11 @@ const SettingsRoute = SettingsRouteImport.update({
 const ReportsRoute = ReportsRouteImport.update({
   id: '/reports',
   path: '/reports',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ReimbursablesRoute = ReimbursablesRouteImport.update({
+  id: '/reimbursables',
+  path: '/reimbursables',
   getParentRoute: () => rootRouteImport,
 } as any)
 const RawDataRoute = RawDataRouteImport.update({
@@ -123,6 +129,7 @@ export interface FileRoutesByFullPath {
   '/expenses': typeof ExpensesRoute
   '/payments': typeof PaymentsRoute
   '/raw-data': typeof RawDataRoute
+  '/reimbursables': typeof ReimbursablesRoute
   '/reports': typeof ReportsRoute
   '/settings': typeof SettingsRoute
   '/staff': typeof StaffRoute
@@ -142,6 +149,7 @@ export interface FileRoutesByTo {
   '/expenses': typeof ExpensesRoute
   '/payments': typeof PaymentsRoute
   '/raw-data': typeof RawDataRoute
+  '/reimbursables': typeof ReimbursablesRoute
   '/reports': typeof ReportsRoute
   '/settings': typeof SettingsRoute
   '/staff': typeof StaffRoute
@@ -162,6 +170,7 @@ export interface FileRoutesById {
   '/expenses': typeof ExpensesRoute
   '/payments': typeof PaymentsRoute
   '/raw-data': typeof RawDataRoute
+  '/reimbursables': typeof ReimbursablesRoute
   '/reports': typeof ReportsRoute
   '/settings': typeof SettingsRoute
   '/staff': typeof StaffRoute
@@ -183,6 +192,7 @@ export interface FileRouteTypes {
     | '/expenses'
     | '/payments'
     | '/raw-data'
+    | '/reimbursables'
     | '/reports'
     | '/settings'
     | '/staff'
@@ -202,6 +212,7 @@ export interface FileRouteTypes {
     | '/expenses'
     | '/payments'
     | '/raw-data'
+    | '/reimbursables'
     | '/reports'
     | '/settings'
     | '/staff'
@@ -221,6 +232,7 @@ export interface FileRouteTypes {
     | '/expenses'
     | '/payments'
     | '/raw-data'
+    | '/reimbursables'
     | '/reports'
     | '/settings'
     | '/staff'
@@ -241,6 +253,7 @@ export interface RootRouteChildren {
   ExpensesRoute: typeof ExpensesRoute
   PaymentsRoute: typeof PaymentsRoute
   RawDataRoute: typeof RawDataRoute
+  ReimbursablesRoute: typeof ReimbursablesRoute
   ReportsRoute: typeof ReportsRoute
   SettingsRoute: typeof SettingsRoute
   StaffRoute: typeof StaffRoute
@@ -286,6 +299,13 @@ declare module '@tanstack/react-router' {
       path: '/reports'
       fullPath: '/reports'
       preLoaderRoute: typeof ReportsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/reimbursables': {
+      id: '/reimbursables'
+      path: '/reimbursables'
+      fullPath: '/reimbursables'
+      preLoaderRoute: typeof ReimbursablesRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/raw-data': {
@@ -385,6 +405,7 @@ const rootRouteChildren: RootRouteChildren = {
   ExpensesRoute: ExpensesRoute,
   PaymentsRoute: PaymentsRoute,
   RawDataRoute: RawDataRoute,
+  ReimbursablesRoute: ReimbursablesRoute,
   ReportsRoute: ReportsRoute,
   SettingsRoute: SettingsRoute,
   StaffRoute: StaffRoute,

@@ -117,6 +117,50 @@ export function WorkBrief({
         </table>
       </div>
 
+      {/* 2b. Venue & travel navigation */}
+      <div className="pdf-avoid-break">
+        <PdfSection title="Venue & Travel Details" />
+        <div
+          style={{
+            display: "flex",
+            flexWrap: "wrap",
+            gap: 12,
+            background: DOC.paper,
+            border: `1px solid ${DOC.line}`,
+            padding: "8px 10px",
+            marginBottom: 14,
+          }}
+        >
+          {[
+            ["Main Venue", project.venue ?? "—"],
+            ["Place / District", project.place_district ?? "—"],
+            ["Nearest Railway Station", project.nearest_railway_station ?? "—"],
+            [
+              "Venue Contact",
+              [project.venue_contact_name, project.venue_contact_phone].filter(Boolean).join(" - ") ||
+                "—",
+            ],
+          ].map(([k, v]) => (
+            <div key={k as string} style={{ flex: 1, minWidth: 120 }}>
+              <div style={label}>{k}</div>
+              <div style={{ fontSize: 9.2, fontWeight: 600, marginTop: 2, wordBreak: "break-word" }}>
+                {v as string}
+              </div>
+            </div>
+          ))}
+          {project.google_maps_link ? (
+            <div style={{ width: "100%" }}>
+              <div style={label}>Google Maps</div>
+              <div style={{ fontSize: 8.4, marginTop: 2, wordBreak: "break-all", color: DOC.darkGold }}>
+                {project.google_maps_link}
+              </div>
+            </div>
+          ) : null}
+        </div>
+      </div>
+
+
+
       {/* 3. Deliverables */}
       {true && (
         <div className="pdf-avoid-break">

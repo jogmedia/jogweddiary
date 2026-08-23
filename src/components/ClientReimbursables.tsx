@@ -216,9 +216,11 @@ export function ClientReimbursablesDialog({
   return (
     <>
       <Dialog open={open} onOpenChange={onOpenChange}>
-        <DialogContent className="max-h-[90vh] overflow-y-auto sm:max-w-lg">
-          <DialogHeader>
-            <DialogTitle className="font-display text-xl">Client reimbursables ledger</DialogTitle>
+        <DialogContent className="max-h-[90vh] overflow-y-auto overscroll-contain pb-8 sm:max-w-lg">
+          <DialogHeader className="sticky top-0 z-10 -mx-6 -mt-6 mb-1 bg-background px-6 pb-2 pt-6">
+            <DialogTitle className="break-words pr-10 font-display text-lg leading-snug sm:text-xl">
+              Client reimbursables ledger
+            </DialogTitle>
           </DialogHeader>
 
           <div className="surface p-4">

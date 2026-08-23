@@ -278,7 +278,9 @@ function ProjectDetail() {
                     events,
                     settings?.business_name ?? "JOG MEDIA",
                     settings?.phone,
+                    project as any,
                   ),
+
                 )
               }
             >

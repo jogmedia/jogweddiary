@@ -167,6 +167,7 @@ function ProjectDetail() {
   const delDelivery = useRemove("delivery_records", "Delivery");
 
   const [editOpen, setEditOpen] = useState(false);
+  const [venueOpen, setVenueOpen] = useState(false);
   const [expensesOpen, setExpensesOpen] = useState(false);
   const [reimbOpen, setReimbOpen] = useState(false);
   const [agreedOpen, setAgreedOpen] = useState(false);
@@ -277,7 +278,9 @@ function ProjectDetail() {
                     events,
                     settings?.business_name ?? "JOG MEDIA",
                     settings?.phone,
+                    project as any,
                   ),
+
                 )
               }
             >
@@ -391,9 +394,19 @@ function ProjectDetail() {
 
       {/* Venue, place & travel navigation details for the crew */}
       <div className="mb-6 rounded-2xl border border-border bg-card p-4">
-        <div className="mb-3 flex items-center gap-2">
-          <MapPin className="h-4 w-4 text-primary" />
-          <p className="text-sm font-semibold">Venue &amp; travel details</p>
+        <div className="mb-3 flex items-center justify-between gap-2">
+          <div className="flex items-center gap-2">
+            <MapPin className="h-4 w-4 text-primary" />
+            <p className="text-sm font-semibold">Venue &amp; travel details</p>
+          </div>
+          <Button
+            size="sm"
+            variant="ghost"
+            className="h-11 min-w-11 sm:h-9"
+            onClick={() => setVenueOpen(true)}
+          >
+            <Pencil className="mr-1.5 h-4 w-4" /> Edit
+          </Button>
         </div>
         <div className="grid gap-3 sm:grid-cols-3">
           <div className="min-w-0">
@@ -412,23 +425,80 @@ function ProjectDetail() {
               {(project as any).nearest_railway_station || "—"}
             </p>
           </div>
+          {((project as any).venue_contact_name || (project as any).venue_contact_phone) && (
+            <div className="min-w-0 sm:col-span-3">
+              <p className="text-xs text-muted-foreground">Venue contact</p>
+              <p className="text-sm font-medium break-words">
+                {(project as any).venue_contact_name || "—"}
+                {(project as any).venue_contact_phone ? (
+                  <>
+                    {" · "}
+                    <a
+                      className="text-primary underline"
+                      href={`tel:${digitsOnly((project as any).venue_contact_phone)}`}
+                    >
+                      {(project as any).venue_contact_phone}
+                    </a>
+                  </>
+                ) : null}
+              </p>
+            </div>
+          )}
         </div>
         {(project as any).google_maps_link ? (
-          <Button size="sm" variant="outline" className="mt-3" asChild>
+          <Button size="sm" variant="outline" className="mt-3 h-11 sm:h-9" asChild>
             <a
               href={(project as any).google_maps_link}
               target="_blank"
               rel="noreferrer"
             >
-              <MapPin className="mr-1.5 h-4 w-4" /> Open venue in Google Maps
+              <MapPin className="mr-1.5 h-4 w-4" /> 📍 Open in Google Maps
             </a>
           </Button>
         ) : (
           <p className="mt-3 text-xs text-muted-foreground">
-            No Google Maps link added yet — add one from Edit for easy crew navigation.
+            No Google Maps link added yet — tap Edit to add one for easy crew navigation.
           </p>
         )}
       </div>
+
+      <RecordDialog
+        title="Edit Venue & Travel Details"
+        open={venueOpen}
+        onOpenChange={setVenueOpen}
+        submitLabel="Save Details"
+        initial={{
+          venue: project.venue ?? "",
+          place_district: (project as any).place_district ?? "",
+          nearest_railway_station: (project as any).nearest_railway_station ?? "",
+          google_maps_link: (project as any).google_maps_link ?? "",
+          venue_contact_name: (project as any).venue_contact_name ?? "",
+          venue_contact_phone: (project as any).venue_contact_phone ?? "",
+        }}
+        fields={[
+          { name: "venue", label: "Main venue name", placeholder: "e.g. GURUVAYOOR PALAKKAD", full: true },
+          { name: "place_district", label: "Place / District", placeholder: "e.g. Palakkad / Thrissur" },
+          {
+            name: "nearest_railway_station",
+            label: "Nearest railway station",
+            placeholder: "e.g. Shoranur Jn",
+          },
+          {
+            name: "google_maps_link",
+            label: "Google Maps location URL",
+            type: "url",
+            full: true,
+            placeholder: "Paste the Google Maps link",
+            hint: "Paste the share link from Google Maps — crew can tap to navigate.",
+          },
+          { name: "venue_contact_name", label: "Venue contact person (optional)" },
+          { name: "venue_contact_phone", label: "Contact phone (optional)", type: "tel" },
+        ]}
+        onSubmit={async (v) => {
+          await saveProject.mutateAsync({ id, ...v });
+        }}
+      />
+
 
 
 

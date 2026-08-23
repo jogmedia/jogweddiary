@@ -61,11 +61,36 @@ export const fmtTime = (t?: string | null) => {
 
 const line = (label: string, value?: string | null) => (value ? `${label}: ${value}` : null);
 
+export type VenueInfo = {
+  venue?: string | null;
+  place_district?: string | null;
+  nearest_railway_station?: string | null;
+  google_maps_link?: string | null;
+  venue_contact_name?: string | null;
+  venue_contact_phone?: string | null;
+};
+
+/** WhatsApp lines describing the main venue / travel navigation info for a project. */
+export function venueLines(v?: VenueInfo | null): string[] {
+  if (!v) return [];
+  const rows = [
+    line("• Venue", v.venue),
+    line("• Place / District", v.place_district),
+    line("• Nearest Railway Station", v.nearest_railway_station),
+    v.google_maps_link ? `• 📍 Open in Google Maps: ${v.google_maps_link}` : null,
+    v.venue_contact_name || v.venue_contact_phone
+      ? `• ☎️ Venue Contact: ${[v.venue_contact_name, v.venue_contact_phone].filter(Boolean).join(" - ")}`
+      : null,
+  ].filter(Boolean) as string[];
+  return rows.length ? ["📍 *VENUE & TRAVEL DETAILS*", ...rows] : [];
+}
+
 export function buildScheduleMessage(
   clientName: string,
   events: EventLike[],
   businessName = "JOG MEDIA",
   contactPhone?: string | null,
+  venue?: VenueInfo | null,
 ) {
   const blocks = [...events]
     .sort((a, b) => (a.event_date < b.event_date ? -1 : 1))
@@ -91,14 +116,18 @@ export function buildScheduleMessage(
       return `${meta.emoji} *${eventLabel(e)}*\n${rows.filter(Boolean).join("\n")}`;
     });
 
+  const venueBlock = venueLines(venue);
+
   return [
     `📸 *${businessName.toUpperCase()} - WEDDING SHOOT SCHEDULE* 📸`,
     `Client: ${clientName}`,
     "",
     ...blocks.flatMap((b) => [b, ""]),
+    ...(venueBlock.length ? [...venueBlock, ""] : []),
     `📞 Contact ${businessName}${contactPhone ? ` (${contactPhone})` : ""} for any queries!`,
   ].join("\n");
 }
+
 
 export type TravelLike = {
   travel_required?: boolean | null;

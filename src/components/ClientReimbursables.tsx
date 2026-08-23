@@ -175,20 +175,20 @@ export function ClientReimbursablesDialog({
   };
 
   const row = (r: Reimbursable) => (
-    <div key={r.id} className="surface flex items-start justify-between gap-2 p-3">
-      <div className="min-w-0 flex-1">
-        <p className="truncate text-sm font-medium">
+    <div key={r.id} className="surface grid grid-cols-[minmax(0,1fr)_auto] items-start gap-2 p-3">
+      <div className="min-w-0">
+        <p className="break-words text-sm font-medium">
           {r.item_name} ·{" "}
           <span className={r.kind === "claim" ? "text-destructive" : "text-success"}>
             {r.kind === "claim" ? "-" : "+"}
             {inr(r.amount)}
           </span>
         </p>
-        <p className="truncate text-xs text-muted-foreground">
+        <p className="break-words text-xs text-muted-foreground">
           {fmtDate(r.entry_date)} · {sourceLabel(r.payment_mode)}
           {r.reference_no ? ` · ${r.reference_no}` : ""}
         </p>
-        {r.notes && <p className="mt-1 text-xs text-muted-foreground">{r.notes}</p>}
+        {r.notes && <p className="mt-1 break-words text-xs text-muted-foreground">{r.notes}</p>}
       </div>
       <div className="flex shrink-0 items-center gap-1">
         <Button
@@ -216,9 +216,11 @@ export function ClientReimbursablesDialog({
   return (
     <>
       <Dialog open={open} onOpenChange={onOpenChange}>
-        <DialogContent className="max-h-[90vh] overflow-y-auto sm:max-w-lg">
-          <DialogHeader>
-            <DialogTitle className="font-display text-xl">Client reimbursables ledger</DialogTitle>
+        <DialogContent className="max-h-[90vh] overflow-y-auto overscroll-contain pb-8 sm:max-w-lg">
+          <DialogHeader className="sticky top-0 z-10 -mx-6 -mt-6 mb-1 bg-background px-6 pb-2 pt-6">
+            <DialogTitle className="break-words pr-10 font-display text-lg leading-snug sm:text-xl">
+              Client reimbursables ledger
+            </DialogTitle>
           </DialogHeader>
 
           <div className="surface p-4">

@@ -39,6 +39,19 @@ import { RecordDialog, type Field } from "@/components/RecordDialog";
 import { Button } from "@/components/ui/button";
 
 import { DrivePicker } from "@/components/DrivePicker";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import {
+  STAGE_STATUSES,
+  WORKFLOW_STEPS,
+  derivedStages,
+  workflowProgress,
+} from "@/lib/workflow";
 
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {

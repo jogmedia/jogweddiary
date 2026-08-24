@@ -33,6 +33,7 @@ export const NAV = [
   { to: "/calendar", label: "Calendar", icon: CalendarDays, adminOnly: false },
   { to: "/payments", label: "Payments", icon: Wallet, adminOnly: true },
   { to: "/expenses", label: "Expenses", icon: Receipt, adminOnly: true },
+  { to: "/reimbursables", label: "Reimbursables", icon: Wallet, adminOnly: true },
   { to: "/tasks", label: "Tasks", icon: ListChecks, adminOnly: false },
   { to: "/staff", label: "Staff", icon: UserCog, adminOnly: true },
   { to: "/raw-data", label: "Raw Data", icon: HardDrive, adminOnly: false },

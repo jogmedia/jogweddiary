@@ -205,11 +205,34 @@ function ProjectDetail() {
   const wa = digitsOnly(project.clients?.whatsapp ?? project.clients?.phone);
 
   const checklist = [
-    { label: "Shoot", value: project.shoot_status },
-    { label: "Editing", value: project.editing_status },
-    { label: "Album", value: project.album_status },
-    { label: "Delivery", value: project.delivery_status },
+    { label: "Shoot", field: "shoot_status", value: project.shoot_status },
+    { label: "Editing", field: "editing_status", value: project.editing_status },
+    { label: "Album", field: "album_status", value: project.album_status },
+    { label: "Delivery", field: "delivery_status", value: project.delivery_status },
   ];
+
+  const shootDates = events.length
+    ? events.map((e) => e.event_date).filter(Boolean)
+    : [project.event_date];
+  const allShootDatesPassed =
+    shootDates.length > 0 && shootDates.every((d) => String(d) < todayISO());
+
+  const progress = workflowProgress(project as any);
+
+  /** Toggle a workflow step: saves the tick, its timestamp, and any auto stage bumps. */
+  const toggleWorkflow = (key: string, done: boolean) => {
+    const next = !done;
+    const stamps = { ...(((project as any).workflow_completed_at as any) ?? {}) };
+    if (next) stamps[key] = new Date().toISOString();
+    else delete stamps[key];
+    const merged = { ...(project as any), [key]: next };
+    saveProject.mutate({
+      id,
+      [key]: next,
+      workflow_completed_at: stamps,
+      ...derivedStages(merged, allShootDatesPassed),
+    });
+  };
 
   const timeline = [
     { date: project.created_at?.slice(0, 10), label: "Project created" },

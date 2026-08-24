@@ -1213,6 +1213,7 @@ export type Database = {
           venue_contact_name: string | null
           venue_contact_phone: string | null
           video_editing_done: boolean
+          workflow_completed_at: Json
         }
         Insert: {
           advance_account?: string | null
@@ -1266,6 +1267,7 @@ export type Database = {
           venue_contact_name?: string | null
           venue_contact_phone?: string | null
           video_editing_done?: boolean
+          workflow_completed_at?: Json
         }
         Update: {
           advance_account?: string | null
@@ -1319,6 +1321,7 @@ export type Database = {
           venue_contact_name?: string | null
           venue_contact_phone?: string | null
           video_editing_done?: boolean
+          workflow_completed_at?: Json
         }
         Relationships: [
           {

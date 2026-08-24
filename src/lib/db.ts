@@ -532,6 +532,11 @@ function sanitize(values: Record<string, unknown>) {
       out[k] = v;
       continue;
     }
+    // known jsonb object columns
+    if (k === "workflow_completed_at") {
+      out[k] = v;
+      continue;
+    }
     if (v !== null && typeof v === "object") continue;
     out[k] = v;
   }

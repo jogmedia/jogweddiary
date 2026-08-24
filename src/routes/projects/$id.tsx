@@ -39,6 +39,19 @@ import { RecordDialog, type Field } from "@/components/RecordDialog";
 import { Button } from "@/components/ui/button";
 
 import { DrivePicker } from "@/components/DrivePicker";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import {
+  STAGE_STATUSES,
+  WORKFLOW_STEPS,
+  derivedStages,
+  workflowProgress,
+} from "@/lib/workflow";
 
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
@@ -192,11 +205,34 @@ function ProjectDetail() {
   const wa = digitsOnly(project.clients?.whatsapp ?? project.clients?.phone);
 
   const checklist = [
-    { label: "Shoot", value: project.shoot_status },
-    { label: "Editing", value: project.editing_status },
-    { label: "Album", value: project.album_status },
-    { label: "Delivery", value: project.delivery_status },
+    { label: "Shoot", field: "shoot_status", value: project.shoot_status },
+    { label: "Editing", field: "editing_status", value: project.editing_status },
+    { label: "Album", field: "album_status", value: project.album_status },
+    { label: "Delivery", field: "delivery_status", value: project.delivery_status },
   ];
+
+  const shootDates = events.length
+    ? events.map((e) => e.event_date).filter(Boolean)
+    : [project.event_date];
+  const allShootDatesPassed =
+    shootDates.length > 0 && shootDates.every((d) => String(d) < todayISO());
+
+  const progress = workflowProgress(project as any);
+
+  /** Toggle a workflow step: saves the tick, its timestamp, and any auto stage bumps. */
+  const toggleWorkflow = (key: string, done: boolean) => {
+    const next = !done;
+    const stamps = { ...(((project as any).workflow_completed_at as any) ?? {}) };
+    if (next) stamps[key] = new Date().toISOString();
+    else delete stamps[key];
+    const merged = { ...(project as any), [key]: next };
+    saveProject.mutate({
+      id,
+      [key]: next,
+      workflow_completed_at: stamps,
+      ...derivedStages(merged, allShootDatesPassed),
+    });
+  };
 
   const timeline = [
     { date: project.created_at?.slice(0, 10), label: "Project created" },
@@ -614,16 +650,46 @@ function ProjectDetail() {
       {/* Checklist */}
 
       <div className="surface mb-6 p-4">
-        <p className="mb-3 text-sm font-semibold">Production checklist</p>
+        <div className="mb-3 flex flex-wrap items-center justify-between gap-2">
+          <p className="text-sm font-semibold">Production checklist</p>
+          <span className="text-xs font-medium text-primary">
+            {progress.count}/{progress.total} stages · {progress.label}
+          </span>
+        </div>
         <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
-          {checklist.map((c) => (
-            <div key={c.label} className="rounded-lg border border-border p-3">
-              <p className="text-xs text-muted-foreground">{c.label}</p>
-              <div className="mt-1.5">
-                <StatusBadge value={c.value} />
+          {checklist.map((c) => {
+            const v = String(c.value ?? "pending").toLowerCase();
+            const tone =
+              v === "completed"
+                ? "border-success/40 bg-success/10"
+                : v === "in_progress"
+                  ? "border-info/40 bg-info/10"
+                  : "border-border";
+            return (
+              <div key={c.label} className={`rounded-lg border p-3 transition-colors ${tone}`}>
+                <p className="text-xs text-muted-foreground">{c.label}</p>
+                <div className="mt-1.5 flex items-center gap-1.5">
+                  <StatusBadge value={c.value} />
+                  {v === "completed" && <CheckCircle2 className="h-4 w-4 text-success" />}
+                </div>
+                <Select
+                  value={v}
+                  onValueChange={(next) => saveProject.mutate({ id, [c.field]: next })}
+                >
+                  <SelectTrigger className="mt-2 h-9 text-xs" aria-label={`${c.label} status`}>
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {STAGE_STATUSES.map((o) => (
+                      <SelectItem key={o.value} value={o.value}>
+                        {o.label}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
               </div>
-            </div>
-          ))}
+            );
+          })}
         </div>
       </div>
 
@@ -637,19 +703,28 @@ function ProjectDetail() {
           </p>
         </div>
         <div className="grid grid-cols-2 gap-2 lg:grid-cols-3">
-          {WORKFLOW.map((w) => {
+          {WORKFLOW_STEPS.map((w) => {
             const done = Boolean((project as any)[w.key]);
+            const at = (((project as any).workflow_completed_at as any) ?? {})[w.key] as
+              | string
+              | undefined;
             return (
               <button
                 key={w.key}
                 type="button"
-                onClick={() => saveProject.mutate({ id, [w.key]: !done })}
-                className={`flex items-center justify-between gap-2 rounded-lg border p-3 text-left text-xs transition-colors ${
+                aria-pressed={done}
+                onClick={() => toggleWorkflow(w.key, done)}
+                className={`flex min-h-[44px] items-center justify-between gap-2 rounded-lg border p-3 text-left text-xs transition-colors ${
                   done ? "border-success/40 bg-success/10 text-success" : "border-border hover:bg-muted/60"
                 }`}
               >
-                <span className="font-medium">{w.label}</span>
-                <CheckCircle2 className={`h-4 w-4 ${done ? "" : "text-muted-foreground/40"}`} />
+                <span className="font-medium">
+                  {w.label}
+                  {done && at ? (
+                    <span className="block text-[11px] font-normal opacity-80">{fmtDate(at.slice(0, 10))}</span>
+                  ) : null}
+                </span>
+                <CheckCircle2 className={`h-4 w-4 shrink-0 ${done ? "" : "text-muted-foreground/40"}`} />
               </button>
             );
           })}

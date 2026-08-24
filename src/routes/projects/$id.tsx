@@ -650,16 +650,46 @@ function ProjectDetail() {
       {/* Checklist */}
 
       <div className="surface mb-6 p-4">
-        <p className="mb-3 text-sm font-semibold">Production checklist</p>
+        <div className="mb-3 flex flex-wrap items-center justify-between gap-2">
+          <p className="text-sm font-semibold">Production checklist</p>
+          <span className="text-xs font-medium text-primary">
+            {progress.count}/{progress.total} stages · {progress.label}
+          </span>
+        </div>
         <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
-          {checklist.map((c) => (
-            <div key={c.label} className="rounded-lg border border-border p-3">
-              <p className="text-xs text-muted-foreground">{c.label}</p>
-              <div className="mt-1.5">
-                <StatusBadge value={c.value} />
+          {checklist.map((c) => {
+            const v = String(c.value ?? "pending").toLowerCase();
+            const tone =
+              v === "completed"
+                ? "border-success/40 bg-success/10"
+                : v === "in_progress"
+                  ? "border-info/40 bg-info/10"
+                  : "border-border";
+            return (
+              <div key={c.label} className={`rounded-lg border p-3 transition-colors ${tone}`}>
+                <p className="text-xs text-muted-foreground">{c.label}</p>
+                <div className="mt-1.5 flex items-center gap-1.5">
+                  <StatusBadge value={c.value} />
+                  {v === "completed" && <CheckCircle2 className="h-4 w-4 text-success" />}
+                </div>
+                <Select
+                  value={v}
+                  onValueChange={(next) => saveProject.mutate({ id, [c.field]: next })}
+                >
+                  <SelectTrigger className="mt-2 h-9 text-xs" aria-label={`${c.label} status`}>
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {STAGE_STATUSES.map((o) => (
+                      <SelectItem key={o.value} value={o.value}>
+                        {o.label}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
               </div>
-            </div>
-          ))}
+            );
+          })}
         </div>
       </div>
 

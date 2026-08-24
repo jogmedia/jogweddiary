@@ -703,19 +703,28 @@ function ProjectDetail() {
           </p>
         </div>
         <div className="grid grid-cols-2 gap-2 lg:grid-cols-3">
-          {WORKFLOW.map((w) => {
+          {WORKFLOW_STEPS.map((w) => {
             const done = Boolean((project as any)[w.key]);
+            const at = (((project as any).workflow_completed_at as any) ?? {})[w.key] as
+              | string
+              | undefined;
             return (
               <button
                 key={w.key}
                 type="button"
-                onClick={() => saveProject.mutate({ id, [w.key]: !done })}
-                className={`flex items-center justify-between gap-2 rounded-lg border p-3 text-left text-xs transition-colors ${
+                aria-pressed={done}
+                onClick={() => toggleWorkflow(w.key, done)}
+                className={`flex min-h-[44px] items-center justify-between gap-2 rounded-lg border p-3 text-left text-xs transition-colors ${
                   done ? "border-success/40 bg-success/10 text-success" : "border-border hover:bg-muted/60"
                 }`}
               >
-                <span className="font-medium">{w.label}</span>
-                <CheckCircle2 className={`h-4 w-4 ${done ? "" : "text-muted-foreground/40"}`} />
+                <span className="font-medium">
+                  {w.label}
+                  {done && at ? (
+                    <span className="block text-[11px] font-normal opacity-80">{fmtDate(at.slice(0, 10))}</span>
+                  ) : null}
+                </span>
+                <CheckCircle2 className={`h-4 w-4 shrink-0 ${done ? "" : "text-muted-foreground/40"}`} />
               </button>
             );
           })}

@@ -1,0 +1,1 @@
+ALTER TABLE public.projects ADD COLUMN IF NOT EXISTS workflow_completed_at jsonb NOT NULL DEFAULT '{}'::jsonb;

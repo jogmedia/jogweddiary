@@ -164,6 +164,24 @@ function ProjectsPage() {
                     <p className="font-semibold">{inr(p.balance_due)}</p>
                   </div>
                 </div>
+                <div className="mt-3">
+                  {(() => {
+                    const pr = workflowProgress(p as any);
+                    return (
+                      <>
+                        <div className="mb-1 flex items-center justify-between text-xs">
+                          <span className="font-medium text-primary">{pr.label}</span>
+                          <span className="text-muted-foreground">
+                            {pr.count}/{pr.total} stages
+                          </span>
+                        </div>
+                        <div className="h-1.5 w-full overflow-hidden rounded-full bg-muted">
+                          <div className="h-full rounded-full bg-primary" style={{ width: `${pr.pct}%` }} />
+                        </div>
+                      </>
+                    );
+                  })()}
+                </div>
                 <div className="mt-3 flex flex-wrap gap-1.5">
                   <StatusBadge value={`shoot: ${p.shoot_status}`} />
                   <StatusBadge value={`edit: ${p.editing_status}`} />

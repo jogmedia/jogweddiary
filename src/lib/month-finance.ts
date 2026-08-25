@@ -27,9 +27,11 @@ export type MonthPayment = {
   date: string;
   client: string;
   project: string;
+  projectId: string | null;
   mode: string;
   bank: string;
   amount: number;
+  stage: string;
 };
 
 export type MonthExpense = {
@@ -37,10 +39,21 @@ export type MonthExpense = {
   date: string;
   category: string;
   project: string;
+  projectId: string | null;
   paidTo: string;
   bank: string;
   amount: number;
   isDraw: boolean;
+  row: any;
+};
+
+const paymentStage = (p: any) => {
+  const hint = `${p.reference_no ?? ""} ${p.notes ?? ""}`.toLowerCase();
+  if (hint.includes("advance") || hint.includes("booking")) return "Advance";
+  if (hint.includes("final") || hint.includes("balance")) return "Final";
+  const bal = Number(p.projects?.balance_due ?? NaN);
+  if (!Number.isNaN(bal) && bal <= 0) return "Final";
+  return "Interim";
 };
 
 /** Live income / expense / profit / owner-draw breakdown for one month. */
@@ -61,9 +74,11 @@ export function useMonthFinance(month: string) {
       date: p.payment_date,
       client: p.projects?.clients?.name ?? "—",
       project: p.projects?.project_name ?? "—",
+      projectId: p.project_id ?? null,
       mode: p.payment_mode ?? "—",
       bank: bankName(p.bank_account_id),
       amount: Number(p.amount ?? 0),
+      stage: paymentStage(p),
     }))
     .sort((a, b) => a.date.localeCompare(b.date));
 
@@ -74,12 +89,15 @@ export function useMonthFinance(month: string) {
       date: e.expense_date,
       category: e.category ?? "—",
       project: e.projects?.project_name ?? "Studio overhead",
+      projectId: e.project_id ?? null,
       paidTo: e.paid_to ?? "—",
       bank: bankName(e.bank_account_id),
       amount: Number(e.amount ?? 0),
       isDraw: e.category === OWNER_DRAW,
+      row: e,
     }))
     .sort((a, b) => a.date.localeCompare(b.date));
+
 
   const totalIncome = paymentRows.reduce((a, r) => a + r.amount, 0);
   const ownerDraw = expenseRows.filter((r) => r.isDraw).reduce((a, r) => a + r.amount, 0);

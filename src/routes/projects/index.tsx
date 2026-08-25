@@ -15,6 +15,7 @@ import {
 } from "@/components/ui/select";
 import { useClients, useProjects } from "@/lib/db";
 import { fmtDate, inr, todayISO } from "@/lib/format";
+import { workflowProgress } from "@/lib/workflow";
 
 export const Route = createFileRoute("/projects/")({
   head: () => ({

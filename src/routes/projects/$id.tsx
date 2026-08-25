@@ -103,14 +103,6 @@ const PAY_MODES = ["cash", "upi", "bank", "cheque", "card"].map((v) => ({ value:
 
 
 
-const WORKFLOW = [
-  { key: "raw_backup_done", label: "Raw data backed up" },
-  { key: "photo_selection_done", label: "Photo selection done" },
-  { key: "album_editing_done", label: "Album editing" },
-  { key: "video_editing_done", label: "Video editing" },
-  { key: "album_printed", label: "Album printed" },
-  { key: "final_delivery_done", label: "Final delivery" },
-];
 
 function ProjectDetail() {
   const { id } = useParams({ from: "/projects/$id" });

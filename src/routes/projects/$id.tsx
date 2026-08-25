@@ -332,6 +332,21 @@ function ProjectDetail() {
         }
       />
 
+      <div className="surface mb-6 p-4">
+        <div className="mb-2 flex flex-wrap items-center justify-between gap-2">
+          <p className="text-sm font-semibold">{progress.label}</p>
+          <span className="text-xs text-muted-foreground">
+            {progress.count}/{progress.total} stages completed
+          </span>
+        </div>
+        <div className="h-2 w-full overflow-hidden rounded-full bg-muted">
+          <div
+            className="h-full rounded-full bg-primary transition-all"
+            style={{ width: `${progress.pct}%` }}
+          />
+        </div>
+      </div>
+
       <div className="mb-6 grid grid-cols-2 gap-4 lg:grid-cols-4">
         <ClickableStatCard
           label="Agreed amount"

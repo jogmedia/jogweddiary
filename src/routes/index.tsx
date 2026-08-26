@@ -31,6 +31,8 @@ import { ShootDay } from "@/components/ShootDay";
 import { TravelBadge, travelState } from "@/components/TravelBadge";
 import { BankBalancesWidget, OwnerSalaryWidget } from "@/components/MoneyWidgets";
 import { MonthlyFinanceCard } from "@/components/MonthlyFinance";
+import { DashboardMetricCards } from "@/components/DashboardMetrics";
+
 import { currentMonthKey } from "@/lib/month-finance";
 
 import { PageHeader, StatCard, StatusBadge } from "@/components/ui-kit";

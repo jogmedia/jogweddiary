@@ -274,30 +274,10 @@ function Dashboard() {
         <StatCard label="Total Projects" value={String(stats.total)} icon={<FolderKanban className="h-4 w-4" />} />
         <StatCard label="Active" value={String(stats.active)} hint="in progress" />
         <StatCard label="Completed" value={String(stats.completed)} tone="success" />
-        <StatCard
-          label="Pending Payments"
-          value={inr(stats.pending)}
-          tone="destructive"
-          icon={<IndianRupee className="h-4 w-4" />}
-        />
-        <StatCard
-          label="Monthly Income"
-          value={inr(stats.monthlyIncome)}
-          tone="success"
-          icon={<TrendingUp className="h-4 w-4" />}
-        />
-        <StatCard
-          label="Monthly Expenses"
-          value={inr(stats.monthlyExpense)}
-          icon={<TrendingDown className="h-4 w-4" />}
-        />
-        <StatCard
-          label="Monthly Profit"
-          value={inr(stats.monthlyProfit)}
-          tone={stats.monthlyProfit >= 0 ? "success" : "destructive"}
-        />
+        <DashboardMetricCards month={selMonth} />
         <StatCard label="Deliveries Done" value={String(deliveries.length)} icon={<PackageCheck className="h-4 w-4" />} />
       </div>
+
 
       {/* 4. Financial trends */}
       <div className="mt-6 grid gap-4 lg:grid-cols-3">

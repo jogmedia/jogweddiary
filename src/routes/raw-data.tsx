@@ -15,7 +15,12 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { DRIVE_OPTIONS } from "@/lib/drives";
+import {
+  BACKUP_BADGE,
+  DRIVE_OPTIONS,
+  backupState,
+  buildBackupRecordMessage,
+} from "@/lib/drives";
 import { exportPdf } from "@/lib/exporters";
 import { fmtDate, todayISO } from "@/lib/format";
 import { openWhatsApp } from "@/lib/whatsapp";
@@ -47,16 +52,28 @@ type Filter = "all" | "pending" | "done";
 
 const ALL_DISKS = "__all__";
 
-const backupMsg = (crew: string, client: string, date: string, drive: string, folder: string) =>
-  `Hi ${crew}, raw data for ${client}'s shoot (${fmtDate(date)}) is ready.\n\nHard Disk: ${
-    drive || "not assigned"
-  }\nFolder: ${folder || "not assigned"}\n\nPlease start the editing work. - JOG MEDIA`;
+const backupMsg = (
+  client: string,
+  project: string,
+  date: string,
+  primary: string,
+  secondary: string,
+  folder: string,
+) =>
+  buildBackupRecordMessage({
+    projectName: `${client} — ${project}`,
+    primary,
+    secondary,
+    folder,
+    date: fmtDate(date),
+  });
 
 function RawDataPage() {
   const { data: projects = [], isLoading } = useProjects();
   const { data: assignments = [] } = useAssignments();
   const save = useUpsert("projects", "Backup status");
   const [drives, setDrives] = useState<Record<string, string>>({});
+  const [seconds, setSeconds] = useState<Record<string, string>>({});
   const [folders, setFolders] = useState<Record<string, string>>({});
   const [filter, setFilter] = useState<Filter>("all");
   const [disk, setDisk] = useState<string>(ALL_DISKS);
@@ -66,7 +83,9 @@ function RawDataPage() {
   const today = todayISO();
 
   const clientName = (p: Project) => p.clients?.name ?? p.project_name;
-  const driveOf = (p: Project) => (drives[p.id] ?? p.backup_drive ?? "").trim();
+  const driveOf = (p: Project) =>
+    (drives[p.id] ?? p.primary_hard_disk ?? p.backup_drive ?? "").trim();
+  const secondOf = (p: Project) => (seconds[p.id] ?? p.secondary_hard_disk ?? "").trim();
   const crewFor = (p: Project) => assignments.filter((a) => a.project_id === p.id);
   const folderOf = (p: Project) => (folders[p.id] ?? p.backup_folder ?? "").trim();
 
@@ -104,14 +123,21 @@ function RawDataPage() {
   const doneCount = shot.filter((p) => p.raw_backup_done).length;
 
   const diskOptions = useMemo(() => {
-    const used = new Set(shot.map((p) => (p.backup_drive ?? "").trim()).filter(Boolean));
+    const used = new Set(
+      shot
+        .flatMap((p) => [
+          (p.primary_hard_disk ?? p.backup_drive ?? "").trim(),
+          (p.secondary_hard_disk ?? "").trim(),
+        ])
+        .filter(Boolean),
+    );
     return [...DRIVE_OPTIONS.filter((d) => used.has(d)), ...[...used].filter((d) => !DRIVE_OPTIONS.includes(d))];
   }, [shot]);
 
   const matchesQuery = (p: Project) => {
     const query = q.trim().toLowerCase();
     if (!query) return true;
-    const hay = `${clientName(p)} ${p.project_name} ${p.venue ?? ""} ${driveOf(p)} ${folderOf(p)}`
+    const hay = `${clientName(p)} ${p.project_name} ${p.venue ?? ""} ${driveOf(p)} ${secondOf(p)} ${folderOf(p)}`
       .toLowerCase()
       .replace(/[_\-.]/g, " ");
     // every word typed must appear somewhere → "disk 3" and "hard disk 3" both work
@@ -124,7 +150,7 @@ function RawDataPage() {
   const rows = shot.filter((p) => {
     if (filter === "pending" && p.raw_backup_done) return false;
     if (filter === "done" && !p.raw_backup_done) return false;
-    if (disk !== ALL_DISKS && (p.backup_drive ?? "").trim() !== disk) return false;
+    if (disk !== ALL_DISKS && driveOf(p) !== disk && secondOf(p) !== disk) return false;
     return matchesQuery(p);
   });
 
@@ -132,12 +158,16 @@ function RawDataPage() {
     save.mutate({
       id: p.id,
       raw_backup_done: done,
+      primary_hard_disk: driveOf(p) || null,
+      secondary_hard_disk: secondOf(p) || null,
       backup_drive: driveOf(p) || null,
       backup_folder: folderOf(p) || null,
     });
 
   const dirty = (p: Project) =>
-    driveOf(p) !== (p.backup_drive ?? "").trim() || folderOf(p) !== (p.backup_folder ?? "").trim();
+    driveOf(p) !== (p.primary_hard_disk ?? p.backup_drive ?? "").trim() ||
+    secondOf(p) !== (p.secondary_hard_disk ?? "").trim() ||
+    folderOf(p) !== (p.backup_folder ?? "").trim();
 
   return (
     <AppShell>
@@ -234,7 +264,8 @@ function RawDataPage() {
               <th align="left">Project / Event</th>
               <th align="left">Event Date</th>
               <th align="left">Backup Status</th>
-              <th align="left">Hard Disk No.</th>
+              <th align="left">Primary Disk</th>
+              <th align="left">Secondary Disk</th>
               <th align="left">Folder Name</th>
             </tr>
           </thead>
@@ -246,6 +277,7 @@ function RawDataPage() {
                 <td>{fmtDate(p.event_date)}</td>
                 <td>{p.raw_backup_done ? "Backed up" : "Pending"}</td>
                 <td>{driveOf(p) || "—"}</td>
+                <td>{secondOf(p) || "—"}</td>
                 <td>{folderOf(p) || "—"}</td>
               </tr>
             ))}
@@ -279,12 +311,10 @@ function RawDataPage() {
                 <div className="flex shrink-0 items-start gap-2">
                   <span
                     className={`shrink-0 rounded-lg border px-2.5 py-1 text-xs font-semibold uppercase tracking-wide ${
-                      p.raw_backup_done
-                        ? "border-success/30 bg-success/10 text-success"
-                        : "border-destructive/30 bg-destructive/10 text-destructive"
+                      BACKUP_BADGE[backupState(driveOf(p), secondOf(p))].className
                     }`}
                   >
-                    {p.raw_backup_done ? "Backed Up" : "Pending"}
+                    {BACKUP_BADGE[backupState(driveOf(p), secondOf(p))].label}
                   </span>
                   {q.trim() ? (
                     editorsFor(p).length === 1 ? (
@@ -296,10 +326,11 @@ function RawDataPage() {
                           openWhatsApp(
                             a.staff?.phone,
                             backupMsg(
-                              a.staff?.name ?? "team",
                               clientName(p),
+                              p.project_name,
                               p.event_date,
                               driveOf(p),
+                              secondOf(p),
                               folderOf(p),
                             ),
                           );
@@ -341,10 +372,11 @@ function RawDataPage() {
                                         openWhatsApp(
                                           a.staff?.phone,
                                           backupMsg(
-                                            a.staff?.name ?? "team",
                                             clientName(p),
+                                            p.project_name,
                                             p.event_date,
                                             driveOf(p),
+                                            secondOf(p),
                                             folderOf(p),
                                           ),
                                         )
@@ -367,14 +399,29 @@ function RawDataPage() {
               {/* Highlighted details grid */}
               <div className="mt-4 grid grid-cols-1 gap-3 rounded-xl border border-border bg-muted/30 p-3 sm:grid-cols-2">
                 <div>
-                  <p className="text-xs font-medium text-muted-foreground">Hard Disk No.</p>
+                  <p className="text-xs font-medium text-muted-foreground">💽 Primary Disk (Working)</p>
                   <div className="mt-1 flex items-center gap-1.5 text-sm font-semibold text-foreground">
                     <HardDrive className="h-4 w-4 text-primary" />
-                    {driveOf(p) ? driveOf(p) : <span className="text-muted-foreground">Not assigned</span>}
+                    {driveOf(p) ? (
+                      <span className="break-words">{driveOf(p)}</span>
+                    ) : (
+                      <span className="text-muted-foreground">Not assigned</span>
+                    )}
                   </div>
                 </div>
                 <div>
-                  <p className="text-xs font-medium text-muted-foreground">Folder Path / Name</p>
+                  <p className="text-xs font-medium text-muted-foreground">💾 Secondary Disk (Backup)</p>
+                  <div className="mt-1 flex items-center gap-1.5 text-sm font-semibold text-foreground">
+                    <HardDrive className="h-4 w-4 text-primary" />
+                    {secondOf(p) ? (
+                      <span className="break-words">{secondOf(p)}</span>
+                    ) : (
+                      <span className="text-muted-foreground">Not assigned</span>
+                    )}
+                  </div>
+                </div>
+                <div>
+                  <p className="text-xs font-medium text-muted-foreground">📁 Folder Path / Name</p>
                   <div className="mt-1 flex items-center gap-1.5 text-sm font-semibold text-foreground">
                     <span className="font-mono text-xs text-primary">📁</span>
                     {folderOf(p) ? (
@@ -389,8 +436,14 @@ function RawDataPage() {
               {editing[p.id] ? (
                 <div className="mt-3 space-y-3 rounded-xl border border-border bg-muted/40 p-3">
                   <DrivePicker
-                    value={drives[p.id] ?? p.backup_drive ?? ""}
+                    label="Primary Working Disk *"
+                    value={driveOf(p)}
                     onChange={(v) => setDrives((d) => ({ ...d, [p.id]: v }))}
+                  />
+                  <DrivePicker
+                    label="Secondary Backup Disk *"
+                    value={secondOf(p)}
+                    onChange={(v) => setSeconds((d) => ({ ...d, [p.id]: v }))}
                   />
                   <div>
                     <p className="mb-1 text-xs font-medium text-muted-foreground">Folder name</p>
@@ -404,10 +457,10 @@ function RawDataPage() {
                     <label className="flex items-center gap-2 text-xs">
                       <Switch
                         checked={!!p.raw_backup_done}
-                        disabled={save.isPending}
+                        disabled={save.isPending || !(driveOf(p) && secondOf(p))}
                         onCheckedChange={(v) => toggle(p, v)}
                       />
-                      <span>Backed up to primary &amp; secondary disks</span>
+                      <span>Confirmed backed up to both disks</span>
                     </label>
                     <span className="flex gap-2">
                       <Button
@@ -423,6 +476,8 @@ function RawDataPage() {
                         onClick={() => {
                           save.mutate({
                             id: p.id,
+                            primary_hard_disk: driveOf(p) || null,
+                            secondary_hard_disk: secondOf(p) || null,
                             backup_drive: driveOf(p) || null,
                             backup_folder: folderOf(p) || null,
                           });
@@ -458,7 +513,14 @@ function RawDataPage() {
                           onClick={() =>
                             openWhatsApp(
                               a.staff?.phone,
-                              backupMsg(a.staff?.name ?? "team", clientName(p), p.event_date, driveOf(p), folderOf(p)),
+                              backupMsg(
+                                clientName(p),
+                                p.project_name,
+                                p.event_date,
+                                driveOf(p),
+                                secondOf(p),
+                                folderOf(p),
+                              ),
                             )
                           }
                         >

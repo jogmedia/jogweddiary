@@ -1193,11 +1193,13 @@ export type Database = {
           payment_status: string
           photo_selection_done: boolean
           place_district: string | null
+          primary_hard_disk: string | null
           project_name: string
           project_status: string
           raw_backup_done: boolean
           raw_drive_link: string | null
           raw_sent_date: string | null
+          secondary_hard_disk: string | null
           selection_received_date: string | null
           sent_to_printing_date: string | null
           shoot_status: string
@@ -1247,11 +1249,13 @@ export type Database = {
           payment_status?: string
           photo_selection_done?: boolean
           place_district?: string | null
+          primary_hard_disk?: string | null
           project_name: string
           project_status?: string
           raw_backup_done?: boolean
           raw_drive_link?: string | null
           raw_sent_date?: string | null
+          secondary_hard_disk?: string | null
           selection_received_date?: string | null
           sent_to_printing_date?: string | null
           shoot_status?: string
@@ -1301,11 +1305,13 @@ export type Database = {
           payment_status?: string
           photo_selection_done?: boolean
           place_district?: string | null
+          primary_hard_disk?: string | null
           project_name?: string
           project_status?: string
           raw_backup_done?: boolean
           raw_drive_link?: string | null
           raw_sent_date?: string | null
+          secondary_hard_disk?: string | null
           selection_received_date?: string | null
           sent_to_printing_date?: string | null
           shoot_status?: string

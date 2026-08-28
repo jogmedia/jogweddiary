@@ -6,22 +6,34 @@ import { Switch } from "@/components/ui/switch";
 import { fmtDate, todayISO } from "@/lib/format";
 import { openWhatsApp } from "@/lib/whatsapp";
 import { DrivePicker } from "@/components/DrivePicker";
+import { BACKUP_BADGE, backupState, buildBackupRecordMessage } from "@/lib/drives";
 import { useAssignments, useProjects, useUpsert } from "@/lib/db";
 import type { Assignment, Project } from "@/lib/db";
 
 const reminderMsg = (crew: string, client: string, date: string) =>
   `Hi ${crew}, please upload/handover the raw data for ${client}'s shoot held on ${fmtDate(date)}. Backup is currently pending.`;
 
-const doneMsg = (crew: string, client: string, date: string, drive?: string) =>
-  `Hi ${crew}, Raw Data Backup for ${client}'s shoot (${fmtDate(date)}) has been successfully completed and verified${
-    drive ? ` (stored on ${drive})` : ""
-  }. Thank you!`;
+const doneMsg = (
+  project: string,
+  date: string,
+  primary: string,
+  secondary: string,
+  folder: string,
+) =>
+  buildBackupRecordMessage({
+    projectName: project,
+    primary,
+    secondary,
+    folder,
+    date: fmtDate(date),
+  });
 
 export function BackupAlert() {
   const { data: projects = [] } = useProjects();
   const { data: assignments = [] } = useAssignments();
   const save = useUpsert("projects", "Backup status");
   const [drives, setDrives] = useState<Record<string, string>>({});
+  const [seconds, setSeconds] = useState<Record<string, string>>({});
   const today = todayISO();
 
   const pending = projects.filter(
@@ -41,13 +53,30 @@ export function BackupAlert() {
   const crewFor = (p: Project) => assignments.filter((a) => a.project_id === p.id);
   const clientName = (p: Project) => p.clients?.name ?? p.project_name;
 
+  const primaryOf = (p: Project) =>
+    (drives[p.id] ?? p.primary_hard_disk ?? p.backup_drive ?? "").trim();
+  const secondOf = (p: Project) => (seconds[p.id] ?? p.secondary_hard_disk ?? "").trim();
+
   const markDone = (p: Project, notify?: Assignment) => {
-    const drive = (drives[p.id] ?? p.backup_drive ?? "").trim();
-    save.mutate({ id: p.id, raw_backup_done: true, backup_drive: drive || null });
+    const drive = primaryOf(p);
+    const second = secondOf(p);
+    save.mutate({
+      id: p.id,
+      raw_backup_done: true,
+      primary_hard_disk: drive || null,
+      secondary_hard_disk: second || null,
+      backup_drive: drive || null,
+    });
     if (notify?.staff?.phone) {
       openWhatsApp(
         notify.staff.phone,
-        doneMsg(notify.staff.name ?? "team", clientName(p), p.event_date, drive),
+        doneMsg(
+          `${clientName(p)} — ${p.project_name}`,
+          p.event_date,
+          drive,
+          second,
+          (p.backup_folder ?? "").trim(),
+        ),
       );
     }
   };
@@ -88,7 +117,8 @@ export function BackupAlert() {
                   <th align="left">Project / Event</th>
                   <th align="left">Event Date</th>
                   <th align="left">Backup Status</th>
-                  <th align="left">Hard Disk No.</th>
+                  <th align="left">Primary Disk</th>
+                  <th align="left">Secondary Disk</th>
                 </tr>
               </thead>
               <tbody>
@@ -97,8 +127,9 @@ export function BackupAlert() {
                     <td>{clientName(p)}</td>
                     <td>{p.project_name}</td>
                     <td>{fmtDate(p.event_date)}</td>
-                    <td>{p.raw_backup_done ? "Backed up" : "Pending"}</td>
-                    <td>{(drives[p.id] ?? p.backup_drive ?? "").trim() || "—"}</td>
+                    <td>{BACKUP_BADGE[backupState(primaryOf(p), secondOf(p))].label}</td>
+                    <td>{primaryOf(p) || "—"}</td>
+                    <td>{secondOf(p) || "—"}</td>
                   </tr>
                 ))}
               </tbody>
@@ -117,10 +148,26 @@ export function BackupAlert() {
                       <p className="truncate text-xs text-muted-foreground">
                         {p.project_name} · {fmtDate(p.event_date)}
                       </p>
-                      {(drives[p.id] ?? p.backup_drive ?? "").trim() ? (
-                        <p className="mt-1 inline-flex items-center gap-1.5 rounded-lg border border-success/30 bg-success/10 px-2 py-1 text-xs font-medium text-success">
-                          <HardDrive className="h-3.5 w-3.5" /> Backup Location:{" "}
-                          {(drives[p.id] ?? p.backup_drive ?? "").trim()}
+                      <span
+                        className={`mt-1 inline-flex rounded-lg border px-2 py-0.5 text-[11px] font-semibold uppercase tracking-wide ${
+                          BACKUP_BADGE[backupState(primaryOf(p), secondOf(p))].className
+                        }`}
+                      >
+                        {BACKUP_BADGE[backupState(primaryOf(p), secondOf(p))].label}
+                      </span>
+                      {primaryOf(p) ? (
+                        <p className="mt-1 flex items-center gap-1.5 text-xs text-muted-foreground">
+                          <HardDrive className="h-3.5 w-3.5 text-primary" /> 💽 Primary: {primaryOf(p)}
+                        </p>
+                      ) : null}
+                      {secondOf(p) ? (
+                        <p className="mt-0.5 flex items-center gap-1.5 text-xs text-muted-foreground">
+                          <HardDrive className="h-3.5 w-3.5 text-primary" /> 💾 Secondary: {secondOf(p)}
+                        </p>
+                      ) : null}
+                      {(p.backup_folder ?? "").trim() ? (
+                        <p className="mt-0.5 break-all font-mono text-[11px] text-muted-foreground">
+                          📁 {(p.backup_folder ?? "").trim()}
                         </p>
                       ) : null}
                     </div>
@@ -179,20 +226,27 @@ export function BackupAlert() {
                     </div>
                   )}
 
-                  <DrivePicker
-                    className="mt-3 border-t border-border pt-2.5"
-                    value={drives[p.id] ?? p.backup_drive ?? ""}
-                    onChange={(v) => setDrives((d) => ({ ...d, [p.id]: v }))}
-                  />
+                  <div className="mt-3 grid grid-cols-1 gap-3 border-t border-border pt-2.5 sm:grid-cols-2">
+                    <DrivePicker
+                      label="Primary Working Disk *"
+                      value={primaryOf(p)}
+                      onChange={(v) => setDrives((d) => ({ ...d, [p.id]: v }))}
+                    />
+                    <DrivePicker
+                      label="Secondary Backup Disk *"
+                      value={secondOf(p)}
+                      onChange={(v) => setSeconds((d) => ({ ...d, [p.id]: v }))}
+                    />
+                  </div>
 
 
                   <label className="mt-3 flex items-center gap-2 border-t border-border pt-2.5 text-xs">
                     <Switch
                       checked={!!p.raw_backup_done}
-                      disabled={save.isPending}
+                      disabled={save.isPending || !(primaryOf(p) && secondOf(p))}
                       onCheckedChange={(v) => v && markDone(p, crew[0])}
                     />
-                    <span>Raw Data Backed Up to Primary &amp; Secondary Hard Drives</span>
+                    <span>Confirmed backed up to both disks</span>
                   </label>
 
                 </li>
@@ -216,7 +270,9 @@ export function BackupAlert() {
                     </span>
                     <span className="flex items-center gap-1 text-success">
                       <HardDrive className="h-3.5 w-3.5" />
-                      Backup Location: {p.backup_drive}
+                      {[p.primary_hard_disk ?? p.backup_drive, p.secondary_hard_disk]
+                        .filter(Boolean)
+                        .join(" + ")}
                     </span>
                   </li>
                 ))}

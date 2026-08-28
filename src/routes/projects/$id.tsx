@@ -180,7 +180,11 @@ function ProjectDetail() {
   const { data: reimbursables = [] } = useReimbursables(id);
   const [receipt, setReceipt] = useState<any | null>(null);
   const [driveEdit, setDriveEdit] = useState<string | null>(null);
-  const drive = driveEdit ?? project?.backup_drive ?? "";
+  const [secondEdit, setSecondEdit] = useState<string | null>(null);
+  const [folderEdit, setFolderEdit] = useState<string | null>(null);
+  const drive = driveEdit ?? project?.primary_hard_disk ?? project?.backup_drive ?? "";
+  const second = secondEdit ?? project?.secondary_hard_disk ?? "";
+  const folder = folderEdit ?? project?.backup_folder ?? "";
   const setDrive = (v: string) => setDriveEdit(v);
 
 
@@ -737,20 +741,68 @@ function ProjectDetail() {
           })}
         </div>
         <div className="mt-3 border-t border-border pt-3">
-          {(project.backup_drive ?? "").trim() ? (
-            <p className="mb-2 inline-flex items-center gap-1.5 rounded-lg border border-success/30 bg-success/10 px-2.5 py-1.5 text-xs font-medium text-success">
-              <HardDrive className="h-3.5 w-3.5" /> Backup Location: {project.backup_drive}
-            </p>
-          ) : null}
-          <div className="flex flex-col gap-2 sm:flex-row sm:items-end">
-            <DrivePicker className="flex-1" value={drive} onChange={setDrive} />
+          <div className="mb-2 flex flex-wrap items-center gap-2">
+            <span
+              className={`inline-flex rounded-lg border px-2.5 py-1 text-xs font-semibold uppercase tracking-wide ${
+                BACKUP_BADGE[backupState(drive.trim(), second.trim())].className
+              }`}
+            >
+              {BACKUP_BADGE[backupState(drive.trim(), second.trim())].label}
+            </span>
+            {drive.trim() ? (
+              <span className="inline-flex items-center gap-1.5 text-xs text-muted-foreground">
+                <HardDrive className="h-3.5 w-3.5 text-primary" /> 💽 Primary: {drive.trim()}
+              </span>
+            ) : null}
+            {second.trim() ? (
+              <span className="inline-flex items-center gap-1.5 text-xs text-muted-foreground">
+                <HardDrive className="h-3.5 w-3.5 text-primary" /> 💾 Secondary: {second.trim()}
+              </span>
+            ) : null}
+            {folder.trim() ? (
+              <span className="break-all font-mono text-[11px] text-muted-foreground">
+                📁 {folder.trim()}
+              </span>
+            ) : null}
+          </div>
+          <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+            <DrivePicker label="Primary Working Disk *" value={drive} onChange={setDrive} />
+            <DrivePicker
+              label="Secondary Backup Disk *"
+              value={second}
+              onChange={(v) => setSecondEdit(v)}
+            />
+          </div>
+          <div className="mt-3 flex flex-col gap-2 sm:flex-row sm:items-end">
+            <div className="flex-1">
+              <p className="text-xs font-medium">Folder name</p>
+              <Input
+                className="mt-1 h-9 text-xs"
+                placeholder="e.g. JOG_2026_Akhil_Wedding"
+                value={folder}
+                onChange={(e) => setFolderEdit(e.target.value)}
+              />
+            </div>
             <Button
               variant="outline"
               className="h-9 shrink-0"
-              disabled={saveProject.isPending || drive === (project.backup_drive ?? "")}
-              onClick={() => saveProject.mutate({ id, backup_drive: drive.trim() || null })}
+              disabled={
+                saveProject.isPending ||
+                (drive === (project.primary_hard_disk ?? project.backup_drive ?? "") &&
+                  second === (project.secondary_hard_disk ?? "") &&
+                  folder === (project.backup_folder ?? ""))
+              }
+              onClick={() =>
+                saveProject.mutate({
+                  id,
+                  primary_hard_disk: drive.trim() || null,
+                  secondary_hard_disk: second.trim() || null,
+                  backup_drive: drive.trim() || null,
+                  backup_folder: folder.trim() || null,
+                })
+              }
             >
-              Save drive
+              Save backup info
             </Button>
           </div>
 

@@ -34,6 +34,8 @@ export type Project = {
   raw_backup_done?: boolean;
   backup_drive?: string | null;
   backup_folder?: string | null;
+  primary_hard_disk?: string | null;
+  secondary_hard_disk?: string | null;
 
   photo_selection_done?: boolean;
   album_editing_done?: boolean;

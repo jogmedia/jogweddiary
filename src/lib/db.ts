@@ -306,7 +306,7 @@ export const useExpenses = (projectId?: string) =>
     queryFn: async () => {
       let q = anyDb
         .from("project_expenses")
-        .select("*, projects(project_name)")
+        .select("*, projects(project_name, clients(name))")
         .order("expense_date", { ascending: false });
       if (projectId) q = q.eq("project_id", projectId);
       const { data, error } = await q;

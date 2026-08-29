@@ -502,12 +502,21 @@ function RawDataPage() {
                     <label className="flex items-center gap-2 text-xs">
                       <Switch
                         checked={!!p.raw_backup_done}
-                        disabled={save.isPending || !(driveOf(p) && secondOf(p))}
+                        disabled={save.isPending || (!p.raw_backup_done && !(driveOf(p) && secondOf(p)))}
                         onCheckedChange={(v) => toggle(p, v)}
                       />
                       <span>Confirmed backed up to both disks</span>
                     </label>
-                    <span className="flex gap-2">
+                    <span className="flex flex-wrap gap-2">
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        className="text-destructive"
+                        disabled={save.isPending}
+                        onClick={() => resetBackup(p)}
+                      >
+                        <RotateCcw className="mr-1.5 h-4 w-4" /> Mark as pending / unassign disks
+                      </Button>
                       <Button
                         size="sm"
                         variant="ghost"

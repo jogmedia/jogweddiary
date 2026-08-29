@@ -97,6 +97,7 @@ export function ClickableStatCard({
   tone = "default",
   onClick,
   ariaLabel,
+  active = false,
 }: {
   label: string;
   value: string;
@@ -104,6 +105,7 @@ export function ClickableStatCard({
   tone?: "default" | "success" | "warning" | "destructive";
   onClick: () => void;
   ariaLabel?: string;
+  active?: boolean;
 }) {
   const toneClass =
     tone === "success"
@@ -118,7 +120,11 @@ export function ClickableStatCard({
       type="button"
       onClick={onClick}
       aria-label={ariaLabel ?? label}
-      className="surface flex h-full min-h-[112px] w-full cursor-pointer flex-col justify-between p-4 text-left transition-colors hover:border-primary/60 hover:bg-accent/40 sm:p-5"
+      aria-pressed={active}
+      className={cn(
+        "surface flex h-full min-h-[112px] w-full cursor-pointer flex-col justify-between p-4 text-left transition-colors hover:border-primary/60 hover:bg-accent/40 sm:p-5",
+        active && "border-primary ring-2 ring-primary/30 bg-accent/40",
+      )}
     >
       <div className="flex items-start justify-between gap-2">
         <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">{label}</p>

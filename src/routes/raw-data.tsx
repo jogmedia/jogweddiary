@@ -1,8 +1,16 @@
 import { useMemo, useState } from "react";
 import { createFileRoute } from "@tanstack/react-router";
-import { FileDown, HardDrive, HardDriveDownload, MessageCircle, Pencil, Search } from "lucide-react";
+import {
+  FileDown,
+  HardDrive,
+  HardDriveDownload,
+  MessageCircle,
+  Pencil,
+  RotateCcw,
+  Search,
+} from "lucide-react";
 import { AppShell } from "@/components/AppShell";
-import { EmptyState, PageHeader, StatCard } from "@/components/ui-kit";
+import { ClickableStatCard, EmptyState, PageHeader } from "@/components/ui-kit";
 import { DrivePicker } from "@/components/DrivePicker";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -154,6 +162,14 @@ function RawDataPage() {
     return matchesQuery(p);
   });
 
+  /** keep the post-production workflow timestamp in sync with the backup tick */
+  const workflowStamp = (p: Project, done: boolean) => {
+    const current = { ...((p as any).workflow_completed_at ?? {}) } as Record<string, any>;
+    if (done) current.raw_backup_done = new Date().toISOString();
+    else delete current.raw_backup_done;
+    return current;
+  };
+
   const toggle = (p: Project, done: boolean) =>
     save.mutate({
       id: p.id,
@@ -162,7 +178,26 @@ function RawDataPage() {
       secondary_hard_disk: secondOf(p) || null,
       backup_drive: driveOf(p) || null,
       backup_folder: folderOf(p) || null,
+      workflow_completed_at: workflowStamp(p, done),
     });
+
+  /** Revert to "backup pending": clears disks, folder and the workflow tick. */
+  const resetBackup = (p: Project) => {
+    setDrives((d) => ({ ...d, [p.id]: "" }));
+    setSeconds((d) => ({ ...d, [p.id]: "" }));
+    setFolders((f) => ({ ...f, [p.id]: "" }));
+    save.mutate({
+      id: p.id,
+      raw_backup_done: false,
+      primary_hard_disk: null,
+      secondary_hard_disk: null,
+      backup_drive: null,
+      backup_folder: null,
+      
+      workflow_completed_at: workflowStamp(p, false),
+    });
+    setEditing((e) => ({ ...e, [p.id]: false }));
+  };
 
   const dirty = (p: Project) =>
     driveOf(p) !== (p.primary_hard_disk ?? p.backup_drive ?? "").trim() ||
@@ -182,14 +217,32 @@ function RawDataPage() {
       />
 
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
-        <StatCard label="Shoots completed" value={String(shot.length)} icon={<HardDrive className="h-4 w-4" />} />
-        <StatCard
+        <ClickableStatCard
+          label="Shoots completed"
+          value={String(shot.length)}
+          hint="Tap to show all shoots"
+          active={filter === "all"}
+          onClick={() => setFilter("all")}
+          ariaLabel="Show all completed shoots"
+        />
+        <ClickableStatCard
           label="Backup pending"
           value={String(pendingCount)}
           tone={pendingCount ? "destructive" : "success"}
           hint="Raw data not yet secured"
+          active={filter === "pending"}
+          onClick={() => setFilter((f) => (f === "pending" ? "all" : "pending"))}
+          ariaLabel="Filter shoots pending backup"
         />
-        <StatCard label="Backed up" value={String(doneCount)} tone="success" hint="Stored on hard disks" />
+        <ClickableStatCard
+          label="Backed up"
+          value={String(doneCount)}
+          tone="success"
+          hint="Stored on hard disks"
+          active={filter === "done"}
+          onClick={() => setFilter((f) => (f === "done" ? "all" : "done"))}
+          ariaLabel="Filter shoots already backed up"
+        />
       </div>
 
       <div className="surface mt-6 p-3">
@@ -457,12 +510,21 @@ function RawDataPage() {
                     <label className="flex items-center gap-2 text-xs">
                       <Switch
                         checked={!!p.raw_backup_done}
-                        disabled={save.isPending || !(driveOf(p) && secondOf(p))}
+                        disabled={save.isPending || (!p.raw_backup_done && !(driveOf(p) && secondOf(p)))}
                         onCheckedChange={(v) => toggle(p, v)}
                       />
                       <span>Confirmed backed up to both disks</span>
                     </label>
-                    <span className="flex gap-2">
+                    <span className="flex flex-wrap gap-2">
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        className="text-destructive"
+                        disabled={save.isPending}
+                        onClick={() => resetBackup(p)}
+                      >
+                        <RotateCcw className="mr-1.5 h-4 w-4" /> Mark as pending / unassign disks
+                      </Button>
                       <Button
                         size="sm"
                         variant="ghost"

@@ -174,7 +174,11 @@ function ExpensesPage() {
                   {e.category} · {inr(e.amount)}
                 </p>
                 <p className="truncate text-xs text-muted-foreground">
-                  {e.projects?.project_name ?? "Studio overhead"} · {fmtDate(e.expense_date)}
+                  <span className="font-semibold text-primary">
+                    {(e.projects as any)?.clients?.name ?? "Studio Overhead"}
+                  </span>
+                  {e.projects?.project_name ? ` · ${e.projects.project_name}` : ""} ·{" "}
+                  {fmtDate(e.expense_date)}
                   {e.paid_to ? ` · ${e.paid_to}` : ""}
                 </p>
               </button>

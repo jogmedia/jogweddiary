@@ -91,7 +91,9 @@ function ExpensesPage() {
   const rows = useMemo(
     () =>
       expenses.filter((e) => {
-        const text = `${e.category} ${e.paid_to ?? ""} ${e.projects?.project_name ?? ""}`.toLowerCase();
+        const text = `${e.category} ${e.paid_to ?? ""} ${e.projects?.project_name ?? ""} ${
+          (e.projects as any)?.clients?.name ?? ""
+        }`.toLowerCase();
         return (
           (!q || text.includes(q.toLowerCase())) &&
           (!from || e.expense_date >= from) &&

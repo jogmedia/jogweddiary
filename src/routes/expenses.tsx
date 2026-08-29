@@ -91,7 +91,9 @@ function ExpensesPage() {
   const rows = useMemo(
     () =>
       expenses.filter((e) => {
-        const text = `${e.category} ${e.paid_to ?? ""} ${e.projects?.project_name ?? ""}`.toLowerCase();
+        const text = `${e.category} ${e.paid_to ?? ""} ${e.projects?.project_name ?? ""} ${
+          (e.projects as any)?.clients?.name ?? ""
+        }`.toLowerCase();
         return (
           (!q || text.includes(q.toLowerCase())) &&
           (!from || e.expense_date >= from) &&
@@ -149,7 +151,7 @@ function ExpensesPage() {
       <div className="mb-4 flex flex-wrap gap-2">
         <div className="relative min-w-[200px] flex-1">
           <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-          <Input className="pl-9" placeholder="Search category, vendor or project" value={q} onChange={(e) => setQ(e.target.value)} />
+          <Input className="pl-9" placeholder="Search client, category, vendor or project" value={q} onChange={(e) => setQ(e.target.value)} />
         </div>
         <Input type="date" className="w-[160px]" value={from} onChange={(e) => setFrom(e.target.value)} />
         <Input type="date" className="w-[160px]" value={to} onChange={(e) => setTo(e.target.value)} />
@@ -172,7 +174,11 @@ function ExpensesPage() {
                   {e.category} · {inr(e.amount)}
                 </p>
                 <p className="truncate text-xs text-muted-foreground">
-                  {e.projects?.project_name ?? "Studio overhead"} · {fmtDate(e.expense_date)}
+                  <span className="font-semibold text-primary">
+                    {(e.projects as any)?.clients?.name ?? "Studio Overhead"}
+                  </span>
+                  {e.projects?.project_name ? ` · ${e.projects.project_name}` : ""} ·{" "}
+                  {fmtDate(e.expense_date)}
                   {e.paid_to ? ` · ${e.paid_to}` : ""}
                 </p>
               </button>

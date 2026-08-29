@@ -97,6 +97,7 @@ export function ClickableStatCard({
   tone = "default",
   onClick,
   ariaLabel,
+  active = false,
 }: {
   label: string;
   value: string;
@@ -104,6 +105,7 @@ export function ClickableStatCard({
   tone?: "default" | "success" | "warning" | "destructive";
   onClick: () => void;
   ariaLabel?: string;
+  active?: boolean;
 }) {
   const toneClass =
     tone === "success"

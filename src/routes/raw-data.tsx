@@ -185,7 +185,7 @@ function RawDataPage() {
       secondary_hard_disk: null,
       backup_drive: null,
       backup_folder: null,
-      shoot_status: p.shoot_status === "completed" ? "in_progress" : p.shoot_status,
+      
       workflow_completed_at: workflowStamp(p, false),
     });
     setEditing((e) => ({ ...e, [p.id]: false }));

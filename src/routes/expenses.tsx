@@ -151,7 +151,7 @@ function ExpensesPage() {
       <div className="mb-4 flex flex-wrap gap-2">
         <div className="relative min-w-[200px] flex-1">
           <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-          <Input className="pl-9" placeholder="Search category, vendor or project" value={q} onChange={(e) => setQ(e.target.value)} />
+          <Input className="pl-9" placeholder="Search client, category, vendor or project" value={q} onChange={(e) => setQ(e.target.value)} />
         </div>
         <Input type="date" className="w-[160px]" value={from} onChange={(e) => setFrom(e.target.value)} />
         <Input type="date" className="w-[160px]" value={to} onChange={(e) => setTo(e.target.value)} />

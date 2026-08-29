@@ -56,7 +56,7 @@ export const Route = createFileRoute("/raw-data")({
   component: RawDataPage,
 });
 
-type Filter = "all" | "pending" | "done";
+type Filter = "all" | "pending" | "done" | "shot";
 
 const ALL_DISKS = "__all__";
 

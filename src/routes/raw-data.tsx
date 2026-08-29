@@ -129,6 +129,8 @@ function RawDataPage() {
 
   const pendingCount = shot.filter((p) => !p.raw_backup_done).length;
   const doneCount = shot.filter((p) => p.raw_backup_done).length;
+  const shootDone = (p: Project) => (p.shoot_status ?? "").toLowerCase() === "completed";
+  const shootCompletedCount = shot.filter(shootDone).length;
 
   const diskOptions = useMemo(() => {
     const used = new Set(

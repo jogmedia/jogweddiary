@@ -182,14 +182,32 @@ function RawDataPage() {
       />
 
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
-        <StatCard label="Shoots completed" value={String(shot.length)} icon={<HardDrive className="h-4 w-4" />} />
-        <StatCard
+        <ClickableStatCard
+          label="Shoots completed"
+          value={String(shot.length)}
+          hint="Tap to show all shoots"
+          active={filter === "all"}
+          onClick={() => setFilter("all")}
+          ariaLabel="Show all completed shoots"
+        />
+        <ClickableStatCard
           label="Backup pending"
           value={String(pendingCount)}
           tone={pendingCount ? "destructive" : "success"}
           hint="Raw data not yet secured"
+          active={filter === "pending"}
+          onClick={() => setFilter((f) => (f === "pending" ? "all" : "pending"))}
+          ariaLabel="Filter shoots pending backup"
         />
-        <StatCard label="Backed up" value={String(doneCount)} tone="success" hint="Stored on hard disks" />
+        <ClickableStatCard
+          label="Backed up"
+          value={String(doneCount)}
+          tone="success"
+          hint="Stored on hard disks"
+          active={filter === "done"}
+          onClick={() => setFilter((f) => (f === "done" ? "all" : "done"))}
+          ariaLabel="Filter shoots already backed up"
+        />
       </div>
 
       <div className="surface mt-6 p-3">

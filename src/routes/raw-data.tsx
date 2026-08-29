@@ -1,6 +1,14 @@
 import { useMemo, useState } from "react";
 import { createFileRoute } from "@tanstack/react-router";
-import { FileDown, HardDrive, HardDriveDownload, MessageCircle, Pencil, Search } from "lucide-react";
+import {
+  FileDown,
+  HardDrive,
+  HardDriveDownload,
+  MessageCircle,
+  Pencil,
+  RotateCcw,
+  Search,
+} from "lucide-react";
 import { AppShell } from "@/components/AppShell";
 import { ClickableStatCard, EmptyState, PageHeader } from "@/components/ui-kit";
 import { DrivePicker } from "@/components/DrivePicker";

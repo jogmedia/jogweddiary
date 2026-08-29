@@ -154,6 +154,14 @@ function RawDataPage() {
     return matchesQuery(p);
   });
 
+  /** keep the post-production workflow timestamp in sync with the backup tick */
+  const workflowStamp = (p: Project, done: boolean) => {
+    const current = { ...((p as any).workflow_completed_at ?? {}) } as Record<string, any>;
+    if (done) current.raw_backup_done = new Date().toISOString();
+    else delete current.raw_backup_done;
+    return current;
+  };
+
   const toggle = (p: Project, done: boolean) =>
     save.mutate({
       id: p.id,
@@ -162,7 +170,26 @@ function RawDataPage() {
       secondary_hard_disk: secondOf(p) || null,
       backup_drive: driveOf(p) || null,
       backup_folder: folderOf(p) || null,
+      workflow_completed_at: workflowStamp(p, done),
     });
+
+  /** Revert to "backup pending": clears disks, folder and the workflow tick. */
+  const resetBackup = (p: Project) => {
+    setDrives((d) => ({ ...d, [p.id]: "" }));
+    setSeconds((d) => ({ ...d, [p.id]: "" }));
+    setFolders((f) => ({ ...f, [p.id]: "" }));
+    save.mutate({
+      id: p.id,
+      raw_backup_done: false,
+      primary_hard_disk: null,
+      secondary_hard_disk: null,
+      backup_drive: null,
+      backup_folder: null,
+      shoot_status: p.shoot_status === "completed" ? "in_progress" : p.shoot_status,
+      workflow_completed_at: workflowStamp(p, false),
+    });
+    setEditing((e) => ({ ...e, [p.id]: false }));
+  };
 
   const dirty = (p: Project) =>
     driveOf(p) !== (p.primary_hard_disk ?? p.backup_drive ?? "").trim() ||

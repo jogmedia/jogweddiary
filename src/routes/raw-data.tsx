@@ -56,7 +56,7 @@ export const Route = createFileRoute("/raw-data")({
   component: RawDataPage,
 });
 
-type Filter = "all" | "pending" | "done";
+type Filter = "all" | "pending" | "done" | "shot";
 
 const ALL_DISKS = "__all__";
 
@@ -129,6 +129,8 @@ function RawDataPage() {
 
   const pendingCount = shot.filter((p) => !p.raw_backup_done).length;
   const doneCount = shot.filter((p) => p.raw_backup_done).length;
+  const shootDone = (p: Project) => (p.shoot_status ?? "").toLowerCase() === "completed";
+  const shootCompletedCount = shot.filter(shootDone).length;
 
   const diskOptions = useMemo(() => {
     const used = new Set(
@@ -158,6 +160,7 @@ function RawDataPage() {
   const rows = shot.filter((p) => {
     if (filter === "pending" && p.raw_backup_done) return false;
     if (filter === "done" && !p.raw_backup_done) return false;
+    if (filter === "shot" && !shootDone(p)) return false;
     if (disk !== ALL_DISKS && driveOf(p) !== disk && secondOf(p) !== disk) return false;
     return matchesQuery(p);
   });

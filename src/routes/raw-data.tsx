@@ -564,9 +564,9 @@ function RawDataPage() {
                   <div className="flex flex-wrap items-center justify-between gap-2">
                     <label className="flex items-center gap-2 text-xs">
                       <Switch
-                        checked={!!p.raw_backup_done}
-                        disabled={save.isPending || (!p.raw_backup_done && !(driveOf(p) && secondOf(p)))}
-                        onCheckedChange={(v) => toggle(p, v)}
+                        checked={confirmOf(p)}
+                        disabled={save.isPending || !(driveOf(p) && secondOf(p))}
+                        onCheckedChange={(v) => setConfirms((c) => ({ ...c, [p.id]: v }))}
                       />
                       <span>Confirmed backed up to both disks</span>
                     </label>
@@ -578,12 +578,19 @@ function RawDataPage() {
                         disabled={save.isPending}
                         onClick={() => resetBackup(p)}
                       >
-                        <RotateCcw className="mr-1.5 h-4 w-4" /> Mark as pending / unassign disks
+                        <RotateCcw className="mr-1.5 h-4 w-4" /> Reset / Mark as backup pending
                       </Button>
                       <Button
                         size="sm"
                         variant="ghost"
-                        onClick={() => setEditing((e) => ({ ...e, [p.id]: false }))}
+                        onClick={() => {
+                          setEditing((e) => ({ ...e, [p.id]: false }));
+                          setConfirms((c) => {
+                            const next = { ...c };
+                            delete next[p.id];
+                            return next;
+                          });
+                        }}
                       >
                         Close
                       </Button>
@@ -591,19 +598,28 @@ function RawDataPage() {
                         size="sm"
                         disabled={save.isPending || !dirty(p)}
                         onClick={() => {
+                          const done = confirmOf(p) && Boolean(driveOf(p) && secondOf(p));
                           save.mutate({
                             id: p.id,
                             primary_hard_disk: driveOf(p) || null,
                             secondary_hard_disk: secondOf(p) || null,
                             backup_drive: driveOf(p) || null,
                             backup_folder: folderOf(p) || null,
+                            raw_backup_done: done,
+                            workflow_completed_at: workflowStamp(p, done),
                           });
                           setEditing((e) => ({ ...e, [p.id]: false }));
+                          setConfirms((c) => {
+                            const next = { ...c };
+                            delete next[p.id];
+                            return next;
+                          });
                         }}
                       >
                         <HardDriveDownload className="mr-1.5 h-4 w-4" /> Save
                       </Button>
                     </span>
+
                   </div>
                 </div>
               ) : null}

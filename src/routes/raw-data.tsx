@@ -127,10 +127,17 @@ function RawDataPage() {
     [projects, today],
   );
 
-  const pendingCount = shot.filter((p) => !p.raw_backup_done).length;
-  const doneCount = shot.filter((p) => p.raw_backup_done).length;
+  /** Strictly backed up = tick is on AND both disks are actually saved in the database. */
+  const isBackedUp = (p: Project) =>
+    Boolean(p.raw_backup_done) &&
+    Boolean((p.primary_hard_disk ?? p.backup_drive ?? "").trim()) &&
+    Boolean((p.secondary_hard_disk ?? "").trim());
+
+  const pendingCount = shot.filter((p) => !isBackedUp(p)).length;
+  const doneCount = shot.filter(isBackedUp).length;
   const shootDone = (p: Project) => (p.shoot_status ?? "").toLowerCase() === "completed";
   const shootCompletedCount = shot.filter(shootDone).length;
+
 
   const diskOptions = useMemo(() => {
     const used = new Set(

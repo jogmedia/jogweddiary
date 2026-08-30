@@ -360,8 +360,9 @@ function RawDataPage() {
               <div className="flex items-start justify-between gap-3">
                 <div className="min-w-0">
                   <p className="truncate text-base font-semibold text-primary">{clientName(p)}</p>
-                  <p className="mt-0.5 truncate text-sm text-secondary-foreground">
+                  <p className="mt-0.5 break-words text-sm text-secondary-foreground">
                     {p.project_name} · {fmtDate(p.event_date)}
+                    {p.venue ? ` · 📍 ${p.venue}` : ""}
                   </p>
                 </div>
                 <div className="flex shrink-0 items-start gap-2">

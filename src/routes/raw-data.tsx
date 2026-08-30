@@ -222,11 +222,11 @@ function RawDataPage() {
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
         <ClickableStatCard
           label="Shoots completed"
-          value={String(shot.length)}
-          hint="Tap to show all shoots"
-          active={filter === "all"}
-          onClick={() => setFilter("all")}
-          ariaLabel="Show all completed shoots"
+          value={String(shootCompletedCount)}
+          hint="Tap to see shoots marked completed"
+          active={filter === "shot"}
+          onClick={() => setFilter((f) => (f === "shot" ? "all" : "shot"))}
+          ariaLabel="Filter projects whose shoot is completed"
         />
         <ClickableStatCard
           label="Backup pending"

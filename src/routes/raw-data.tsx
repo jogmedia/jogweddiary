@@ -83,6 +83,8 @@ function RawDataPage() {
   const [drives, setDrives] = useState<Record<string, string>>({});
   const [seconds, setSeconds] = useState<Record<string, string>>({});
   const [folders, setFolders] = useState<Record<string, string>>({});
+  const [confirms, setConfirms] = useState<Record<string, boolean>>({});
+
   const [filter, setFilter] = useState<Filter>("all");
   const [disk, setDisk] = useState<string>(ALL_DISKS);
   const [q, setQ] = useState("");

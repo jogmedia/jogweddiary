@@ -453,6 +453,35 @@ function RawDataPage() {
                 </div>
               </div>
 
+              {/* Shoot stage status + revert */}
+              <div className="mt-3 flex flex-wrap items-center gap-2">
+                <span className="rounded-lg border border-border bg-muted/40 px-2.5 py-1 text-xs font-semibold uppercase tracking-wide text-secondary-foreground">
+                  Shoot: {shootDone(p) ? "Completed" : (p.shoot_status ?? "Pending")}
+                </span>
+                <span className="rounded-lg border border-border bg-muted/40 px-2.5 py-1 text-xs font-semibold uppercase tracking-wide text-secondary-foreground">
+                  Backup: {p.raw_backup_done ? "Backed up" : "Pending"}
+                </span>
+                {shootDone(p) ? (
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    className="ml-auto h-9"
+                    onClick={() => save.mutate({ id: p.id, shoot_status: "pending" })}
+                  >
+                    Revert shoot to pending
+                  </Button>
+                ) : (
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    className="ml-auto h-9"
+                    onClick={() => save.mutate({ id: p.id, shoot_status: "completed" })}
+                  >
+                    Mark shoot completed
+                  </Button>
+                )}
+              </div>
+
               {/* Highlighted details grid */}
               <div className="mt-4 grid grid-cols-1 gap-3 rounded-xl border border-border bg-muted/30 p-3 sm:grid-cols-2">
                 <div>

@@ -293,6 +293,19 @@ function RawDataPage() {
             {f.label}
           </Button>
         ))}
+        {filter !== "all" || disk !== ALL_DISKS || q.trim() ? (
+          <Button
+            size="sm"
+            variant="ghost"
+            onClick={() => {
+              setFilter("all");
+              setDisk(ALL_DISKS);
+              setQ("");
+            }}
+          >
+            Show all / Reset filter
+          </Button>
+        ) : null}
         <Select value={disk} onValueChange={setDisk}>
           <SelectTrigger className="h-9 w-full sm:ml-auto sm:w-52">
             <SelectValue placeholder="Filter by Hard Disk" />

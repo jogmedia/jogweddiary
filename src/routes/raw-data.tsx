@@ -83,6 +83,8 @@ function RawDataPage() {
   const [drives, setDrives] = useState<Record<string, string>>({});
   const [seconds, setSeconds] = useState<Record<string, string>>({});
   const [folders, setFolders] = useState<Record<string, string>>({});
+  const [confirms, setConfirms] = useState<Record<string, boolean>>({});
+
   const [filter, setFilter] = useState<Filter>("all");
   const [disk, setDisk] = useState<string>(ALL_DISKS);
   const [q, setQ] = useState("");
@@ -127,10 +129,17 @@ function RawDataPage() {
     [projects, today],
   );
 
-  const pendingCount = shot.filter((p) => !p.raw_backup_done).length;
-  const doneCount = shot.filter((p) => p.raw_backup_done).length;
+  /** Strictly backed up = tick is on AND both disks are actually saved in the database. */
+  const isBackedUp = (p: Project) =>
+    Boolean(p.raw_backup_done) &&
+    Boolean((p.primary_hard_disk ?? p.backup_drive ?? "").trim()) &&
+    Boolean((p.secondary_hard_disk ?? "").trim());
+
+  const pendingCount = shot.filter((p) => !isBackedUp(p)).length;
+  const doneCount = shot.filter(isBackedUp).length;
   const shootDone = (p: Project) => (p.shoot_status ?? "").toLowerCase() === "completed";
   const shootCompletedCount = shot.filter(shootDone).length;
+
 
   const diskOptions = useMemo(() => {
     const used = new Set(
@@ -158,8 +167,9 @@ function RawDataPage() {
   };
 
   const rows = shot.filter((p) => {
-    if (filter === "pending" && p.raw_backup_done) return false;
-    if (filter === "done" && !p.raw_backup_done) return false;
+    if (filter === "pending" && isBackedUp(p)) return false;
+    if (filter === "done" && !isBackedUp(p)) return false;
+
     if (filter === "shot" && !shootDone(p)) return false;
     if (disk !== ALL_DISKS && driveOf(p) !== disk && secondOf(p) !== disk) return false;
     return matchesQuery(p);
@@ -173,22 +183,16 @@ function RawDataPage() {
     return current;
   };
 
-  const toggle = (p: Project, done: boolean) =>
-    save.mutate({
-      id: p.id,
-      raw_backup_done: done,
-      primary_hard_disk: driveOf(p) || null,
-      secondary_hard_disk: secondOf(p) || null,
-      backup_drive: driveOf(p) || null,
-      backup_folder: folderOf(p) || null,
-      workflow_completed_at: workflowStamp(p, done),
-    });
+
+  /** Draft state of the "confirmed backed up to both disks" toggle. */
+  const confirmOf = (p: Project) => confirms[p.id] ?? isBackedUp(p);
 
   /** Revert to "backup pending": clears disks, folder and the workflow tick. */
   const resetBackup = (p: Project) => {
     setDrives((d) => ({ ...d, [p.id]: "" }));
     setSeconds((d) => ({ ...d, [p.id]: "" }));
     setFolders((f) => ({ ...f, [p.id]: "" }));
+    setConfirms((c) => ({ ...c, [p.id]: false }));
     save.mutate({
       id: p.id,
       raw_backup_done: false,
@@ -196,7 +200,6 @@ function RawDataPage() {
       secondary_hard_disk: null,
       backup_drive: null,
       backup_folder: null,
-      
       workflow_completed_at: workflowStamp(p, false),
     });
     setEditing((e) => ({ ...e, [p.id]: false }));
@@ -205,7 +208,9 @@ function RawDataPage() {
   const dirty = (p: Project) =>
     driveOf(p) !== (p.primary_hard_disk ?? p.backup_drive ?? "").trim() ||
     secondOf(p) !== (p.secondary_hard_disk ?? "").trim() ||
-    folderOf(p) !== (p.backup_folder ?? "").trim();
+    folderOf(p) !== (p.backup_folder ?? "").trim() ||
+    confirmOf(p) !== isBackedUp(p);
+
 
   return (
     <AppShell>
@@ -345,7 +350,7 @@ function RawDataPage() {
                 <td>{clientName(p)}</td>
                 <td>{p.project_name}</td>
                 <td>{fmtDate(p.event_date)}</td>
-                <td>{p.raw_backup_done ? "Backed up" : "Pending"}</td>
+                <td>{isBackedUp(p) ? "Backed up" : "Pending"}</td>
                 <td>{driveOf(p) || "—"}</td>
                 <td>{secondOf(p) || "—"}</td>
                 <td>{folderOf(p) || "—"}</td>
@@ -473,7 +478,7 @@ function RawDataPage() {
                   Shoot: {shootDone(p) ? "Completed" : (p.shoot_status ?? "Pending")}
                 </span>
                 <span className="rounded-lg border border-border bg-muted/40 px-2.5 py-1 text-xs font-semibold uppercase tracking-wide text-secondary-foreground">
-                  Backup: {p.raw_backup_done ? "Backed up" : "Pending"}
+                  Backup: {isBackedUp(p) ? "Backed up" : "Pending"}
                 </span>
                 {shootDone(p) ? (
                   <Button
@@ -556,9 +561,9 @@ function RawDataPage() {
                   <div className="flex flex-wrap items-center justify-between gap-2">
                     <label className="flex items-center gap-2 text-xs">
                       <Switch
-                        checked={!!p.raw_backup_done}
-                        disabled={save.isPending || (!p.raw_backup_done && !(driveOf(p) && secondOf(p)))}
-                        onCheckedChange={(v) => toggle(p, v)}
+                        checked={confirmOf(p)}
+                        disabled={save.isPending || !(driveOf(p) && secondOf(p))}
+                        onCheckedChange={(v) => setConfirms((c) => ({ ...c, [p.id]: v }))}
                       />
                       <span>Confirmed backed up to both disks</span>
                     </label>
@@ -570,12 +575,19 @@ function RawDataPage() {
                         disabled={save.isPending}
                         onClick={() => resetBackup(p)}
                       >
-                        <RotateCcw className="mr-1.5 h-4 w-4" /> Mark as pending / unassign disks
+                        <RotateCcw className="mr-1.5 h-4 w-4" /> Reset / Mark as backup pending
                       </Button>
                       <Button
                         size="sm"
                         variant="ghost"
-                        onClick={() => setEditing((e) => ({ ...e, [p.id]: false }))}
+                        onClick={() => {
+                          setEditing((e) => ({ ...e, [p.id]: false }));
+                          setConfirms((c) => {
+                            const next = { ...c };
+                            delete next[p.id];
+                            return next;
+                          });
+                        }}
                       >
                         Close
                       </Button>
@@ -583,19 +595,28 @@ function RawDataPage() {
                         size="sm"
                         disabled={save.isPending || !dirty(p)}
                         onClick={() => {
+                          const done = confirmOf(p) && Boolean(driveOf(p) && secondOf(p));
                           save.mutate({
                             id: p.id,
                             primary_hard_disk: driveOf(p) || null,
                             secondary_hard_disk: secondOf(p) || null,
                             backup_drive: driveOf(p) || null,
                             backup_folder: folderOf(p) || null,
+                            raw_backup_done: done,
+                            workflow_completed_at: workflowStamp(p, done),
                           });
                           setEditing((e) => ({ ...e, [p.id]: false }));
+                          setConfirms((c) => {
+                            const next = { ...c };
+                            delete next[p.id];
+                            return next;
+                          });
                         }}
                       >
                         <HardDriveDownload className="mr-1.5 h-4 w-4" /> Save
                       </Button>
                     </span>
+
                   </div>
                 </div>
               ) : null}

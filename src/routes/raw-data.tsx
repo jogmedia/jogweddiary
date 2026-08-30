@@ -194,11 +194,15 @@ function RawDataPage() {
       workflow_completed_at: workflowStamp(p, done),
     });
 
+  /** Draft state of the "confirmed backed up to both disks" toggle. */
+  const confirmOf = (p: Project) => confirms[p.id] ?? isBackedUp(p);
+
   /** Revert to "backup pending": clears disks, folder and the workflow tick. */
   const resetBackup = (p: Project) => {
     setDrives((d) => ({ ...d, [p.id]: "" }));
     setSeconds((d) => ({ ...d, [p.id]: "" }));
     setFolders((f) => ({ ...f, [p.id]: "" }));
+    setConfirms((c) => ({ ...c, [p.id]: false }));
     save.mutate({
       id: p.id,
       raw_backup_done: false,
@@ -206,7 +210,6 @@ function RawDataPage() {
       secondary_hard_disk: null,
       backup_drive: null,
       backup_folder: null,
-      
       workflow_completed_at: workflowStamp(p, false),
     });
     setEditing((e) => ({ ...e, [p.id]: false }));
@@ -215,7 +218,9 @@ function RawDataPage() {
   const dirty = (p: Project) =>
     driveOf(p) !== (p.primary_hard_disk ?? p.backup_drive ?? "").trim() ||
     secondOf(p) !== (p.secondary_hard_disk ?? "").trim() ||
-    folderOf(p) !== (p.backup_folder ?? "").trim();
+    folderOf(p) !== (p.backup_folder ?? "").trim() ||
+    confirmOf(p) !== isBackedUp(p);
+
 
   return (
     <AppShell>

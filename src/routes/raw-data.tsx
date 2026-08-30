@@ -350,7 +350,7 @@ function RawDataPage() {
                 <td>{clientName(p)}</td>
                 <td>{p.project_name}</td>
                 <td>{fmtDate(p.event_date)}</td>
-                <td>{p.raw_backup_done ? "Backed up" : "Pending"}</td>
+                <td>{isBackedUp(p) ? "Backed up" : "Pending"}</td>
                 <td>{driveOf(p) || "—"}</td>
                 <td>{secondOf(p) || "—"}</td>
                 <td>{folderOf(p) || "—"}</td>
@@ -478,7 +478,7 @@ function RawDataPage() {
                   Shoot: {shootDone(p) ? "Completed" : (p.shoot_status ?? "Pending")}
                 </span>
                 <span className="rounded-lg border border-border bg-muted/40 px-2.5 py-1 text-xs font-semibold uppercase tracking-wide text-secondary-foreground">
-                  Backup: {p.raw_backup_done ? "Backed up" : "Pending"}
+                  Backup: {isBackedUp(p) ? "Backed up" : "Pending"}
                 </span>
                 {shootDone(p) ? (
                   <Button

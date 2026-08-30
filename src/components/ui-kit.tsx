@@ -1,5 +1,6 @@
 import type { ReactNode } from "react";
-import { ChevronRight } from "lucide-react";
+import { ArrowLeft, ChevronRight } from "lucide-react";
+import { Link } from "@tanstack/react-router";
 import { cn } from "@/lib/utils";
 
 const TONE: Record<string, string> = {

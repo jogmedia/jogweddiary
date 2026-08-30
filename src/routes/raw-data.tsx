@@ -222,11 +222,11 @@ function RawDataPage() {
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
         <ClickableStatCard
           label="Shoots completed"
-          value={String(shot.length)}
-          hint="Tap to show all shoots"
-          active={filter === "all"}
-          onClick={() => setFilter("all")}
-          ariaLabel="Show all completed shoots"
+          value={String(shootCompletedCount)}
+          hint="Tap to see shoots marked completed"
+          active={filter === "shot"}
+          onClick={() => setFilter((f) => (f === "shot" ? "all" : "shot"))}
+          ariaLabel="Filter projects whose shoot is completed"
         />
         <ClickableStatCard
           label="Backup pending"
@@ -282,6 +282,7 @@ function RawDataPage() {
           { key: "all", label: "All Drives" },
           { key: "done", label: "Backed Up" },
           { key: "pending", label: "Pending Backup" },
+          { key: "shot", label: "Shoot Completed" },
         ] as { key: Filter; label: string }[]).map((f) => (
           <Button
             key={f.key}
@@ -292,6 +293,19 @@ function RawDataPage() {
             {f.label}
           </Button>
         ))}
+        {filter !== "all" || disk !== ALL_DISKS || q.trim() ? (
+          <Button
+            size="sm"
+            variant="ghost"
+            onClick={() => {
+              setFilter("all");
+              setDisk(ALL_DISKS);
+              setQ("");
+            }}
+          >
+            Show all / Reset filter
+          </Button>
+        ) : null}
         <Select value={disk} onValueChange={setDisk}>
           <SelectTrigger className="h-9 w-full sm:ml-auto sm:w-52">
             <SelectValue placeholder="Filter by Hard Disk" />
@@ -360,8 +374,9 @@ function RawDataPage() {
               <div className="flex items-start justify-between gap-3">
                 <div className="min-w-0">
                   <p className="truncate text-base font-semibold text-primary">{clientName(p)}</p>
-                  <p className="mt-0.5 truncate text-sm text-secondary-foreground">
+                  <p className="mt-0.5 break-words text-sm text-secondary-foreground">
                     {p.project_name} · {fmtDate(p.event_date)}
+                    {p.venue ? ` · 📍 ${p.venue}` : ""}
                   </p>
                 </div>
                 <div className="flex shrink-0 items-start gap-2">
@@ -450,6 +465,35 @@ function RawDataPage() {
                     )
                   ) : null}
                 </div>
+              </div>
+
+              {/* Shoot stage status + revert */}
+              <div className="mt-3 flex flex-wrap items-center gap-2">
+                <span className="rounded-lg border border-border bg-muted/40 px-2.5 py-1 text-xs font-semibold uppercase tracking-wide text-secondary-foreground">
+                  Shoot: {shootDone(p) ? "Completed" : (p.shoot_status ?? "Pending")}
+                </span>
+                <span className="rounded-lg border border-border bg-muted/40 px-2.5 py-1 text-xs font-semibold uppercase tracking-wide text-secondary-foreground">
+                  Backup: {p.raw_backup_done ? "Backed up" : "Pending"}
+                </span>
+                {shootDone(p) ? (
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    className="ml-auto h-9"
+                    onClick={() => save.mutate({ id: p.id, shoot_status: "pending" })}
+                  >
+                    Revert shoot to pending
+                  </Button>
+                ) : (
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    className="ml-auto h-9"
+                    onClick={() => save.mutate({ id: p.id, shoot_status: "completed" })}
+                  >
+                    Mark shoot completed
+                  </Button>
+                )}
               </div>
 
               {/* Highlighted details grid */}

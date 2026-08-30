@@ -165,8 +165,9 @@ function RawDataPage() {
   };
 
   const rows = shot.filter((p) => {
-    if (filter === "pending" && p.raw_backup_done) return false;
-    if (filter === "done" && !p.raw_backup_done) return false;
+    if (filter === "pending" && isBackedUp(p)) return false;
+    if (filter === "done" && !isBackedUp(p)) return false;
+
     if (filter === "shot" && !shootDone(p)) return false;
     if (disk !== ALL_DISKS && driveOf(p) !== disk && secondOf(p) !== disk) return false;
     return matchesQuery(p);

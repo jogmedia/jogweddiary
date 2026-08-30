@@ -183,16 +183,6 @@ function RawDataPage() {
     return current;
   };
 
-  const toggle = (p: Project, done: boolean) =>
-    save.mutate({
-      id: p.id,
-      raw_backup_done: done,
-      primary_hard_disk: driveOf(p) || null,
-      secondary_hard_disk: secondOf(p) || null,
-      backup_drive: driveOf(p) || null,
-      backup_folder: folderOf(p) || null,
-      workflow_completed_at: workflowStamp(p, done),
-    });
 
   /** Draft state of the "confirmed backed up to both disks" toggle. */
   const confirmOf = (p: Project) => confirms[p.id] ?? isBackedUp(p);

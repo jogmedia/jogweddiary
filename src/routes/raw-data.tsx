@@ -282,6 +282,7 @@ function RawDataPage() {
           { key: "all", label: "All Drives" },
           { key: "done", label: "Backed Up" },
           { key: "pending", label: "Pending Backup" },
+          { key: "shot", label: "Shoot Completed" },
         ] as { key: Filter; label: string }[]).map((f) => (
           <Button
             key={f.key}

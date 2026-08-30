@@ -1,5 +1,6 @@
 import type { ReactNode } from "react";
-import { ChevronRight } from "lucide-react";
+import { ArrowLeft, ChevronRight } from "lucide-react";
+import { Link } from "@tanstack/react-router";
 import { cn } from "@/lib/utils";
 
 const TONE: Record<string, string> = {
@@ -38,14 +39,29 @@ export function PageHeader({
   title,
   subtitle,
   actions,
+  backTo = "/",
+  backLabel = "Back to Dashboard",
+  hideBack = false,
 }: {
   title: string;
   subtitle?: string;
   actions?: ReactNode;
+  backTo?: string;
+  backLabel?: string;
+  hideBack?: boolean;
 }) {
   return (
     <div className="mb-6 flex flex-wrap items-end justify-between gap-3">
       <div>
+        {!hideBack && (
+          <Link
+            to={backTo}
+            className="no-print -ml-1 inline-flex min-h-11 items-center gap-1.5 px-1 py-2 text-sm font-medium text-muted-foreground transition-colors hover:text-foreground"
+          >
+            <ArrowLeft className="h-4 w-4" />
+            {backLabel}
+          </Link>
+        )}
         <h1 className="page-title">{title}</h1>
         {subtitle && <p className="mt-1 text-sm text-muted-foreground">{subtitle}</p>}
       </div>

@@ -1,7 +1,6 @@
-import { createFileRoute, Link, useParams } from "@tanstack/react-router";
+import { createFileRoute, useParams } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
 import {
-  ArrowLeft,
   Phone,
   MessageCircle,
   Plus,
@@ -244,11 +243,9 @@ function ProjectDetail() {
 
   return (
     <AppShell>
-      <Link to="/projects" className="mb-3 inline-flex items-center text-sm text-muted-foreground hover:text-foreground">
-        <ArrowLeft className="mr-1.5 h-4 w-4" /> All projects
-      </Link>
-
       <PageHeader
+        backTo="/projects"
+        backLabel="All projects"
         title={project.project_name}
         subtitle={`${project.clients?.name ?? "—"} · ${fmtDate(project.event_date)} · ${project.venue ?? "Venue TBD"} · ${project.package_name ?? "No package"}`}
         actions={

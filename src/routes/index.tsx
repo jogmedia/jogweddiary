@@ -177,6 +177,7 @@ function Dashboard() {
   return (
     <AppShell>
       <PageHeader
+        hideBack
         title="Studio Dashboard"
         subtitle={`Overview for ${new Date().toLocaleDateString("en-IN", { month: "long", year: "numeric" })}`}
       />

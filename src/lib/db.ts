@@ -428,6 +428,48 @@ export const useBankAccounts = () =>
     queryFn: () => fetchList<BankAccount>("bank_accounts", "*", { column: "bank_name", ascending: true }),
   });
 
+export type HardDisk = {
+  id: string;
+  name: string;
+  capacity: string | null;
+  sort_order: number;
+  is_active: boolean;
+};
+
+/** Shared, editable list of studio hard disks used by every backup selector. */
+export const useHardDisks = () =>
+  useQuery({
+    queryKey: ["hard_disks"],
+    queryFn: () => fetchList<HardDisk>("hard_disks", "*", { column: "sort_order", ascending: true }),
+  });
+
+/** Renames a disk and repoints every project that referenced the old label. */
+export function useRenameHardDisk() {
+  const invalidate = useInvalidate();
+  return useMutation({
+    mutationFn: async (v: { id: string; oldName: string; name: string; capacity?: string | null }) => {
+      const { error } = await anyDb
+        .from("hard_disks")
+        .update({ name: v.name, capacity: v.capacity ?? null })
+        .eq("id", v.id);
+      if (error) throw error;
+      if (v.oldName !== v.name) {
+        for (const col of ["primary_hard_disk", "secondary_hard_disk", "backup_drive"]) {
+          await anyDb.from("projects").update({ [col]: v.name }).eq(col, v.oldName);
+        }
+      }
+      logActivity("updated", "hard_disks", v.id, "Hard disk");
+    },
+    onSuccess: () => {
+      invalidate("hard_disks");
+      invalidate("projects");
+      toast.success("Hard disk updated");
+    },
+    onError: (e: any) => toast.error(e?.message ?? "Could not update hard disk"),
+  });
+}
+
+
 
 export const useJournalEntries = () =>
   useQuery({

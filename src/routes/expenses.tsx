@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
-import { Download, Pencil, Plus, Search, Trash2 } from "lucide-react";
+import { CalendarDays, Download, Pencil, Plus, Search, Trash2 } from "lucide-react";
 import { AppShell } from "@/components/AppShell";
 import { EmptyState, PageHeader, StatCard } from "@/components/ui-kit";
 import { RecordDialog, type Field } from "@/components/RecordDialog";
@@ -12,7 +12,15 @@ import { exportCsv, exportExcel } from "@/lib/exporters";
 import { BankAccountField, needsBankAccount } from "@/components/BankAccountField";
 import { useExpenseCategories } from "@/lib/expense-categories";
 
+const MODE_LABELS: Record<string, string> = {
+  cash: "Cash in Hand",
+  upi: "Bank / UPI",
+  bank: "Bank Transfer",
+  cheque: "Cheque",
+  card: "Card",
+};
 
+const modeLabel = (v?: string | null) => MODE_LABELS[v ?? ""] ?? (v ? v : "Unspecified");
 
 export const Route = createFileRoute("/expenses")({
   head: () => ({
@@ -164,46 +172,54 @@ function ExpensesPage() {
       ) : (
         <div className="surface divide-y divide-border">
           {rows.map((e) => (
-            <div key={e.id} className="flex items-center justify-between gap-2 p-3">
-              <button
-                type="button"
-                className="min-w-0 flex-1 text-left"
-                onClick={() => setEditing(e)}
-              >
-                <p className="truncate text-sm font-medium">
-                  {e.category} · {inr(e.amount)}
-                </p>
-                <p className="truncate text-xs text-muted-foreground">
-                  <span className="font-semibold text-primary">
-                    {(e.projects as any)?.clients?.name ?? "Studio Overhead"}
-                  </span>
-                  {e.projects?.project_name ? ` · ${e.projects.project_name}` : ""} ·{" "}
-                  {fmtDate(e.expense_date)}
-                  {e.paid_to ? ` · ${e.paid_to}` : ""}
-                </p>
-              </button>
-              <div className="flex shrink-0 items-center gap-1">
-                <Button
-                  size="icon"
-                  variant="ghost"
-                  className="h-11 w-11"
-                  aria-label="Edit expense"
-                  title="Edit expense"
+            <div key={e.id} className="px-3 py-2.5">
+              <div className="grid grid-cols-[minmax(0,1fr)_auto] items-start gap-2">
+                <button
+                  type="button"
+                  className="min-w-0 text-left"
                   onClick={() => setEditing(e)}
                 >
-                  <Pencil className="h-4 w-4" />
-                </Button>
-                <Button
-                  size="icon"
-                  variant="ghost"
-                  className="h-11 w-11"
-                  aria-label="Delete expense"
-                  title="Delete expense"
-                  onClick={() => remove.mutate(e.id)}
-                >
-                  <Trash2 className="h-4 w-4 text-destructive" />
-                </Button>
+                  <p className="truncate text-sm font-medium">
+                    {e.category} · {inr(e.amount)}
+                  </p>
+                  <p className="truncate text-xs text-muted-foreground">
+                    <span className="font-semibold text-primary">
+                      {(e.projects as any)?.clients?.name ?? "Studio Overhead"}
+                    </span>
+                    {e.projects?.project_name ? ` · ${e.projects.project_name}` : ""}
+                  </p>
+                </button>
+                <div className="flex shrink-0 items-center gap-1">
+                  <Button
+                    size="icon"
+                    variant="ghost"
+                    className="h-11 w-11"
+                    aria-label="Edit expense"
+                    title="Edit expense"
+                    onClick={() => setEditing(e)}
+                  >
+                    <Pencil className="h-4 w-4" />
+                  </Button>
+                  <Button
+                    size="icon"
+                    variant="ghost"
+                    className="h-11 w-11"
+                    aria-label="Delete expense"
+                    title="Delete expense"
+                    onClick={() => remove.mutate(e.id)}
+                  >
+                    <Trash2 className="h-4 w-4 text-destructive" />
+                  </Button>
+                </div>
               </div>
+              <p className="mt-0.5 flex flex-wrap items-center gap-2 text-xs text-muted-foreground">
+                <span className="flex items-center gap-1">
+                  <CalendarDays className="h-3.5 w-3.5 shrink-0" />
+                  {fmtDate(e.expense_date)}
+                </span>
+                <span>• Paid via {modeLabel(e.payment_mode)}</span>
+                {e.paid_to ? <span className="truncate">• {e.paid_to}</span> : null}
+              </p>
             </div>
           ))}
         </div>

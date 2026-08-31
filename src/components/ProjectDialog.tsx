@@ -420,12 +420,13 @@ export function ProjectDialog({
     });
     const pid = (projectId ?? id) as string;
 
-    // Keep the advance in sync as the first received payment, credited to the chosen account.
+    // Auto-record the advance ONLY when a brand-new project is first created.
+    // Editing an existing project never touches the payments table.
     const advance = Number(values.advance_amount ?? 0);
-    const logged = existingPayments.find((p) => (p.reference_no ?? "") === ADVANCE_REF);
-    if (pid && advance > 0) {
+    const isNewProject = !projectId;
+    const alreadyLogged = existingPayments.some((p) => (p.reference_no ?? "") === ADVANCE_REF);
+    if (isNewProject && pid && advance > 0 && !alreadyLogged) {
       await savePayment.mutateAsync({
-        ...(logged ? { id: logged.id } : {}),
         project_id: pid,
         payment_date: values.advance_date || todayISO(),
         amount: advance,
@@ -435,6 +436,7 @@ export function ProjectDialog({
         notes: "Advance received on booking (auto-recorded)",
       });
     }
+
 
 
     for (const [key, row] of Object.entries(rows)) {

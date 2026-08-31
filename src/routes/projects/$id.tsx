@@ -1,7 +1,6 @@
-import { createFileRoute, Link, useParams } from "@tanstack/react-router";
+import { createFileRoute, useParams } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
 import {
-  ArrowLeft,
   Phone,
   MessageCircle,
   Plus,

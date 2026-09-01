@@ -1,13 +1,26 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
-import { ChevronLeft, ChevronRight, TrendingDown, TrendingUp, Scale } from "lucide-react";
+import {
+  ChevronLeft,
+  ChevronRight,
+  Pencil,
+  Plus,
+  Scale,
+  Trash2,
+  TrendingDown,
+  TrendingUp,
+} from "lucide-react";
 import { AppShell } from "@/components/AppShell";
 import { PageHeader, StatCard } from "@/components/ui-kit";
+import { RecordDialog, type Field } from "@/components/RecordDialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { useExpenses, usePayments } from "@/lib/db";
+import { useExpenses, usePayments, useProjects, useRemove, useUpsert } from "@/lib/db";
 import { fmtDate, inr, localISO, todayISO, dayOffsetISO } from "@/lib/format";
 import { cn } from "@/lib/utils";
+import { PAY_ACCOUNTS } from "@/lib/accounts";
+import { BankAccountField, needsBankAccount } from "@/components/BankAccountField";
+import { useExpenseCategories } from "@/lib/expense-categories";
 
 const MODE_LABELS: Record<string, string> = {
   cash: "Cash in Hand",
@@ -17,6 +30,11 @@ const MODE_LABELS: Record<string, string> = {
   card: "Card",
 };
 const modeLabel = (v?: string | null) => MODE_LABELS[v ?? ""] ?? (v ? v : "Unspecified");
+
+const MODE_OPTIONS = ["cash", "upi", "bank", "cheque", "card"].map((v) => ({
+  value: v,
+  label: modeLabel(v),
+}));
 
 export const Route = createFileRoute("/daybook")({
   head: () => ({
@@ -44,6 +62,7 @@ type Row = {
   amount: number;
   mode: string;
   note?: string | null;
+  raw: Record<string, any>;
 };
 
 function DaybookPage() {
@@ -52,6 +71,93 @@ function DaybookPage() {
 
   const { data: payments = [] } = usePayments();
   const { data: expenses = [] } = useExpenses();
+  const { data: projects = [] } = useProjects();
+  const { options: categoryOptions, addCategory } = useExpenseCategories();
+
+  const savePayment = useUpsert("project_payments", "Payment");
+  const removePayment = useRemove("project_payments", "Payment");
+  const saveExpense = useUpsert("project_expenses", "Expense");
+  const removeExpense = useRemove("project_expenses", "Expense");
+
+  const [addIncome, setAddIncome] = useState(false);
+  const [addExpense, setAddExpense] = useState(false);
+  const [editIncome, setEditIncome] = useState<Record<string, any> | null>(null);
+  const [editExpense, setEditExpense] = useState<Record<string, any> | null>(null);
+
+  const projectOptions = projects.map((p) => ({
+    value: p.id,
+    label: `${p.project_name}${p.clients?.name ? ` — ${p.clients.name}` : ""}`,
+  }));
+
+  const incomeFields: Field[] = [
+    {
+      name: "project_id",
+      label: "Project / Client",
+      type: "select",
+      required: true,
+      options: projectOptions,
+      full: true,
+    },
+    { name: "payment_date", label: "Payment date", type: "date", required: true },
+    { name: "amount", label: "Amount (₹)", type: "number", required: true },
+    {
+      name: "payment_mode",
+      label: "Payment mode",
+      type: "select",
+      required: true,
+      options: MODE_OPTIONS,
+    },
+    {
+      name: "account",
+      label: "Deposited to account",
+      type: "select",
+      options: PAY_ACCOUNTS.map((a) => ({ value: a.value, label: a.label })),
+    },
+    {
+      name: "notes",
+      label: "Notes / payment stage",
+      type: "textarea",
+      placeholder: "Advance / Interim / Final",
+    },
+  ];
+
+  const expenseFields: Field[] = [
+    {
+      name: "project_id",
+      label: "Project / Client (leave blank for Studio Overhead / General)",
+      type: "select",
+      options: projectOptions,
+      full: true,
+    },
+    {
+      name: "category",
+      label: "Category",
+      type: "select",
+      required: true,
+      options: categoryOptions,
+      onAddOption: addCategory,
+      addOptionTitle: "Add expense category",
+      addOptionLabel: "Category name",
+    },
+    { name: "amount", label: "Amount (₹)", type: "number", required: true },
+    { name: "expense_date", label: "Expense date", type: "date", required: true },
+    { name: "paid_to", label: "Paid to" },
+    { name: "payment_mode", label: "Paid via", type: "select", options: MODE_OPTIONS },
+    { name: "notes", label: "Notes", type: "textarea" },
+  ];
+
+  const bankExtra = (values: Record<string, any>, set: (n: string, v: any) => void) =>
+    needsBankAccount(values.payment_mode) ? (
+      <BankAccountField
+        value={values.bank_account_id ?? null}
+        onChange={(v) => set("bank_account_id", v)}
+      />
+    ) : null;
+
+  const withBank = (v: Record<string, any>) => ({
+    ...v,
+    bank_account_id: needsBankAccount(v.payment_mode) ? (v.bank_account_id ?? null) : null,
+  });
 
   const income: Row[] = useMemo(
     () =>
@@ -64,6 +170,7 @@ function DaybookPage() {
           amount: Number(p.amount ?? 0),
           mode: modeLabel(p.payment_mode),
           note: p.notes ?? p.reference_no ?? null,
+          raw: p as any,
         })),
     [payments, date],
   );
@@ -82,6 +189,7 @@ function DaybookPage() {
           amount: Number(e.amount ?? 0),
           mode: modeLabel(e.payment_mode),
           note: e.notes ?? e.paid_to ?? null,
+          raw: e as any,
         })),
     [expenses, date],
   );
@@ -99,12 +207,13 @@ function DaybookPage() {
   const isToday = date === todayISO();
   const isYesterday = date === dayOffsetISO(-1);
 
+  const confirmDelete = (fn: () => void) => {
+    if (typeof window === "undefined" || window.confirm("Delete this transaction?")) fn();
+  };
+
   return (
     <AppShell>
-      <PageHeader
-        title="Daily Daybook"
-        subtitle={`Cash flow for ${fmtDate(date)}`}
-      />
+      <PageHeader title="Daily Daybook" subtitle={`Cash flow for ${fmtDate(date)}`} />
 
       {/* Date selector */}
       <div className="surface flex flex-wrap items-center gap-2 p-3">
@@ -131,6 +240,14 @@ function DaybookPage() {
             onClick={() => setDate(dayOffsetISO(-1))}
           >
             Yesterday
+          </Button>
+        </div>
+        <div className="ml-auto flex flex-wrap gap-2">
+          <Button size="sm" onClick={() => setAddIncome(true)}>
+            <Plus className="mr-1.5 h-4 w-4" /> Record Income
+          </Button>
+          <Button size="sm" variant="outline" onClick={() => setAddExpense(true)}>
+            <Plus className="mr-1.5 h-4 w-4" /> Add Expense
           </Button>
         </div>
       </div>
@@ -181,35 +298,101 @@ function DaybookPage() {
         ))}
       </div>
 
-      {income.length === 0 && outflow.length === 0 ? (
-        <div className="surface mt-4 p-10 text-center text-sm text-muted-foreground">
-          No transactions recorded for this day
+      <div className="mt-4 grid gap-4 lg:grid-cols-2">
+        <div className={cn(tab === "expense" && "hidden lg:block")}>
+          <Column
+            title="INCOME / INFLOW (വരവ്)"
+            dot="🟢"
+            rows={income}
+            total={inTotal}
+            totalLabel="Day's income"
+            tone="success"
+            empty="No income recorded for this day"
+            addLabel="Record Income"
+            onAdd={() => setAddIncome(true)}
+            onEdit={(r) => setEditIncome(r.raw)}
+            onDelete={(r) => confirmDelete(() => removePayment.mutate(r.id))}
+          />
         </div>
-      ) : (
-        <div className="mt-4 grid gap-4 lg:grid-cols-2">
-          <div className={cn(tab === "expense" && "hidden lg:block")}>
-            <Column
-              title="INCOME / INFLOW (വരവ്)"
-              dot="🟢"
-              rows={income}
-              total={inTotal}
-              totalLabel="Day's income"
-              tone="success"
-              empty="No income recorded for this day"
-            />
-          </div>
-          <div className={cn(tab === "income" && "hidden lg:block")}>
-            <Column
-              title="EXPENSES / OUTFLOW (ചിലവ്)"
-              dot="🔴"
-              rows={outflow}
-              total={outTotal}
-              totalLabel="Day's expenses"
-              tone="destructive"
-              empty="No expenses recorded for this day"
-            />
-          </div>
+        <div className={cn(tab === "income" && "hidden lg:block")}>
+          <Column
+            title="EXPENSES / OUTFLOW (ചിലവ്)"
+            dot="🔴"
+            rows={outflow}
+            total={outTotal}
+            totalLabel="Day's expenses"
+            tone="destructive"
+            empty="No expenses recorded for this day"
+            addLabel="Add Expense"
+            onAdd={() => setAddExpense(true)}
+            onEdit={(r) => setEditExpense(r.raw)}
+            onDelete={(r) => confirmDelete(() => removeExpense.mutate(r.id))}
+          />
         </div>
+      </div>
+
+      {addIncome && (
+        <RecordDialog
+          title="Add Daily Income"
+          submitLabel="Save Income"
+          fields={incomeFields}
+          initial={{ payment_date: date, payment_mode: "cash" }}
+          open={addIncome}
+          onOpenChange={setAddIncome}
+          extra={bankExtra}
+          onSubmit={async (v) => {
+            await savePayment.mutateAsync(withBank(v));
+            setAddIncome(false);
+          }}
+        />
+      )}
+
+      {editIncome && (
+        <RecordDialog
+          title="Edit Income"
+          submitLabel="Update Income"
+          fields={incomeFields}
+          initial={editIncome}
+          open={!!editIncome}
+          onOpenChange={(v) => !v && setEditIncome(null)}
+          extra={bankExtra}
+          onSubmit={async (v) => {
+            await savePayment.mutateAsync({ ...withBank(v), id: editIncome.id });
+            setEditIncome(null);
+          }}
+        />
+      )}
+
+      {addExpense && (
+        <RecordDialog
+          title="Add Daily Expense"
+          submitLabel="Save Expense"
+          fields={expenseFields}
+          initial={{ expense_date: date, payment_mode: "cash" }}
+          open={addExpense}
+          onOpenChange={setAddExpense}
+          extra={bankExtra}
+          onSubmit={async (v) => {
+            await saveExpense.mutateAsync(withBank(v));
+            setAddExpense(false);
+          }}
+        />
+      )}
+
+      {editExpense && (
+        <RecordDialog
+          title="Edit Expense"
+          submitLabel="Update Expense"
+          fields={expenseFields}
+          initial={editExpense}
+          open={!!editExpense}
+          onOpenChange={(v) => !v && setEditExpense(null)}
+          extra={bankExtra}
+          onSubmit={async (v) => {
+            await saveExpense.mutateAsync({ ...withBank(v), id: editExpense.id });
+            setEditExpense(null);
+          }}
+        />
       )}
     </AppShell>
   );
@@ -223,6 +406,10 @@ function Column({
   totalLabel,
   tone,
   empty,
+  addLabel,
+  onAdd,
+  onEdit,
+  onDelete,
 }: {
   title: string;
   dot: string;
@@ -231,23 +418,54 @@ function Column({
   totalLabel: string;
   tone: "success" | "destructive";
   empty: string;
+  addLabel: string;
+  onAdd: () => void;
+  onEdit: (r: Row) => void;
+  onDelete: (r: Row) => void;
 }) {
   const toneText = tone === "success" ? "text-success" : "text-destructive";
   return (
     <div className="surface flex h-full flex-col p-4">
-      <p className="mb-3 flex items-center gap-2 text-sm font-semibold">
-        <span aria-hidden>{dot}</span>
-        {title}
-      </p>
+      <div className="mb-3 flex flex-wrap items-center justify-between gap-2">
+        <p className="flex items-center gap-2 text-sm font-semibold">
+          <span aria-hidden>{dot}</span>
+          {title}
+        </p>
+        <Button size="sm" variant="outline" onClick={onAdd}>
+          <Plus className="mr-1.5 h-4 w-4" /> {addLabel}
+        </Button>
+      </div>
       {rows.length === 0 ? (
         <p className="py-8 text-center text-sm text-muted-foreground">{empty}</p>
       ) : (
         <ul className="flex-1 divide-y divide-border">
           {rows.map((r) => (
             <li key={r.id} className="py-3">
-              <div className="flex items-start justify-between gap-3">
+              <div className="flex items-start justify-between gap-2">
                 <p className="min-w-0 flex-1 text-sm font-semibold">{r.title}</p>
                 <p className={cn("shrink-0 text-sm font-semibold", toneText)}>{inr(r.amount)}</p>
+                <div className="flex shrink-0 items-center gap-0.5">
+                  <Button
+                    size="icon"
+                    variant="ghost"
+                    className="h-9 w-9"
+                    aria-label="Edit transaction"
+                    title="Edit transaction"
+                    onClick={() => onEdit(r)}
+                  >
+                    <Pencil className="h-4 w-4" />
+                  </Button>
+                  <Button
+                    size="icon"
+                    variant="ghost"
+                    className="h-9 w-9"
+                    aria-label="Delete transaction"
+                    title="Delete transaction"
+                    onClick={() => onDelete(r)}
+                  >
+                    <Trash2 className="h-4 w-4 text-destructive" />
+                  </Button>
+                </div>
               </div>
               {r.sub && <p className="mt-0.5 text-xs text-muted-foreground">{r.sub}</p>}
               <div className="mt-1 flex flex-wrap items-center gap-2 text-xs text-muted-foreground">

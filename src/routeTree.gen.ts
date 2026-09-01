@@ -19,6 +19,7 @@ import { Route as RawDataRouteImport } from './routes/raw-data'
 import { Route as PaymentsRouteImport } from './routes/payments'
 import { Route as ExpensesRouteImport } from './routes/expenses'
 import { Route as DeliveryRouteImport } from './routes/delivery'
+import { Route as DaybookRouteImport } from './routes/daybook'
 import { Route as ClientsRouteImport } from './routes/clients'
 import { Route as CalendarRouteImport } from './routes/calendar'
 import { Route as AuthRouteImport } from './routes/auth'
@@ -78,6 +79,11 @@ const DeliveryRoute = DeliveryRouteImport.update({
   path: '/delivery',
   getParentRoute: () => rootRouteImport,
 } as any)
+const DaybookRoute = DaybookRouteImport.update({
+  id: '/daybook',
+  path: '/daybook',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ClientsRoute = ClientsRouteImport.update({
   id: '/clients',
   path: '/clients',
@@ -125,6 +131,7 @@ export interface FileRoutesByFullPath {
   '/auth': typeof AuthRoute
   '/calendar': typeof CalendarRoute
   '/clients': typeof ClientsRoute
+  '/daybook': typeof DaybookRoute
   '/delivery': typeof DeliveryRoute
   '/expenses': typeof ExpensesRoute
   '/payments': typeof PaymentsRoute
@@ -145,6 +152,7 @@ export interface FileRoutesByTo {
   '/auth': typeof AuthRoute
   '/calendar': typeof CalendarRoute
   '/clients': typeof ClientsRoute
+  '/daybook': typeof DaybookRoute
   '/delivery': typeof DeliveryRoute
   '/expenses': typeof ExpensesRoute
   '/payments': typeof PaymentsRoute
@@ -166,6 +174,7 @@ export interface FileRoutesById {
   '/auth': typeof AuthRoute
   '/calendar': typeof CalendarRoute
   '/clients': typeof ClientsRoute
+  '/daybook': typeof DaybookRoute
   '/delivery': typeof DeliveryRoute
   '/expenses': typeof ExpensesRoute
   '/payments': typeof PaymentsRoute
@@ -188,6 +197,7 @@ export interface FileRouteTypes {
     | '/auth'
     | '/calendar'
     | '/clients'
+    | '/daybook'
     | '/delivery'
     | '/expenses'
     | '/payments'
@@ -208,6 +218,7 @@ export interface FileRouteTypes {
     | '/auth'
     | '/calendar'
     | '/clients'
+    | '/daybook'
     | '/delivery'
     | '/expenses'
     | '/payments'
@@ -228,6 +239,7 @@ export interface FileRouteTypes {
     | '/auth'
     | '/calendar'
     | '/clients'
+    | '/daybook'
     | '/delivery'
     | '/expenses'
     | '/payments'
@@ -249,6 +261,7 @@ export interface RootRouteChildren {
   AuthRoute: typeof AuthRoute
   CalendarRoute: typeof CalendarRoute
   ClientsRoute: typeof ClientsRoute
+  DaybookRoute: typeof DaybookRoute
   DeliveryRoute: typeof DeliveryRoute
   ExpensesRoute: typeof ExpensesRoute
   PaymentsRoute: typeof PaymentsRoute
@@ -336,6 +349,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DeliveryRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/daybook': {
+      id: '/daybook'
+      path: '/daybook'
+      fullPath: '/daybook'
+      preLoaderRoute: typeof DaybookRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/clients': {
       id: '/clients'
       path: '/clients'
@@ -401,6 +421,7 @@ const rootRouteChildren: RootRouteChildren = {
   AuthRoute: AuthRoute,
   CalendarRoute: CalendarRoute,
   ClientsRoute: ClientsRoute,
+  DaybookRoute: DaybookRoute,
   DeliveryRoute: DeliveryRoute,
   ExpensesRoute: ExpensesRoute,
   PaymentsRoute: PaymentsRoute,

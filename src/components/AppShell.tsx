@@ -31,6 +31,7 @@ export const NAV = [
   { to: "/clients", label: "Clients", icon: Users, adminOnly: true },
   { to: "/projects", label: "Projects", icon: FolderKanban, adminOnly: false },
   { to: "/calendar", label: "Calendar", icon: CalendarDays, adminOnly: false },
+  { to: "/daybook", label: "Daily Daybook", icon: BookOpen, adminOnly: true },
   { to: "/payments", label: "Payments", icon: Wallet, adminOnly: true },
   { to: "/expenses", label: "Expenses", icon: Receipt, adminOnly: true },
   { to: "/reimbursables", label: "Reimbursables", icon: Wallet, adminOnly: true },

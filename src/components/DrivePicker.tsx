@@ -144,7 +144,6 @@ export function DrivePicker({ value, onChange, className, label = "Select Hard D
         </SelectContent>
       </Select>
 
-      {isOther && value !== OTHER_DRIVE ? null : null}
       {isOther && (
         <Input
           className="mt-2 h-9 text-xs"

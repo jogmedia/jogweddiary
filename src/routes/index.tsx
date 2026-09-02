@@ -32,6 +32,8 @@ import { TravelBadge, travelState } from "@/components/TravelBadge";
 import { BankBalancesWidget, OwnerSalaryWidget } from "@/components/MoneyWidgets";
 import { MonthlyFinanceCard } from "@/components/MonthlyFinance";
 import { DashboardMetricCards } from "@/components/DashboardMetrics";
+import { TodayDaybook } from "@/components/TodayDaybook";
+
 
 import { currentMonthKey } from "@/lib/month-finance";
 
@@ -198,6 +200,12 @@ function Dashboard() {
       <div className="mt-4">
         <ShootDay date={dayOffsetISO(2)} title="Day After Tomorrow's Shoot" />
       </div>
+
+      {/* Today's daybook snapshot */}
+      <div className="mt-4">
+        <TodayDaybook />
+      </div>
+
 
       {/* 2. Crew reminders below daily shoots */}
       <CrewReminders />

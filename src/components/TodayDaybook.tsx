@@ -30,6 +30,7 @@ type Row = {
   sub: string;
   amount: number;
   mode: string;
+  projectId?: string | null;
   raw: Record<string, any>;
 };
 
@@ -129,6 +130,7 @@ export function TodayDaybook() {
           sub: p.projects?.project_name ?? "Studio income",
           amount: Number(p.amount ?? 0),
           mode: modeLabel(p.payment_mode),
+          projectId: (p as any).project_id,
           raw: p as any,
         })),
     [payments, today],
@@ -147,6 +149,7 @@ export function TodayDaybook() {
               : (e.projects?.project_name ?? "Studio overhead"),
           amount: Number(e.amount ?? 0),
           mode: modeLabel(e.payment_mode),
+          projectId: (e as any).project_id,
           raw: e as any,
         })),
     [expenses, today],
@@ -163,10 +166,25 @@ export function TodayDaybook() {
   const TransactionRow = ({ row, variant }: { row: Row; variant: "income" | "expense" }) => (
     <li className="flex items-start gap-2 py-2.5">
       <div className="min-w-0 flex-1">
-        <p className="truncate text-sm font-medium">{row.title}</p>
-        <p className="truncate text-xs text-muted-foreground">
-          {row.sub} · {row.mode}
-        </p>
+        {row.projectId ? (
+          <Link
+            to="/projects/$id"
+            params={{ id: row.projectId }}
+            className="group block cursor-pointer"
+          >
+            <p className="truncate text-sm font-medium group-hover:underline">{row.title}</p>
+            <p className="truncate text-xs text-muted-foreground group-hover:underline">
+              {row.sub} · {row.mode}
+            </p>
+          </Link>
+        ) : (
+          <>
+            <p className="truncate text-sm font-medium">{row.title}</p>
+            <p className="truncate text-xs text-muted-foreground">
+              {row.sub} · {row.mode}
+            </p>
+          </>
+        )}
       </div>
       <p className={cn("shrink-0 text-sm font-semibold", variant === "income" ? "text-success" : "text-destructive")}>
         {inr(row.amount)}

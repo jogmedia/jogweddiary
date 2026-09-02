@@ -244,8 +244,8 @@ function ProjectDetail() {
   return (
     <AppShell>
       <PageHeader
-        backTo="/projects"
-        backLabel="All projects"
+        backTo="/"
+        backLabel="Back to Dashboard"
         title={project.project_name}
         subtitle={`${project.clients?.name ?? "—"} · ${fmtDate(project.event_date)} · ${project.venue ?? "Venue TBD"} · ${project.package_name ?? "No package"}`}
         actions={

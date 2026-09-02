@@ -1,4 +1,4 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
 import {
   ChevronLeft,
@@ -62,6 +62,7 @@ type Row = {
   amount: number;
   mode: string;
   note?: string | null;
+  projectId?: string | null;
   raw: Record<string, any>;
 };
 
@@ -170,6 +171,7 @@ function DaybookPage() {
           amount: Number(p.amount ?? 0),
           mode: modeLabel(p.payment_mode),
           note: p.notes ?? p.reference_no ?? null,
+          projectId: (p as any).project_id,
           raw: p as any,
         })),
     [payments, date],
@@ -189,6 +191,7 @@ function DaybookPage() {
           amount: Number(e.amount ?? 0),
           mode: modeLabel(e.payment_mode),
           note: e.notes ?? e.paid_to ?? null,
+          projectId: (e as any).project_id,
           raw: e as any,
         })),
     [expenses, date],
@@ -442,7 +445,25 @@ function Column({
           {rows.map((r) => (
             <li key={r.id} className="py-3">
               <div className="flex items-start justify-between gap-2">
-                <p className="min-w-0 flex-1 text-sm font-semibold">{r.title}</p>
+                {r.projectId ? (
+                  <Link
+                    to="/projects/$id"
+                    params={{ id: r.projectId }}
+                    className="group min-w-0 flex-1 cursor-pointer"
+                  >
+                    <p className="truncate text-sm font-semibold group-hover:underline">{r.title}</p>
+                    {r.sub && (
+                      <p className="mt-0.5 truncate text-xs text-muted-foreground group-hover:underline">
+                        {r.sub}
+                      </p>
+                    )}
+                  </Link>
+                ) : (
+                  <div className="min-w-0 flex-1">
+                    <p className="text-sm font-semibold">{r.title}</p>
+                    {r.sub && <p className="mt-0.5 text-xs text-muted-foreground">{r.sub}</p>}
+                  </div>
+                )}
                 <p className={cn("shrink-0 text-sm font-semibold", toneText)}>{inr(r.amount)}</p>
                 <div className="flex shrink-0 items-center gap-0.5">
                   <Button
@@ -467,7 +488,6 @@ function Column({
                   </Button>
                 </div>
               </div>
-              {r.sub && <p className="mt-0.5 text-xs text-muted-foreground">{r.sub}</p>}
               <div className="mt-1 flex flex-wrap items-center gap-2 text-xs text-muted-foreground">
                 <span className="rounded-full border border-border px-2 py-0.5">{r.mode}</span>
                 {r.note && <span className="min-w-0 truncate">{r.note}</span>}

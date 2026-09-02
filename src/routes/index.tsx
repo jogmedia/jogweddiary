@@ -32,6 +32,8 @@ import { TravelBadge, travelState } from "@/components/TravelBadge";
 import { BankBalancesWidget, OwnerSalaryWidget } from "@/components/MoneyWidgets";
 import { MonthlyFinanceCard } from "@/components/MonthlyFinance";
 import { DashboardMetricCards } from "@/components/DashboardMetrics";
+import { TodayDaybook } from "@/components/TodayDaybook";
+
 
 import { currentMonthKey } from "@/lib/month-finance";
 

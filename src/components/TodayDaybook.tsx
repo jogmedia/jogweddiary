@@ -36,7 +36,7 @@ type Row = {
 /** Compact today-only cash flow widget for the studio dashboard. */
 export function TodayDaybook() {
   const today = todayISO();
-  const [tab, setTab] = useState<"income" | "expense">("income");
+  const [tab, setTab] = useState<"all" | "income" | "expense">("all");
 
   const { data: payments = [] } = usePayments();
   const { data: expenses = [] } = useExpenses();
@@ -160,7 +160,43 @@ export function TodayDaybook() {
     if (typeof window === "undefined" || window.confirm("Delete this transaction?")) fn();
   };
 
-  const rows = tab === "income" ? income : outflow;
+  const TransactionRow = ({ row, variant }: { row: Row; variant: "income" | "expense" }) => (
+    <li className="flex items-start gap-2 py-2.5">
+      <div className="min-w-0 flex-1">
+        <p className="truncate text-sm font-medium">{row.title}</p>
+        <p className="truncate text-xs text-muted-foreground">
+          {row.sub} · {row.mode}
+        </p>
+      </div>
+      <p className={cn("shrink-0 text-sm font-semibold", variant === "income" ? "text-success" : "text-destructive")}>
+        {inr(row.amount)}
+      </p>
+      <div className="flex shrink-0 items-center gap-0.5">
+        <Button
+          size="icon"
+          variant="ghost"
+          className="h-9 w-9"
+          aria-label="Edit transaction"
+          title="Edit transaction"
+          onClick={() => (variant === "income" ? setEditIncome(row.raw) : setEditExpense(row.raw))}
+        >
+          <Pencil className="h-4 w-4" />
+        </Button>
+        <Button
+          size="icon"
+          variant="ghost"
+          className="h-9 w-9"
+          aria-label="Delete transaction"
+          title="Delete transaction"
+          onClick={() =>
+            confirmDelete(() => (variant === "income" ? removePayment.mutate(row.id) : removeExpense.mutate(row.id)))
+          }
+        >
+          <Trash2 className="h-4 w-4 text-destructive" />
+        </Button>
+      </div>
+    </li>
+  );
 
   return (
     <div className="surface p-4">
@@ -203,8 +239,9 @@ export function TodayDaybook() {
       </div>
 
       {/* Tabs */}
-      <div className="mt-3 grid grid-cols-2 gap-1 rounded-xl border border-border bg-card p-1">
+      <div className="mt-3 grid grid-cols-3 gap-1 rounded-xl border border-border bg-card p-1">
         {([
+          ["all", "All"],
           ["income", `Today's Income (${income.length})`],
           ["expense", `Today's Expenses (${outflow.length})`],
         ] as const).map(([key, label]) => (
@@ -213,7 +250,7 @@ export function TodayDaybook() {
             type="button"
             onClick={() => setTab(key)}
             className={cn(
-              "min-h-10 rounded-lg px-2 text-xs font-medium transition-colors",
+              "min-h-10 rounded-lg px-2 text-xs font-medium leading-tight transition-colors",
               tab === key ? "bg-primary text-primary-foreground" : "text-muted-foreground",
             )}
           >
@@ -222,55 +259,79 @@ export function TodayDaybook() {
         ))}
       </div>
 
-      {rows.length === 0 ? (
-        <p className="py-6 text-center text-sm text-muted-foreground">
-          No {tab === "income" ? "income" : "expense"} logged yet for today
-        </p>
+      {tab === "all" ? (
+        <>
+          <div className="mt-3 grid grid-cols-1 gap-4 md:grid-cols-2">
+            {/* Income column */}
+            <div className="flex min-w-0 flex-col rounded-xl border border-border bg-card p-3">
+              <div className="mb-2 border-b border-border pb-2">
+                <p className="text-sm font-bold text-success">INCOME (വരവ്)</p>
+              </div>
+              {income.length === 0 ? (
+                <p className="py-4 text-center text-xs text-muted-foreground">No income logged today</p>
+              ) : (
+                <ul className="flex-1 divide-y divide-border">
+                  {income.map((r) => (
+                    <TransactionRow key={r.id} row={r} variant="income" />
+                  ))}
+                </ul>
+              )}
+              <div className="mt-2 border-t border-border pt-2">
+                <p className="text-right text-sm font-bold text-success">Total Income: {inr(inTotal)}</p>
+              </div>
+            </div>
+
+            {/* Expense column */}
+            <div className="flex min-w-0 flex-col rounded-xl border border-border bg-card p-3">
+              <div className="mb-2 border-b border-border pb-2">
+                <p className="text-sm font-bold text-destructive">EXPENSES (ചിലവ്)</p>
+              </div>
+              {outflow.length === 0 ? (
+                <p className="py-4 text-center text-xs text-muted-foreground">No expenses logged today</p>
+              ) : (
+                <ul className="flex-1 divide-y divide-border">
+                  {outflow.map((r) => (
+                    <TransactionRow key={r.id} row={r} variant="expense" />
+                  ))}
+                </ul>
+              )}
+              <div className="mt-2 border-t border-border pt-2">
+                <p className="text-right text-sm font-bold text-destructive">Total Expenses: {inr(outTotal)}</p>
+              </div>
+            </div>
+          </div>
+
+          {/* Net balance bar */}
+          <div className="mt-3 flex flex-col justify-between gap-2 rounded-xl border border-border bg-card p-3 text-xs sm:flex-row sm:items-center sm:text-sm">
+            <span className="font-semibold">
+              Total Income: <span className="text-success">{inr(inTotal)}</span>
+            </span>
+            <span className="hidden sm:inline text-muted-foreground">|</span>
+            <span className="font-semibold">
+              Total Expenses: <span className="text-destructive">{inr(outTotal)}</span>
+            </span>
+            <span className="hidden sm:inline text-muted-foreground">|</span>
+            <span className={cn("font-bold", net >= 0 ? "text-success" : "text-destructive")}>
+              Net Balance: {inr(net)}
+            </span>
+          </div>
+        </>
+      ) : tab === "income" ? (
+        income.length === 0 ? (
+          <p className="py-6 text-center text-sm text-muted-foreground">No income logged yet for today</p>
+        ) : (
+          <ul className="mt-1 divide-y divide-border">
+            {income.map((r) => (
+              <TransactionRow key={r.id} row={r} variant="income" />
+            ))}
+          </ul>
+        )
+      ) : outflow.length === 0 ? (
+        <p className="py-6 text-center text-sm text-muted-foreground">No expenses logged yet for today</p>
       ) : (
         <ul className="mt-1 divide-y divide-border">
-          {rows.map((r) => (
-            <li key={r.id} className="flex items-start gap-2 py-2.5">
-              <div className="min-w-0 flex-1">
-                <p className="truncate text-sm font-medium">{r.title}</p>
-                <p className="truncate text-xs text-muted-foreground">
-                  {r.sub} · {r.mode}
-                </p>
-              </div>
-              <p
-                className={cn(
-                  "shrink-0 text-sm font-semibold",
-                  tab === "income" ? "text-success" : "text-destructive",
-                )}
-              >
-                {inr(r.amount)}
-              </p>
-              <div className="flex shrink-0 items-center gap-0.5">
-                <Button
-                  size="icon"
-                  variant="ghost"
-                  className="h-9 w-9"
-                  aria-label="Edit transaction"
-                  title="Edit transaction"
-                  onClick={() => (tab === "income" ? setEditIncome(r.raw) : setEditExpense(r.raw))}
-                >
-                  <Pencil className="h-4 w-4" />
-                </Button>
-                <Button
-                  size="icon"
-                  variant="ghost"
-                  className="h-9 w-9"
-                  aria-label="Delete transaction"
-                  title="Delete transaction"
-                  onClick={() =>
-                    confirmDelete(() =>
-                      tab === "income" ? removePayment.mutate(r.id) : removeExpense.mutate(r.id),
-                    )
-                  }
-                >
-                  <Trash2 className="h-4 w-4 text-destructive" />
-                </Button>
-              </div>
-            </li>
+          {outflow.map((r) => (
+            <TransactionRow key={r.id} row={r} variant="expense" />
           ))}
         </ul>
       )}

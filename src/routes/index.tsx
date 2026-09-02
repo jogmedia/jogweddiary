@@ -199,6 +199,12 @@ function Dashboard() {
         <ShootDay date={dayOffsetISO(2)} title="Day After Tomorrow's Shoot" />
       </div>
 
+      {/* Today's daybook snapshot */}
+      <div className="mt-4">
+        <TodayDaybook />
+      </div>
+
+
       {/* 2. Crew reminders below daily shoots */}
       <CrewReminders />
 

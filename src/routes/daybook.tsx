@@ -219,50 +219,53 @@ function DaybookPage() {
       <PageHeader title="Daily Daybook" subtitle={`Cash flow for ${fmtDate(date)}`} />
 
       {/* Date selector */}
-      <div className="surface flex flex-wrap items-center gap-2 p-3">
-        <Button variant="outline" size="icon" aria-label="Previous day" onClick={() => step(-1)}>
-          <ChevronLeft className="h-4 w-4" />
-        </Button>
-        <Input
-          type="date"
-          value={date}
-          onChange={(e) => setDate(e.target.value || todayISO())}
-          className="h-11 w-[170px]"
-          aria-label="Select date"
-        />
-        <Button variant="outline" size="icon" aria-label="Next day" onClick={() => step(1)}>
-          <ChevronRight className="h-4 w-4" />
-        </Button>
-        <div className="flex flex-wrap gap-2">
-          <Button size="sm" variant={isToday ? "default" : "outline"} onClick={() => setDate(todayISO())}>
-            Today
-          </Button>
-          <Button
-            size="sm"
-            variant={isYesterday ? "default" : "outline"}
-            onClick={() => setDate(dayOffsetISO(-1))}
-          >
-            Yesterday
-          </Button>
-        </div>
-        <div className="ml-auto flex flex-wrap gap-2">
-          <Button size="sm" onClick={() => setAddIncome(true)}>
-            <Plus className="mr-1.5 h-4 w-4" /> Record Income
-          </Button>
-          <Button size="sm" variant="outline" onClick={() => setAddExpense(true)}>
-            <Plus className="mr-1.5 h-4 w-4" /> Add Expense
-          </Button>
+      <div className="surface p-3">
+        <div className="flex flex-col gap-3">
+          <div className="flex items-center justify-center gap-2">
+            <Button variant="outline" size="icon" aria-label="Previous day" onClick={() => step(-1)}>
+              <ChevronLeft className="h-4 w-4" />
+            </Button>
+            <Input
+              type="date"
+              value={date}
+              onChange={(e) => setDate(e.target.value || todayISO())}
+              className="h-11 max-w-[220px] flex-1 text-center"
+              aria-label="Select date"
+            />
+            <Button variant="outline" size="icon" aria-label="Next day" onClick={() => step(1)}>
+              <ChevronRight className="h-4 w-4" />
+            </Button>
+          </div>
+          <div className="flex items-center justify-center gap-2">
+            <Button
+              size="sm"
+              variant={isToday ? "default" : "outline"}
+              className="flex-1 sm:flex-none"
+              onClick={() => setDate(todayISO())}
+            >
+              Today
+            </Button>
+            <Button
+              size="sm"
+              variant={isYesterday ? "default" : "outline"}
+              className="flex-1 sm:flex-none"
+              onClick={() => setDate(dayOffsetISO(-1))}
+            >
+              Yesterday
+            </Button>
+          </div>
         </div>
       </div>
 
       {/* Summary */}
-      <div className="mt-4 grid grid-cols-2 gap-4 lg:grid-cols-3">
+      <div className="mt-4 grid grid-cols-3 gap-2">
         <StatCard
           label="Daily Income"
           value={inr(inTotal)}
           hint={`${income.length} entr${income.length === 1 ? "y" : "ies"}`}
           tone="success"
           icon={<TrendingUp className="h-4 w-4" />}
+          compact
         />
         <StatCard
           label="Daily Expenses"
@@ -270,6 +273,7 @@ function DaybookPage() {
           hint={`${outflow.length} entr${outflow.length === 1 ? "y" : "ies"}`}
           tone="destructive"
           icon={<TrendingDown className="h-4 w-4" />}
+          compact
         />
         <StatCard
           label="Net Balance"
@@ -277,16 +281,17 @@ function DaybookPage() {
           hint={net >= 0 ? "Surplus for the day" : "Deficit for the day"}
           tone={net >= 0 ? "success" : "destructive"}
           icon={<Scale className="h-4 w-4" />}
+          compact
         />
       </div>
 
       {/* Mobile toggle */}
       <div className="mt-4 grid grid-cols-3 gap-1 rounded-xl border border-border bg-card p-1 lg:hidden">
         {([
-          ["all", "All"],
-          ["income", `Income (${inr(inTotal)})`],
-          ["expense", `Expenses (${inr(outTotal)})`],
-        ] as const).map(([key, label]) => (
+          ["all", "All", "All"],
+          ["income", "Income", `Income (${inr(inTotal)})`],
+          ["expense", "Expenses", `Expenses (${inr(outTotal)})`],
+        ] as const).map(([key, mobileLabel, desktopLabel]) => (
           <button
             key={key}
             type="button"
@@ -296,7 +301,8 @@ function DaybookPage() {
               tab === key ? "bg-primary text-primary-foreground" : "text-muted-foreground",
             )}
           >
-            {label}
+            <span className="sm:hidden">{mobileLabel}</span>
+            <span className="hidden sm:inline">{desktopLabel}</span>
           </button>
         ))}
       </div>
@@ -429,12 +435,12 @@ function Column({
   const toneText = tone === "success" ? "text-success" : "text-destructive";
   return (
     <div className="surface flex h-full flex-col p-4">
-      <div className="mb-3 flex flex-wrap items-center justify-between gap-2">
-        <p className="flex items-center gap-2 text-sm font-semibold">
+      <div className="mb-3 grid grid-cols-[minmax(0,1fr)_auto] items-center gap-2 sm:flex sm:flex-wrap sm:justify-between">
+        <p className="flex min-w-0 items-center gap-2 text-sm font-semibold">
           <span aria-hidden>{dot}</span>
-          {title}
+          <span className="truncate">{title}</span>
         </p>
-        <Button size="sm" variant="outline" onClick={onAdd}>
+        <Button size="sm" variant="outline" className="shrink-0" onClick={onAdd}>
           <Plus className="mr-1.5 h-4 w-4" /> {addLabel}
         </Button>
       </div>
@@ -444,53 +450,57 @@ function Column({
         <ul className="flex-1 divide-y divide-border">
           {rows.map((r) => (
             <li key={r.id} className="py-3">
-              <div className="flex items-start justify-between gap-2">
-                {r.projectId ? (
-                  <Link
-                    to="/projects/$id"
-                    params={{ id: r.projectId }}
-                    className="group min-w-0 flex-1 cursor-pointer"
-                  >
-                    <p className="truncate text-sm font-semibold group-hover:underline">{r.title}</p>
-                    {r.sub && (
-                      <p className="mt-0.5 truncate text-xs text-muted-foreground group-hover:underline">
-                        {r.sub}
-                      </p>
-                    )}
-                  </Link>
-                ) : (
-                  <div className="min-w-0 flex-1">
-                    <p className="text-sm font-semibold">{r.title}</p>
-                    {r.sub && <p className="mt-0.5 text-xs text-muted-foreground">{r.sub}</p>}
+              <div className="grid grid-cols-[minmax(0,1fr)_auto] items-start gap-3">
+                <div className="min-w-0">
+                  {r.projectId ? (
+                    <Link
+                      to="/projects/$id"
+                      params={{ id: r.projectId }}
+                      className="group block cursor-pointer"
+                    >
+                      <p className="truncate text-sm font-semibold group-hover:underline">{r.title}</p>
+                      {r.sub && (
+                        <p className="mt-0.5 truncate text-xs text-muted-foreground group-hover:underline">
+                          {r.sub}
+                        </p>
+                      )}
+                    </Link>
+                  ) : (
+                    <div className="min-w-0">
+                      <p className="text-sm font-semibold">{r.title}</p>
+                      {r.sub && <p className="mt-0.5 text-xs text-muted-foreground">{r.sub}</p>}
+                    </div>
+                  )}
+                  <div className="mt-1 flex min-w-0 flex-wrap items-center gap-2 text-xs text-muted-foreground">
+                    <span className="shrink-0 rounded-full border border-border px-2 py-0.5">{r.mode}</span>
+                    {r.note && <span className="min-w-0 truncate">{r.note}</span>}
                   </div>
-                )}
-                <p className={cn("shrink-0 text-sm font-semibold", toneText)}>{inr(r.amount)}</p>
-                <div className="flex shrink-0 items-center gap-0.5">
-                  <Button
-                    size="icon"
-                    variant="ghost"
-                    className="h-9 w-9"
-                    aria-label="Edit transaction"
-                    title="Edit transaction"
-                    onClick={() => onEdit(r)}
-                  >
-                    <Pencil className="h-4 w-4" />
-                  </Button>
-                  <Button
-                    size="icon"
-                    variant="ghost"
-                    className="h-9 w-9"
-                    aria-label="Delete transaction"
-                    title="Delete transaction"
-                    onClick={() => onDelete(r)}
-                  >
-                    <Trash2 className="h-4 w-4 text-destructive" />
-                  </Button>
                 </div>
-              </div>
-              <div className="mt-1 flex flex-wrap items-center gap-2 text-xs text-muted-foreground">
-                <span className="rounded-full border border-border px-2 py-0.5">{r.mode}</span>
-                {r.note && <span className="min-w-0 truncate">{r.note}</span>}
+                <div className="flex shrink-0 flex-col items-end gap-1 sm:flex-row sm:items-center sm:gap-2">
+                  <p className={cn("whitespace-nowrap text-sm font-semibold", toneText)}>{inr(r.amount)}</p>
+                  <div className="flex shrink-0 items-center gap-0.5">
+                    <Button
+                      size="icon"
+                      variant="ghost"
+                      className="h-9 w-9"
+                      aria-label="Edit transaction"
+                      title="Edit transaction"
+                      onClick={() => onEdit(r)}
+                    >
+                      <Pencil className="h-4 w-4" />
+                    </Button>
+                    <Button
+                      size="icon"
+                      variant="ghost"
+                      className="h-9 w-9"
+                      aria-label="Delete transaction"
+                      title="Delete transaction"
+                      onClick={() => onDelete(r)}
+                    >
+                      <Trash2 className="h-4 w-4 text-destructive" />
+                    </Button>
+                  </div>
+                </div>
               </div>
             </li>
           ))}

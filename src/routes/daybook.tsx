@@ -219,39 +219,41 @@ function DaybookPage() {
       <PageHeader title="Daily Daybook" subtitle={`Cash flow for ${fmtDate(date)}`} />
 
       {/* Date selector */}
-      <div className="surface flex flex-wrap items-center gap-2 p-3">
-        <Button variant="outline" size="icon" aria-label="Previous day" onClick={() => step(-1)}>
-          <ChevronLeft className="h-4 w-4" />
-        </Button>
-        <Input
-          type="date"
-          value={date}
-          onChange={(e) => setDate(e.target.value || todayISO())}
-          className="h-11 w-[170px]"
-          aria-label="Select date"
-        />
-        <Button variant="outline" size="icon" aria-label="Next day" onClick={() => step(1)}>
-          <ChevronRight className="h-4 w-4" />
-        </Button>
-        <div className="flex flex-wrap gap-2">
-          <Button size="sm" variant={isToday ? "default" : "outline"} onClick={() => setDate(todayISO())}>
-            Today
-          </Button>
-          <Button
-            size="sm"
-            variant={isYesterday ? "default" : "outline"}
-            onClick={() => setDate(dayOffsetISO(-1))}
-          >
-            Yesterday
-          </Button>
-        </div>
-        <div className="ml-auto flex flex-wrap gap-2">
-          <Button size="sm" onClick={() => setAddIncome(true)}>
-            <Plus className="mr-1.5 h-4 w-4" /> Record Income
-          </Button>
-          <Button size="sm" variant="outline" onClick={() => setAddExpense(true)}>
-            <Plus className="mr-1.5 h-4 w-4" /> Add Expense
-          </Button>
+      <div className="surface p-3">
+        <div className="flex flex-col gap-3">
+          <div className="flex items-center justify-center gap-2">
+            <Button variant="outline" size="icon" aria-label="Previous day" onClick={() => step(-1)}>
+              <ChevronLeft className="h-4 w-4" />
+            </Button>
+            <Input
+              type="date"
+              value={date}
+              onChange={(e) => setDate(e.target.value || todayISO())}
+              className="h-11 max-w-[220px] flex-1 text-center"
+              aria-label="Select date"
+            />
+            <Button variant="outline" size="icon" aria-label="Next day" onClick={() => step(1)}>
+              <ChevronRight className="h-4 w-4" />
+            </Button>
+          </div>
+          <div className="flex items-center justify-center gap-2">
+            <Button
+              size="sm"
+              variant={isToday ? "default" : "outline"}
+              className="flex-1 sm:flex-none"
+              onClick={() => setDate(todayISO())}
+            >
+              Today
+            </Button>
+            <Button
+              size="sm"
+              variant={isYesterday ? "default" : "outline"}
+              className="flex-1 sm:flex-none"
+              onClick={() => setDate(dayOffsetISO(-1))}
+            >
+              Yesterday
+            </Button>
+          </div>
         </div>
       </div>
 

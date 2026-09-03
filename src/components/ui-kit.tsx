@@ -76,12 +76,14 @@ export function StatCard({
   hint,
   icon,
   tone = "default",
+  compact = false,
 }: {
   label: string;
   value: string;
   hint?: string;
   icon?: ReactNode;
   tone?: "default" | "success" | "warning" | "destructive";
+  compact?: boolean;
 }) {
   const toneClass =
     tone === "success"
@@ -92,14 +94,36 @@ export function StatCard({
           ? "text-destructive"
           : "text-foreground";
   return (
-    <div className="surface flex h-full min-h-[112px] flex-col justify-between p-4 sm:p-5">
-      <div className="flex items-start justify-between gap-2">
-        <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">{label}</p>
+    <div
+      className={cn(
+        "surface flex h-full flex-col justify-between",
+        compact ? "min-h-[72px] p-2 sm:min-h-[112px] sm:p-4" : "min-h-[112px] p-4 sm:p-5",
+      )}
+    >
+      <div className="flex items-start justify-between gap-1">
+        <p
+          className={cn(
+            "font-medium uppercase tracking-wide text-muted-foreground",
+            compact ? "text-[10px] leading-tight sm:text-xs" : "text-xs",
+          )}
+        >
+          {label}
+        </p>
         {icon && <span className="text-muted-foreground">{icon}</span>}
       </div>
-      <div className="mt-3">
-        <p className={cn("stat-value", toneClass)}>{value}</p>
-        {hint && <p className="mt-1 text-xs text-muted-foreground">{hint}</p>}
+      <div className="mt-2 sm:mt-3">
+        <p
+          className={cn(
+            "font-bold leading-tight tracking-tight tabular-nums",
+            compact ? "text-sm sm:text-[1.35rem] sm:leading-snug" : "stat-value",
+            toneClass,
+          )}
+        >
+          {value}
+        </p>
+        {hint && (
+          <p className={cn("mt-1 text-xs text-muted-foreground", compact && "hidden sm:block")}>{hint}</p>
+        )}
       </div>
     </div>
   );

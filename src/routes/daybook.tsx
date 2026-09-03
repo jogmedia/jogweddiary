@@ -258,13 +258,14 @@ function DaybookPage() {
       </div>
 
       {/* Summary */}
-      <div className="mt-4 grid grid-cols-2 gap-4 lg:grid-cols-3">
+      <div className="mt-4 grid grid-cols-3 gap-2">
         <StatCard
           label="Daily Income"
           value={inr(inTotal)}
           hint={`${income.length} entr${income.length === 1 ? "y" : "ies"}`}
           tone="success"
           icon={<TrendingUp className="h-4 w-4" />}
+          compact
         />
         <StatCard
           label="Daily Expenses"
@@ -272,6 +273,7 @@ function DaybookPage() {
           hint={`${outflow.length} entr${outflow.length === 1 ? "y" : "ies"}`}
           tone="destructive"
           icon={<TrendingDown className="h-4 w-4" />}
+          compact
         />
         <StatCard
           label="Net Balance"
@@ -279,16 +281,17 @@ function DaybookPage() {
           hint={net >= 0 ? "Surplus for the day" : "Deficit for the day"}
           tone={net >= 0 ? "success" : "destructive"}
           icon={<Scale className="h-4 w-4" />}
+          compact
         />
       </div>
 
       {/* Mobile toggle */}
       <div className="mt-4 grid grid-cols-3 gap-1 rounded-xl border border-border bg-card p-1 lg:hidden">
         {([
-          ["all", "All"],
-          ["income", `Income (${inr(inTotal)})`],
-          ["expense", `Expenses (${inr(outTotal)})`],
-        ] as const).map(([key, label]) => (
+          ["all", "All", "All"],
+          ["income", "Income", `Income (${inr(inTotal)})`],
+          ["expense", "Expenses", `Expenses (${inr(outTotal)})`],
+        ] as const).map(([key, mobileLabel, desktopLabel]) => (
           <button
             key={key}
             type="button"
@@ -298,7 +301,8 @@ function DaybookPage() {
               tab === key ? "bg-primary text-primary-foreground" : "text-muted-foreground",
             )}
           >
-            {label}
+            <span className="sm:hidden">{mobileLabel}</span>
+            <span className="hidden sm:inline">{desktopLabel}</span>
           </button>
         ))}
       </div>

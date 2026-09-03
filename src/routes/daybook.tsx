@@ -435,12 +435,12 @@ function Column({
   const toneText = tone === "success" ? "text-success" : "text-destructive";
   return (
     <div className="surface flex h-full flex-col p-4">
-      <div className="mb-3 flex flex-wrap items-center justify-between gap-2">
-        <p className="flex items-center gap-2 text-sm font-semibold">
+      <div className="mb-3 grid grid-cols-[minmax(0,1fr)_auto] items-center gap-2 sm:flex sm:flex-wrap sm:justify-between">
+        <p className="flex min-w-0 items-center gap-2 text-sm font-semibold">
           <span aria-hidden>{dot}</span>
-          {title}
+          <span className="truncate">{title}</span>
         </p>
-        <Button size="sm" variant="outline" onClick={onAdd}>
+        <Button size="sm" variant="outline" className="shrink-0" onClick={onAdd}>
           <Plus className="mr-1.5 h-4 w-4" /> {addLabel}
         </Button>
       </div>
@@ -450,53 +450,57 @@ function Column({
         <ul className="flex-1 divide-y divide-border">
           {rows.map((r) => (
             <li key={r.id} className="py-3">
-              <div className="flex items-start justify-between gap-2">
-                {r.projectId ? (
-                  <Link
-                    to="/projects/$id"
-                    params={{ id: r.projectId }}
-                    className="group min-w-0 flex-1 cursor-pointer"
-                  >
-                    <p className="truncate text-sm font-semibold group-hover:underline">{r.title}</p>
-                    {r.sub && (
-                      <p className="mt-0.5 truncate text-xs text-muted-foreground group-hover:underline">
-                        {r.sub}
-                      </p>
-                    )}
-                  </Link>
-                ) : (
-                  <div className="min-w-0 flex-1">
-                    <p className="text-sm font-semibold">{r.title}</p>
-                    {r.sub && <p className="mt-0.5 text-xs text-muted-foreground">{r.sub}</p>}
+              <div className="grid grid-cols-[minmax(0,1fr)_auto] items-start gap-3">
+                <div className="min-w-0">
+                  {r.projectId ? (
+                    <Link
+                      to="/projects/$id"
+                      params={{ id: r.projectId }}
+                      className="group block cursor-pointer"
+                    >
+                      <p className="truncate text-sm font-semibold group-hover:underline">{r.title}</p>
+                      {r.sub && (
+                        <p className="mt-0.5 truncate text-xs text-muted-foreground group-hover:underline">
+                          {r.sub}
+                        </p>
+                      )}
+                    </Link>
+                  ) : (
+                    <div className="min-w-0">
+                      <p className="text-sm font-semibold">{r.title}</p>
+                      {r.sub && <p className="mt-0.5 text-xs text-muted-foreground">{r.sub}</p>}
+                    </div>
+                  )}
+                  <div className="mt-1 flex min-w-0 flex-wrap items-center gap-2 text-xs text-muted-foreground">
+                    <span className="shrink-0 rounded-full border border-border px-2 py-0.5">{r.mode}</span>
+                    {r.note && <span className="min-w-0 truncate">{r.note}</span>}
                   </div>
-                )}
-                <p className={cn("shrink-0 text-sm font-semibold", toneText)}>{inr(r.amount)}</p>
-                <div className="flex shrink-0 items-center gap-0.5">
-                  <Button
-                    size="icon"
-                    variant="ghost"
-                    className="h-9 w-9"
-                    aria-label="Edit transaction"
-                    title="Edit transaction"
-                    onClick={() => onEdit(r)}
-                  >
-                    <Pencil className="h-4 w-4" />
-                  </Button>
-                  <Button
-                    size="icon"
-                    variant="ghost"
-                    className="h-9 w-9"
-                    aria-label="Delete transaction"
-                    title="Delete transaction"
-                    onClick={() => onDelete(r)}
-                  >
-                    <Trash2 className="h-4 w-4 text-destructive" />
-                  </Button>
                 </div>
-              </div>
-              <div className="mt-1 flex flex-wrap items-center gap-2 text-xs text-muted-foreground">
-                <span className="rounded-full border border-border px-2 py-0.5">{r.mode}</span>
-                {r.note && <span className="min-w-0 truncate">{r.note}</span>}
+                <div className="flex shrink-0 flex-col items-end gap-1 sm:flex-row sm:items-center sm:gap-2">
+                  <p className={cn("whitespace-nowrap text-sm font-semibold", toneText)}>{inr(r.amount)}</p>
+                  <div className="flex shrink-0 items-center gap-0.5">
+                    <Button
+                      size="icon"
+                      variant="ghost"
+                      className="h-9 w-9"
+                      aria-label="Edit transaction"
+                      title="Edit transaction"
+                      onClick={() => onEdit(r)}
+                    >
+                      <Pencil className="h-4 w-4" />
+                    </Button>
+                    <Button
+                      size="icon"
+                      variant="ghost"
+                      className="h-9 w-9"
+                      aria-label="Delete transaction"
+                      title="Delete transaction"
+                      onClick={() => onDelete(r)}
+                    >
+                      <Trash2 className="h-4 w-4 text-destructive" />
+                    </Button>
+                  </div>
+                </div>
               </div>
             </li>
           ))}

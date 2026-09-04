@@ -634,5 +634,3 @@ function CloseDialog({ fd, onClose }: { fd: FixedDeposit | null; onClose: () => 
     </Dialog>
   );
 }
-
-export { AlertTriangle };

@@ -434,7 +434,7 @@ function Column({
 }) {
   const toneText = tone === "success" ? "text-success" : "text-destructive";
   return (
-    <div className="surface flex h-full flex-col p-4">
+    <div className="surface flex h-full w-full flex-col overflow-hidden px-4 py-3">
       <div className="mb-3 grid grid-cols-[minmax(0,1fr)_auto] items-center gap-2 sm:flex sm:flex-wrap sm:justify-between">
         <p className="flex min-w-0 items-center gap-2 text-sm font-semibold">
           <span aria-hidden>{dot}</span>
@@ -447,68 +447,79 @@ function Column({
       {rows.length === 0 ? (
         <p className="py-8 text-center text-sm text-muted-foreground">{empty}</p>
       ) : (
-        <ul className="flex-1 divide-y divide-border">
+        <ul className="flex-1">
           {rows.map((r) => (
-            <li key={r.id} className="py-3">
-              <div className="grid grid-cols-[minmax(0,1fr)_auto] items-start gap-3">
-                <div className="min-w-0">
-                  {r.projectId ? (
-                    <Link
-                      to="/projects/$id"
-                      params={{ id: r.projectId }}
-                      className="group block cursor-pointer"
-                    >
-                      <p className="truncate text-sm font-semibold group-hover:underline">{r.title}</p>
-                      {r.sub && (
-                        <p className="mt-0.5 truncate text-xs text-muted-foreground group-hover:underline">
-                          {r.sub}
-                        </p>
-                      )}
-                    </Link>
-                  ) : (
-                    <div className="min-w-0">
-                      <p className="text-sm font-semibold">{r.title}</p>
-                      {r.sub && <p className="mt-0.5 text-xs text-muted-foreground">{r.sub}</p>}
-                    </div>
+            <li
+              key={r.id}
+              className="flex w-full items-start justify-between gap-3 border-b border-border/50 py-2.5 last:border-b-0"
+            >
+              <div className="min-w-0 flex-1">
+                {r.projectId ? (
+                  <Link
+                    to="/projects/$id"
+                    params={{ id: r.projectId }}
+                    className="group block cursor-pointer"
+                  >
+                    <p className="truncate text-sm font-medium text-foreground group-hover:underline">
+                      {r.title}
+                    </p>
+                    {r.sub && (
+                      <p className="mt-0.5 block max-w-full truncate text-xs text-muted-foreground group-hover:underline">
+                        {r.sub}
+                      </p>
+                    )}
+                  </Link>
+                ) : (
+                  <div className="min-w-0">
+                    <p className="truncate text-sm font-medium text-foreground">{r.title}</p>
+                    {r.sub && (
+                      <p className="mt-0.5 block max-w-full truncate text-xs text-muted-foreground">{r.sub}</p>
+                    )}
+                  </div>
+                )}
+                <div className="mt-1 flex flex-wrap items-center gap-1.5">
+                  <span className="shrink-0 rounded-full border border-border px-2 py-0.5 text-xs text-muted-foreground">
+                    {r.mode}
+                  </span>
+                  {r.note && (
+                    <span className="min-w-0 truncate text-xs text-muted-foreground">{r.note}</span>
                   )}
-                  <div className="mt-1 flex min-w-0 flex-wrap items-center gap-2 text-xs text-muted-foreground">
-                    <span className="shrink-0 rounded-full border border-border px-2 py-0.5">{r.mode}</span>
-                    {r.note && <span className="min-w-0 truncate">{r.note}</span>}
-                  </div>
                 </div>
-                <div className="flex shrink-0 flex-col items-end gap-1 sm:flex-row sm:items-center sm:gap-2">
-                  <p className={cn("whitespace-nowrap text-sm font-semibold", toneText)}>{inr(r.amount)}</p>
-                  <div className="flex shrink-0 items-center gap-0.5">
-                    <Button
-                      size="icon"
-                      variant="ghost"
-                      className="h-9 w-9"
-                      aria-label="Edit transaction"
-                      title="Edit transaction"
-                      onClick={() => onEdit(r)}
-                    >
-                      <Pencil className="h-4 w-4" />
-                    </Button>
-                    <Button
-                      size="icon"
-                      variant="ghost"
-                      className="h-9 w-9"
-                      aria-label="Delete transaction"
-                      title="Delete transaction"
-                      onClick={() => onDelete(r)}
-                    >
-                      <Trash2 className="h-4 w-4 text-destructive" />
-                    </Button>
-                  </div>
+              </div>
+              <div className="flex flex-shrink-0 items-center gap-2 text-right">
+                <p className={cn("whitespace-nowrap text-sm font-semibold tabular-nums", toneText)}>
+                  {inr(r.amount)}
+                </p>
+                <div className="flex flex-shrink-0 items-center gap-0.5">
+                  <Button
+                    size="icon"
+                    variant="ghost"
+                    className="h-9 w-9 flex-shrink-0 p-1.5 text-muted-foreground hover:text-foreground"
+                    aria-label="Edit transaction"
+                    title="Edit transaction"
+                    onClick={() => onEdit(r)}
+                  >
+                    <Pencil className="h-4 w-4" />
+                  </Button>
+                  <Button
+                    size="icon"
+                    variant="ghost"
+                    className="h-9 w-9 flex-shrink-0 p-1.5 text-muted-foreground hover:text-foreground"
+                    aria-label="Delete transaction"
+                    title="Delete transaction"
+                    onClick={() => onDelete(r)}
+                  >
+                    <Trash2 className="h-4 w-4 text-destructive" />
+                  </Button>
                 </div>
               </div>
             </li>
           ))}
         </ul>
       )}
-      <div className="mt-3 flex items-center justify-between border-t border-border pt-3 text-sm font-semibold">
-        <span>{totalLabel}</span>
-        <span className={toneText}>{inr(total)}</span>
+      <div className="mt-3 flex w-full items-start justify-between gap-3 border-t border-border pt-3 text-sm font-semibold">
+        <span className="min-w-0 truncate">{totalLabel}</span>
+        <span className={cn("flex-shrink-0 whitespace-nowrap tabular-nums", toneText)}>{inr(total)}</span>
       </div>
     </div>
   );

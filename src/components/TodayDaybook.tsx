@@ -293,14 +293,15 @@ export function TodayDaybook() {
               {income.length === 0 ? (
                 <p className="py-4 text-center text-xs text-muted-foreground">No income logged today</p>
               ) : (
-                <ul className="flex-1 divide-y divide-border">
+                <ul className="flex-1">
                   {income.map((r) => (
                     <TransactionRow key={r.id} row={r} variant="income" />
                   ))}
                 </ul>
               )}
-              <div className="mt-2 border-t border-border pt-2">
-                <p className="text-right text-sm font-bold text-success">Total Income: {inr(inTotal)}</p>
+              <div className="mt-3 flex w-full items-start justify-between gap-3 border-t border-border pt-3 text-sm font-semibold">
+                <span className="min-w-0 truncate text-success">Total Income</span>
+                <span className="flex-shrink-0 whitespace-nowrap tabular-nums text-success">{inr(inTotal)}</span>
               </div>
             </div>
 
@@ -312,14 +313,15 @@ export function TodayDaybook() {
               {outflow.length === 0 ? (
                 <p className="py-4 text-center text-xs text-muted-foreground">No expenses logged today</p>
               ) : (
-                <ul className="flex-1 divide-y divide-border">
+                <ul className="flex-1">
                   {outflow.map((r) => (
                     <TransactionRow key={r.id} row={r} variant="expense" />
                   ))}
                 </ul>
               )}
-              <div className="mt-2 border-t border-border pt-2">
-                <p className="text-right text-sm font-bold text-destructive">Total Expenses: {inr(outTotal)}</p>
+              <div className="mt-3 flex w-full items-start justify-between gap-3 border-t border-border pt-3 text-sm font-semibold">
+                <span className="min-w-0 truncate text-destructive">Total Expenses</span>
+                <span className="flex-shrink-0 whitespace-nowrap tabular-nums text-destructive">{inr(outTotal)}</span>
               </div>
             </div>
           </div>

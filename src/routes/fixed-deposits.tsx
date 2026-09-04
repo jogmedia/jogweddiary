@@ -1,6 +1,6 @@
 import { useMemo, useState } from "react";
 import { createFileRoute } from "@tanstack/react-router";
-import { Landmark, Lock, Plus, Pencil, RefreshCw, Wallet, AlertTriangle } from "lucide-react";
+import { Landmark, Lock, Plus, Pencil, RefreshCw, Wallet } from "lucide-react";
 
 import { AppShell } from "@/components/AppShell";
 import { EmptyState, PageHeader, StatCard } from "@/components/ui-kit";

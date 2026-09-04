@@ -222,7 +222,7 @@ export function TodayDaybook() {
   );
 
   return (
-    <div className="surface p-4">
+    <div className="surface w-full overflow-hidden px-4 py-3">
       <div className="flex flex-wrap items-start justify-between gap-2">
         <div className="min-w-0">
           <p className="text-sm font-semibold">📖 Today's Daybook (വരവ് - ചിലവ്)</p>

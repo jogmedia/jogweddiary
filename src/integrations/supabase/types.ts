@@ -395,6 +395,87 @@ export type Database = {
           },
         ]
       }
+      fixed_deposits: {
+        Row: {
+          auto_renew: boolean
+          bank_name: string
+          closed_amount: number | null
+          closed_date: string | null
+          created_at: string
+          deposit_date: string
+          fd_number: string | null
+          id: string
+          interest_rate: number
+          maturity_amount: number
+          maturity_date: string
+          notes: string | null
+          payout_bank_account_id: string | null
+          principal: number
+          source_bank_account_id: string | null
+          status: string
+          tenure_days: number
+          tenure_months: number
+          updated_at: string
+        }
+        Insert: {
+          auto_renew?: boolean
+          bank_name: string
+          closed_amount?: number | null
+          closed_date?: string | null
+          created_at?: string
+          deposit_date?: string
+          fd_number?: string | null
+          id?: string
+          interest_rate?: number
+          maturity_amount?: number
+          maturity_date: string
+          notes?: string | null
+          payout_bank_account_id?: string | null
+          principal?: number
+          source_bank_account_id?: string | null
+          status?: string
+          tenure_days?: number
+          tenure_months?: number
+          updated_at?: string
+        }
+        Update: {
+          auto_renew?: boolean
+          bank_name?: string
+          closed_amount?: number | null
+          closed_date?: string | null
+          created_at?: string
+          deposit_date?: string
+          fd_number?: string | null
+          id?: string
+          interest_rate?: number
+          maturity_amount?: number
+          maturity_date?: string
+          notes?: string | null
+          payout_bank_account_id?: string | null
+          principal?: number
+          source_bank_account_id?: string | null
+          status?: string
+          tenure_days?: number
+          tenure_months?: number
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "fixed_deposits_payout_bank_account_id_fkey"
+            columns: ["payout_bank_account_id"]
+            isOneToOne: false
+            referencedRelation: "bank_accounts"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "fixed_deposits_source_bank_account_id_fkey"
+            columns: ["source_bank_account_id"]
+            isOneToOne: false
+            referencedRelation: "bank_accounts"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       hard_disks: {
         Row: {
           capacity: string | null

@@ -568,6 +568,7 @@ export const useSettings = () =>
 const RELATED: Record<string, string[]> = {
   project_payments: ["payments", "projects", "project", "income_transactions", "bank_accounts", "activity_log"],
   project_reimbursables: ["reimbursables", "bank_accounts", "activity_log"],
+  fixed_deposits: ["fixed_deposits", "bank_accounts", "activity_log"],
   bank_accounts: ["bank_accounts", "payments", "activity_log"],
 
   project_expenses: ["expenses", "projects", "project", "expense_transactions", "bank_accounts", "activity_log"],

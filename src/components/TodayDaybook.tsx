@@ -163,8 +163,11 @@ export function TodayDaybook() {
     if (typeof window === "undefined" || window.confirm("Delete this transaction?")) fn();
   };
 
+  const toneClass = (variant: "income" | "expense") =>
+    variant === "income" ? "text-success" : "text-destructive";
+
   const TransactionRow = ({ row, variant }: { row: Row; variant: "income" | "expense" }) => (
-    <li className="flex items-start gap-2 py-2.5">
+    <li className="flex w-full items-start justify-between gap-3 border-b border-border/50 py-2.5 last:border-b-0">
       <div className="min-w-0 flex-1">
         {row.projectId ? (
           <Link
@@ -172,46 +175,48 @@ export function TodayDaybook() {
             params={{ id: row.projectId }}
             className="group block cursor-pointer"
           >
-            <p className="truncate text-sm font-medium group-hover:underline">{row.title}</p>
-            <p className="truncate text-xs text-muted-foreground group-hover:underline">
+            <p className="truncate text-sm font-medium text-foreground group-hover:underline">{row.title}</p>
+            <p className="mt-0.5 block max-w-full truncate text-xs text-muted-foreground group-hover:underline">
               {row.sub} · {row.mode}
             </p>
           </Link>
         ) : (
-          <>
-            <p className="truncate text-sm font-medium">{row.title}</p>
-            <p className="truncate text-xs text-muted-foreground">
+          <div className="min-w-0">
+            <p className="truncate text-sm font-medium text-foreground">{row.title}</p>
+            <p className="mt-0.5 block max-w-full truncate text-xs text-muted-foreground">
               {row.sub} · {row.mode}
             </p>
-          </>
+          </div>
         )}
       </div>
-      <p className={cn("shrink-0 text-sm font-semibold", variant === "income" ? "text-success" : "text-destructive")}>
-        {inr(row.amount)}
-      </p>
-      <div className="flex shrink-0 items-center gap-0.5">
-        <Button
-          size="icon"
-          variant="ghost"
-          className="h-9 w-9"
-          aria-label="Edit transaction"
-          title="Edit transaction"
-          onClick={() => (variant === "income" ? setEditIncome(row.raw) : setEditExpense(row.raw))}
-        >
-          <Pencil className="h-4 w-4" />
-        </Button>
-        <Button
-          size="icon"
-          variant="ghost"
-          className="h-9 w-9"
-          aria-label="Delete transaction"
-          title="Delete transaction"
-          onClick={() =>
-            confirmDelete(() => (variant === "income" ? removePayment.mutate(row.id) : removeExpense.mutate(row.id)))
-          }
-        >
-          <Trash2 className="h-4 w-4 text-destructive" />
-        </Button>
+      <div className="flex flex-shrink-0 items-center gap-2 text-right">
+        <p className={cn("whitespace-nowrap text-sm font-semibold tabular-nums", toneClass(variant))}>
+          {inr(row.amount)}
+        </p>
+        <div className="flex flex-shrink-0 items-center gap-0.5">
+          <Button
+            size="icon"
+            variant="ghost"
+            className="h-9 w-9 flex-shrink-0 p-1.5 text-muted-foreground hover:text-foreground"
+            aria-label="Edit transaction"
+            title="Edit transaction"
+            onClick={() => (variant === "income" ? setEditIncome(row.raw) : setEditExpense(row.raw))}
+          >
+            <Pencil className="h-4 w-4" />
+          </Button>
+          <Button
+            size="icon"
+            variant="ghost"
+            className="h-9 w-9 flex-shrink-0 p-1.5 text-muted-foreground hover:text-foreground"
+            aria-label="Delete transaction"
+            title="Delete transaction"
+            onClick={() =>
+              confirmDelete(() => (variant === "income" ? removePayment.mutate(row.id) : removeExpense.mutate(row.id)))
+            }
+          >
+            <Trash2 className="h-4 w-4 text-destructive" />
+          </Button>
+        </div>
       </div>
     </li>
   );

@@ -1,0 +1,1 @@
+REVOKE ALL ON FUNCTION public.tg_fd_bank_sync() FROM anon, authenticated;

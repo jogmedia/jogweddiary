@@ -25,6 +25,7 @@ import {
 } from "lucide-react";
 import { AppShell } from "@/components/AppShell";
 import { Button } from "@/components/ui/button";
+import { FixedDepositAlert } from "@/components/FixedDepositAlert";
 import { BackupAlert } from "@/components/BackupAlert";
 import { CrewReminders } from "@/components/CrewReminders";
 import { ShootDay } from "@/components/ShootDay";
@@ -210,6 +211,7 @@ function Dashboard() {
       {/* 2. Crew reminders below daily shoots */}
       <CrewReminders />
 
+      <FixedDepositAlert />
       <BackupAlert />
 
 

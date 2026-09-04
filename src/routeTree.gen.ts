@@ -17,6 +17,7 @@ import { Route as ReportsRouteImport } from './routes/reports'
 import { Route as ReimbursablesRouteImport } from './routes/reimbursables'
 import { Route as RawDataRouteImport } from './routes/raw-data'
 import { Route as PaymentsRouteImport } from './routes/payments'
+import { Route as FixedDepositsRouteImport } from './routes/fixed-deposits'
 import { Route as ExpensesRouteImport } from './routes/expenses'
 import { Route as DeliveryRouteImport } from './routes/delivery'
 import { Route as DaybookRouteImport } from './routes/daybook'
@@ -67,6 +68,11 @@ const RawDataRoute = RawDataRouteImport.update({
 const PaymentsRoute = PaymentsRouteImport.update({
   id: '/payments',
   path: '/payments',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const FixedDepositsRoute = FixedDepositsRouteImport.update({
+  id: '/fixed-deposits',
+  path: '/fixed-deposits',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ExpensesRoute = ExpensesRouteImport.update({
@@ -134,6 +140,7 @@ export interface FileRoutesByFullPath {
   '/daybook': typeof DaybookRoute
   '/delivery': typeof DeliveryRoute
   '/expenses': typeof ExpensesRoute
+  '/fixed-deposits': typeof FixedDepositsRoute
   '/payments': typeof PaymentsRoute
   '/raw-data': typeof RawDataRoute
   '/reimbursables': typeof ReimbursablesRoute
@@ -155,6 +162,7 @@ export interface FileRoutesByTo {
   '/daybook': typeof DaybookRoute
   '/delivery': typeof DeliveryRoute
   '/expenses': typeof ExpensesRoute
+  '/fixed-deposits': typeof FixedDepositsRoute
   '/payments': typeof PaymentsRoute
   '/raw-data': typeof RawDataRoute
   '/reimbursables': typeof ReimbursablesRoute
@@ -177,6 +185,7 @@ export interface FileRoutesById {
   '/daybook': typeof DaybookRoute
   '/delivery': typeof DeliveryRoute
   '/expenses': typeof ExpensesRoute
+  '/fixed-deposits': typeof FixedDepositsRoute
   '/payments': typeof PaymentsRoute
   '/raw-data': typeof RawDataRoute
   '/reimbursables': typeof ReimbursablesRoute
@@ -200,6 +209,7 @@ export interface FileRouteTypes {
     | '/daybook'
     | '/delivery'
     | '/expenses'
+    | '/fixed-deposits'
     | '/payments'
     | '/raw-data'
     | '/reimbursables'
@@ -221,6 +231,7 @@ export interface FileRouteTypes {
     | '/daybook'
     | '/delivery'
     | '/expenses'
+    | '/fixed-deposits'
     | '/payments'
     | '/raw-data'
     | '/reimbursables'
@@ -242,6 +253,7 @@ export interface FileRouteTypes {
     | '/daybook'
     | '/delivery'
     | '/expenses'
+    | '/fixed-deposits'
     | '/payments'
     | '/raw-data'
     | '/reimbursables'
@@ -264,6 +276,7 @@ export interface RootRouteChildren {
   DaybookRoute: typeof DaybookRoute
   DeliveryRoute: typeof DeliveryRoute
   ExpensesRoute: typeof ExpensesRoute
+  FixedDepositsRoute: typeof FixedDepositsRoute
   PaymentsRoute: typeof PaymentsRoute
   RawDataRoute: typeof RawDataRoute
   ReimbursablesRoute: typeof ReimbursablesRoute
@@ -333,6 +346,13 @@ declare module '@tanstack/react-router' {
       path: '/payments'
       fullPath: '/payments'
       preLoaderRoute: typeof PaymentsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/fixed-deposits': {
+      id: '/fixed-deposits'
+      path: '/fixed-deposits'
+      fullPath: '/fixed-deposits'
+      preLoaderRoute: typeof FixedDepositsRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/expenses': {
@@ -424,6 +444,7 @@ const rootRouteChildren: RootRouteChildren = {
   DaybookRoute: DaybookRoute,
   DeliveryRoute: DeliveryRoute,
   ExpensesRoute: ExpensesRoute,
+  FixedDepositsRoute: FixedDepositsRoute,
   PaymentsRoute: PaymentsRoute,
   RawDataRoute: RawDataRoute,
   ReimbursablesRoute: ReimbursablesRoute,

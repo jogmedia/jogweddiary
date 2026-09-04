@@ -18,6 +18,7 @@ import {
   CalendarDays,
   HardDrive,
   Plane,
+  Landmark,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useAuth } from "@/lib/auth";
@@ -40,6 +41,7 @@ export const NAV = [
   { to: "/raw-data", label: "Raw Data", icon: HardDrive, adminOnly: false },
   { to: "/travel", label: "Travel & Bookings", icon: Plane, adminOnly: false },
   { to: "/delivery", label: "Delivery", icon: PackageCheck, adminOnly: false },
+  { to: "/fixed-deposits", label: "Fixed Deposits (FD)", icon: Landmark, adminOnly: true },
   { to: "/accounts", label: "Accounts", icon: BookOpen, adminOnly: true },
   { to: "/reports", label: "Reports", icon: BarChart3, adminOnly: true },
   { to: "/settings", label: "Settings", icon: SettingsIcon, adminOnly: false },

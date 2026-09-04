@@ -428,6 +428,36 @@ export const useBankAccounts = () =>
     queryFn: () => fetchList<BankAccount>("bank_accounts", "*", { column: "bank_name", ascending: true }),
   });
 
+export type FixedDeposit = {
+  id: string;
+  bank_name: string;
+  fd_number: string | null;
+  source_bank_account_id: string | null;
+  principal: number;
+  deposit_date: string;
+  tenure_months: number;
+  tenure_days: number;
+  interest_rate: number;
+  maturity_date: string;
+  maturity_amount: number;
+  auto_renew: boolean;
+  notes: string | null;
+  status: string;
+  closed_date: string | null;
+  closed_amount: number | null;
+  payout_bank_account_id: string | null;
+  created_at: string;
+};
+
+/** Fixed deposits held by the studio (internal asset transfers, not expenses). */
+export const useFixedDeposits = () =>
+  useQuery({
+    queryKey: ["fixed_deposits"],
+    queryFn: () =>
+      fetchList<FixedDeposit>("fixed_deposits", "*", { column: "maturity_date", ascending: true }),
+  });
+
+
 export type HardDisk = {
   id: string;
   name: string;
@@ -538,6 +568,7 @@ export const useSettings = () =>
 const RELATED: Record<string, string[]> = {
   project_payments: ["payments", "projects", "project", "income_transactions", "bank_accounts", "activity_log"],
   project_reimbursables: ["reimbursables", "bank_accounts", "activity_log"],
+  fixed_deposits: ["fixed_deposits", "bank_accounts", "activity_log"],
   bank_accounts: ["bank_accounts", "payments", "activity_log"],
 
   project_expenses: ["expenses", "projects", "project", "expense_transactions", "bank_accounts", "activity_log"],

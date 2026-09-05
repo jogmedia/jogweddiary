@@ -113,7 +113,7 @@ function PendingPaymentsPage() {
       />
 
       <div className="grid grid-cols-2 gap-3">
-        <StatCard label="Total pending to collect" value={inr(totalPending)} tone="danger" />
+        <StatCard label="Total pending to collect" value={inr(totalPending)} tone="destructive" />
         <StatCard
           label="Pending clients"
           value={`${list.length}`}

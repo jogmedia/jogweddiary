@@ -181,7 +181,7 @@ function UpcomingEventsPage() {
 
       <div className="mb-4 grid grid-cols-3 gap-3">
         <StatCard compact label="Upcoming" value={String(upcoming.length)} />
-        <StatCard compact label="Next 7 days" value={String(next7)} tone="info" />
+        <StatCard compact label="Next 7 days" value={String(next7)} tone="success" />
         <StatCard compact label="Needs crew" value={String(needCrew)} tone="destructive" />
       </div>
 

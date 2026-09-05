@@ -9,6 +9,7 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as UpcomingEventsRouteImport } from './routes/upcoming-events'
 import { Route as TravelRouteImport } from './routes/travel'
 import { Route as TasksRouteImport } from './routes/tasks'
 import { Route as StaffRouteImport } from './routes/staff'
@@ -31,6 +32,11 @@ import { Route as ProjectsIndexRouteImport } from './routes/projects/index'
 import { Route as ProjectsIdRouteImport } from './routes/projects/$id'
 import { Route as PortalIdRouteImport } from './routes/portal/$id'
 
+const UpcomingEventsRoute = UpcomingEventsRouteImport.update({
+  id: '/upcoming-events',
+  path: '/upcoming-events',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const TravelRoute = TravelRouteImport.update({
   id: '/travel',
   path: '/travel',
@@ -156,6 +162,7 @@ export interface FileRoutesByFullPath {
   '/staff': typeof StaffRoute
   '/tasks': typeof TasksRoute
   '/travel': typeof TravelRoute
+  '/upcoming-events': typeof UpcomingEventsRoute
   '/portal/$id': typeof PortalIdRoute
   '/projects/$id': typeof ProjectsIdRoute
   '/projects/': typeof ProjectsIndexRoute
@@ -179,6 +186,7 @@ export interface FileRoutesByTo {
   '/staff': typeof StaffRoute
   '/tasks': typeof TasksRoute
   '/travel': typeof TravelRoute
+  '/upcoming-events': typeof UpcomingEventsRoute
   '/portal/$id': typeof PortalIdRoute
   '/projects/$id': typeof ProjectsIdRoute
   '/projects': typeof ProjectsIndexRoute
@@ -203,6 +211,7 @@ export interface FileRoutesById {
   '/staff': typeof StaffRoute
   '/tasks': typeof TasksRoute
   '/travel': typeof TravelRoute
+  '/upcoming-events': typeof UpcomingEventsRoute
   '/portal/$id': typeof PortalIdRoute
   '/projects/$id': typeof ProjectsIdRoute
   '/projects/': typeof ProjectsIndexRoute
@@ -228,6 +237,7 @@ export interface FileRouteTypes {
     | '/staff'
     | '/tasks'
     | '/travel'
+    | '/upcoming-events'
     | '/portal/$id'
     | '/projects/$id'
     | '/projects/'
@@ -251,6 +261,7 @@ export interface FileRouteTypes {
     | '/staff'
     | '/tasks'
     | '/travel'
+    | '/upcoming-events'
     | '/portal/$id'
     | '/projects/$id'
     | '/projects'
@@ -274,6 +285,7 @@ export interface FileRouteTypes {
     | '/staff'
     | '/tasks'
     | '/travel'
+    | '/upcoming-events'
     | '/portal/$id'
     | '/projects/$id'
     | '/projects/'
@@ -298,6 +310,7 @@ export interface RootRouteChildren {
   StaffRoute: typeof StaffRoute
   TasksRoute: typeof TasksRoute
   TravelRoute: typeof TravelRoute
+  UpcomingEventsRoute: typeof UpcomingEventsRoute
   PortalIdRoute: typeof PortalIdRoute
   ProjectsIdRoute: typeof ProjectsIdRoute
   ProjectsIndexRoute: typeof ProjectsIndexRoute
@@ -305,6 +318,13 @@ export interface RootRouteChildren {
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/upcoming-events': {
+      id: '/upcoming-events'
+      path: '/upcoming-events'
+      fullPath: '/upcoming-events'
+      preLoaderRoute: typeof UpcomingEventsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/travel': {
       id: '/travel'
       path: '/travel'
@@ -474,6 +494,7 @@ const rootRouteChildren: RootRouteChildren = {
   StaffRoute: StaffRoute,
   TasksRoute: TasksRoute,
   TravelRoute: TravelRoute,
+  UpcomingEventsRoute: UpcomingEventsRoute,
   PortalIdRoute: PortalIdRoute,
   ProjectsIdRoute: ProjectsIdRoute,
   ProjectsIndexRoute: ProjectsIndexRoute,

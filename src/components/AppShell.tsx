@@ -20,6 +20,7 @@ import {
   Plane,
   Landmark,
   Hourglass,
+  Clapperboard,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useAuth } from "@/lib/auth";
@@ -27,12 +28,13 @@ import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger, SheetTitle } from "@/components/ui/sheet";
 import { InstallAppButton } from "@/components/InstallAppButton";
 import { BankBalancesWidget, OwnerSalaryWidget } from "@/components/MoneyWidgets";
-import { useProjects } from "@/lib/db";
+import { useProjectEvents, useProjects } from "@/lib/db";
 
 export const NAV = [
   { to: "/", label: "Dashboard", icon: LayoutDashboard, adminOnly: false },
   { to: "/clients", label: "Clients", icon: Users, adminOnly: true },
   { to: "/projects", label: "Projects", icon: FolderKanban, adminOnly: false },
+  { to: "/upcoming-events", label: "Upcoming Events", icon: Clapperboard, adminOnly: false },
   { to: "/calendar", label: "Calendar", icon: CalendarDays, adminOnly: false },
   { to: "/daybook", label: "Daily Daybook", icon: BookOpen, adminOnly: true },
   { to: "/payments", label: "Payments", icon: Wallet, adminOnly: true },
@@ -55,6 +57,11 @@ function NavList({ onNavigate }: { onNavigate?: () => void }) {
   const { isAdmin } = useAuth();
   const { data: projects = [] } = useProjects();
   const pendingCount = (projects as any[]).filter((p) => Number(p.balance_due ?? 0) > 0).length;
+  const { data: events = [] } = useProjectEvents();
+  const today = new Date().toISOString().slice(0, 10);
+  const upcomingCount = (events as any[]).filter(
+    (e) => e.event_date >= today && e.status !== "cancelled",
+  ).length;
   return (
     <nav className="flex flex-col gap-1 p-3">
       {NAV.filter((n) => isAdmin || !n.adminOnly).map((item) => {
@@ -74,6 +81,11 @@ function NavList({ onNavigate }: { onNavigate?: () => void }) {
           >
             <Icon className="h-4 w-4 shrink-0" />
             <span className="min-w-0 flex-1 truncate">{item.label}</span>
+            {item.to === "/upcoming-events" && upcomingCount > 0 && (
+              <span className="shrink-0 rounded-full bg-sidebar-primary/15 px-2 py-0.5 text-[11px] font-semibold text-sidebar-primary">
+                {upcomingCount}
+              </span>
+            )}
             {item.to === "/pending-payments" && pendingCount > 0 && (
               <span className="shrink-0 rounded-full bg-destructive px-2 py-0.5 text-[11px] font-semibold text-destructive-foreground">
                 {pendingCount}

@@ -28,7 +28,7 @@ import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger, SheetTitle } from "@/components/ui/sheet";
 import { InstallAppButton } from "@/components/InstallAppButton";
 import { BankBalancesWidget, OwnerSalaryWidget } from "@/components/MoneyWidgets";
-import { RenewalAlertsWidget } from "@/components/RenewalAlerts";
+import { RenewalAlertsWidget, RenewalDialogsHost } from "@/components/RenewalAlerts";
 import { useProjectEvents, useProjects } from "@/lib/db";
 
 export const NAV = [
@@ -168,10 +168,10 @@ export function AppShell({ children }: { children: ReactNode }) {
           <SheetContent side="left" className="w-72 overflow-y-auto bg-sidebar p-0">
             <SheetTitle className="sr-only">Menu</SheetTitle>
             <Brand />
-            <div className="pt-3" onClick={() => setOpen(false)}>
+            <div className="pt-3">
               <BankBalancesWidget compact />
               <OwnerSalaryWidget compact />
-              <RenewalAlertsWidget compact />
+              <RenewalAlertsWidget compact onOpenDialog={() => setOpen(false)} />
             </div>
             <NavList onNavigate={() => setOpen(false)} />
 
@@ -190,6 +190,8 @@ export function AppShell({ children }: { children: ReactNode }) {
         <InstallAppButton className="shrink-0" />
       </header>
 
+
+      <RenewalDialogsHost />
 
       <main className="lg:pl-64">
         <div className="mx-auto max-w-7xl px-4 py-6 lg:px-8">{children}</div>

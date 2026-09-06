@@ -458,6 +458,32 @@ export const useFixedDeposits = () =>
   });
 
 
+export type GoldLoan = {
+  id: string;
+  bank_name: string;
+  loan_number: string | null;
+  gold_grams: number | null;
+  loan_amount: number;
+  loan_date: string;
+  renewal_date: string;
+  interest_rate: number;
+  periodic_interest: number | null;
+  bank_account_id: string | null;
+  notes: string | null;
+  status: string;
+  closed_date: string | null;
+  closed_amount: number | null;
+  created_at: string;
+};
+
+/** Pledged-gold loans whose renewal dates feed the 15-day alert watcher. */
+export const useGoldLoans = () =>
+  useQuery({
+    queryKey: ["gold_loans"],
+    queryFn: () =>
+      fetchList<GoldLoan>("gold_loans", "*", { column: "renewal_date", ascending: true }),
+  });
+
 export type HardDisk = {
   id: string;
   name: string;

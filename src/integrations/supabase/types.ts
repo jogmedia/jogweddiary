@@ -476,6 +476,71 @@ export type Database = {
           },
         ]
       }
+      gold_loans: {
+        Row: {
+          bank_account_id: string | null
+          bank_name: string
+          closed_amount: number | null
+          closed_date: string | null
+          created_at: string
+          gold_grams: number | null
+          id: string
+          interest_rate: number
+          loan_amount: number
+          loan_date: string
+          loan_number: string | null
+          notes: string | null
+          periodic_interest: number | null
+          renewal_date: string
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          bank_account_id?: string | null
+          bank_name: string
+          closed_amount?: number | null
+          closed_date?: string | null
+          created_at?: string
+          gold_grams?: number | null
+          id?: string
+          interest_rate?: number
+          loan_amount?: number
+          loan_date?: string
+          loan_number?: string | null
+          notes?: string | null
+          periodic_interest?: number | null
+          renewal_date: string
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          bank_account_id?: string | null
+          bank_name?: string
+          closed_amount?: number | null
+          closed_date?: string | null
+          created_at?: string
+          gold_grams?: number | null
+          id?: string
+          interest_rate?: number
+          loan_amount?: number
+          loan_date?: string
+          loan_number?: string | null
+          notes?: string | null
+          periodic_interest?: number | null
+          renewal_date?: string
+          status?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "gold_loans_bank_account_id_fkey"
+            columns: ["bank_account_id"]
+            isOneToOne: false
+            referencedRelation: "bank_accounts"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       hard_disks: {
         Row: {
           capacity: string | null

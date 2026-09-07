@@ -130,6 +130,14 @@ function UpcomingEventsPage() {
     [events, today],
   );
 
+  const doneEvents = useMemo(
+    () =>
+      (events as any[])
+        .filter((e) => e.status !== "cancelled" && (e.event_date < today || e.is_shoot_completed === true))
+        .sort((a, b) => (a.event_date > b.event_date ? -1 : a.event_date < b.event_date ? 1 : 0)),
+    [events, today],
+  );
+
   const filtered = useMemo(() => {
     const q = query.trim().toLowerCase();
     const monthPrefix = today.slice(0, 7);

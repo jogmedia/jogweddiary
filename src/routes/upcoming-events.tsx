@@ -1,6 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
-import { CalendarDays, MapPin, Send, Users, ArrowRight, Pencil } from "lucide-react";
+import { CalendarDays, MapPin, Send, Users, ArrowRight, Pencil, Check } from "lucide-react";
 import { AppShell } from "@/components/AppShell";
 import { PageHeader, StatCard, StatusBadge, EmptyState } from "@/components/ui-kit";
 import { Button } from "@/components/ui/button";

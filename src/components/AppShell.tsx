@@ -21,6 +21,7 @@ import {
   Landmark,
   Hourglass,
   Clapperboard,
+  CalendarCheck,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useAuth } from "@/lib/auth";

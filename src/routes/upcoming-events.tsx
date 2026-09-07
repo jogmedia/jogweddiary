@@ -196,7 +196,7 @@ function UpcomingEventsPage() {
       </div>
 
       <div className="mb-4 space-y-3">
-        <div className="flex flex-wrap gap-2">
+        <div className="flex flex-nowrap overflow-x-auto gap-2 py-1 no-scrollbar">
           {RANGES.map((r) => (
             <Button
               key={r.value}

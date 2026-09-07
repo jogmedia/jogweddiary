@@ -232,7 +232,11 @@ function UpcomingEventsPage() {
         />
       </div>
 
-      {filtered.length === 0 && <EmptyState message="No upcoming events match these filters." />}
+      {filtered.length === 0 && (
+        <EmptyState
+          message={range === "done" ? "No completed shoots found." : "No upcoming events match these filters."}
+        />
+      )}
 
       <div className="grid gap-4 lg:grid-cols-2">
         {filtered.map((e) => {

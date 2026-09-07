@@ -44,6 +44,7 @@ const RANGES = [
   { value: "all", label: "All Upcoming" },
   { value: "7", label: "Next 7 Days" },
   { value: "month", label: "This Month" },
+  { value: "done", label: "Shoot Done" },
 ] as const;
 
 const buildEventFields = (typeOptions: { value: string; label: string }[]): Field[] => [

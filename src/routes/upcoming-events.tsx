@@ -1,6 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
-import { CalendarDays, MapPin, Send, Users, ArrowRight, Pencil } from "lucide-react";
+import { CalendarDays, MapPin, Send, Users, ArrowRight, Pencil, Check } from "lucide-react";
 import { AppShell } from "@/components/AppShell";
 import { PageHeader, StatCard, StatusBadge, EmptyState } from "@/components/ui-kit";
 import { Button } from "@/components/ui/button";
@@ -44,6 +44,7 @@ const RANGES = [
   { value: "all", label: "All Upcoming" },
   { value: "7", label: "Next 7 Days" },
   { value: "month", label: "This Month" },
+  { value: "done", label: "Shoot Done" },
 ] as const;
 
 const buildEventFields = (typeOptions: { value: string; label: string }[]): Field[] => [
@@ -129,10 +130,19 @@ function UpcomingEventsPage() {
     [events, today],
   );
 
+  const doneEvents = useMemo(
+    () =>
+      (events as any[])
+        .filter((e) => e.status !== "cancelled" && (e.event_date < today || e.is_shoot_completed === true))
+        .sort((a, b) => (a.event_date > b.event_date ? -1 : a.event_date < b.event_date ? 1 : 0)),
+    [events, today],
+  );
+
   const filtered = useMemo(() => {
     const q = query.trim().toLowerCase();
     const monthPrefix = today.slice(0, 7);
-    return upcoming.filter((e) => {
+    const base = range === "done" ? doneEvents : upcoming;
+    return base.filter((e) => {
       if (range === "7" && daysUntil(e.event_date) > 7) return false;
       if (range === "month" && !e.event_date.startsWith(monthPrefix)) return false;
       if (type !== "all" && e.event_type !== type) return false;
@@ -150,7 +160,7 @@ function UpcomingEventsPage() {
         .toLowerCase();
       return hay.includes(q);
     });
-  }, [upcoming, range, type, query, today]);
+  }, [doneEvents, upcoming, range, type, query, today]);
 
   const next7 = upcoming.filter((e) => daysUntil(e.event_date) <= 7).length;
   const needCrew = upcoming.filter(
@@ -186,7 +196,7 @@ function UpcomingEventsPage() {
       </div>
 
       <div className="mb-4 space-y-3">
-        <div className="flex flex-wrap gap-2">
+        <div className="flex flex-nowrap overflow-x-auto gap-2 py-1 no-scrollbar">
           {RANGES.map((r) => (
             <Button
               key={r.value}
@@ -222,7 +232,11 @@ function UpcomingEventsPage() {
         />
       </div>
 
-      {filtered.length === 0 && <EmptyState message="No upcoming events match these filters." />}
+      {filtered.length === 0 && (
+        <EmptyState
+          message={range === "done" ? "No completed shoots found." : "No upcoming events match these filters."}
+        />
+      )}
 
       <div className="grid gap-4 lg:grid-cols-2">
         {filtered.map((e) => {
@@ -237,9 +251,15 @@ function UpcomingEventsPage() {
                   <p className="flex items-center gap-1.5 text-sm font-semibold">
                     <CalendarDays className="h-4 w-4 shrink-0 text-primary" />
                     {fmtDate(e.event_date)}
-                    <span className="rounded-full bg-primary/10 px-2 py-0.5 text-[11px] font-medium text-primary">
-                      {countdown(e.event_date)}
-                    </span>
+                    {range === "done" ? (
+                      <span className="inline-flex items-center gap-1 rounded-full bg-success/15 px-2 py-0.5 text-[11px] font-medium text-success">
+                        <Check className="h-3 w-3" /> Shoot Completed
+                      </span>
+                    ) : (
+                      <span className="rounded-full bg-primary/10 px-2 py-0.5 text-[11px] font-medium text-primary">
+                        {countdown(e.event_date)}
+                      </span>
+                    )}
                   </p>
                   <Link
                     to="/projects/$id"

@@ -251,9 +251,15 @@ function UpcomingEventsPage() {
                   <p className="flex items-center gap-1.5 text-sm font-semibold">
                     <CalendarDays className="h-4 w-4 shrink-0 text-primary" />
                     {fmtDate(e.event_date)}
-                    <span className="rounded-full bg-primary/10 px-2 py-0.5 text-[11px] font-medium text-primary">
-                      {countdown(e.event_date)}
-                    </span>
+                    {range === "done" ? (
+                      <span className="inline-flex items-center gap-1 rounded-full bg-success/15 px-2 py-0.5 text-[11px] font-medium text-success">
+                        <Check className="h-3 w-3" /> Shoot Completed
+                      </span>
+                    ) : (
+                      <span className="rounded-full bg-primary/10 px-2 py-0.5 text-[11px] font-medium text-primary">
+                        {countdown(e.event_date)}
+                      </span>
+                    )}
                   </p>
                   <Link
                     to="/projects/$id"

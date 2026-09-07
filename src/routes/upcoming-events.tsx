@@ -141,7 +141,8 @@ function UpcomingEventsPage() {
   const filtered = useMemo(() => {
     const q = query.trim().toLowerCase();
     const monthPrefix = today.slice(0, 7);
-    return upcoming.filter((e) => {
+    const base = range === "done" ? doneEvents : upcoming;
+    return base.filter((e) => {
       if (range === "7" && daysUntil(e.event_date) > 7) return false;
       if (range === "month" && !e.event_date.startsWith(monthPrefix)) return false;
       if (type !== "all" && e.event_type !== type) return false;
@@ -159,7 +160,7 @@ function UpcomingEventsPage() {
         .toLowerCase();
       return hay.includes(q);
     });
-  }, [upcoming, range, type, query, today]);
+  }, [doneEvents, upcoming, range, type, query, today]);
 
   const next7 = upcoming.filter((e) => daysUntil(e.event_date) <= 7).length;
   const needCrew = upcoming.filter(

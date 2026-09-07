@@ -21,6 +21,7 @@ import {
   Landmark,
   Hourglass,
   Clapperboard,
+  CalendarCheck,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useAuth } from "@/lib/auth";
@@ -37,6 +38,7 @@ export const NAV = [
   { to: "/projects", label: "Projects", icon: FolderKanban, adminOnly: false },
   { to: "/upcoming-events", label: "Upcoming Events", icon: Clapperboard, adminOnly: false },
   { to: "/calendar", label: "Calendar", icon: CalendarDays, adminOnly: false },
+  { to: "/my-availability", label: "My Free Dates", icon: CalendarCheck, adminOnly: false },
   { to: "/daybook", label: "Daily Daybook", icon: BookOpen, adminOnly: true },
   { to: "/payments", label: "Payments", icon: Wallet, adminOnly: true },
   { to: "/pending-payments", label: "Pending Payments", icon: Hourglass, adminOnly: true },

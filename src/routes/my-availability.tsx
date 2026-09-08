@@ -294,14 +294,14 @@ function AvailabilityPage() {
       )}
 
       {bookDate && (
-        <ProjectDialog
+        <BookShootDialog
           clients={clients.map((c) => ({ id: c.id, name: c.name }))}
-          initial={{ event_date: bookDate }}
-          title={`Book shoot — ${fmtDate(bookDate)}`}
+          date={bookDate}
           open
           onOpenChange={(v) => !v && setBookDate(null)}
         />
       )}
+
     </AppShell>
   );
 }

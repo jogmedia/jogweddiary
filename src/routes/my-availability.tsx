@@ -4,7 +4,7 @@ import { CalendarCheck, ChevronLeft, ChevronRight, CircleDot, Plus } from "lucid
 import { AppShell } from "@/components/AppShell";
 import { PageHeader } from "@/components/ui-kit";
 import { Button } from "@/components/ui/button";
-import { ProjectDialog } from "@/components/ProjectDialog";
+import { BookShootDialog } from "@/components/BookShootDialog";
 import { useClients } from "@/lib/db";
 import { useCrewBookings, type Booking } from "@/lib/crew";
 import { fmtDate } from "@/lib/format";

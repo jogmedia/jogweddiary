@@ -71,6 +71,7 @@ export function RecordDialog({
   open: controlledOpen,
   onOpenChange,
   extra,
+  header,
   onReset,
 }: {
   title: string;
@@ -85,6 +86,10 @@ export function RecordDialog({
   extra?:
     | ReactNode
     | ((values: Record<string, any>, set: (name: string, value: any) => void) => ReactNode);
+  /** Extra UI rendered at the very top of the dialog, above the fields. */
+  header?:
+    | ReactNode
+    | ((values: Record<string, any>, set: (name: string, value: any) => void) => ReactNode);
   /** Called whenever the dialog opens, so parents can reset their own extra state. */
   onReset?: () => void;
 }) {
@@ -92,6 +97,7 @@ export function RecordDialog({
   const open = controlledOpen ?? uncontrolled;
   const setOpen = onOpenChange ?? setUncontrolled;
   const [values, setValues] = useState<Record<string, any>>(initial ?? {});
+
   const [busy, setBusy] = useState(false);
   const [customMode, setCustomMode] = useState<Record<string, boolean>>({});
   const [errors, setErrors] = useState<Record<string, string>>({});
@@ -171,6 +177,10 @@ export function RecordDialog({
         <DialogHeader>
           <DialogTitle className="font-display text-xl">{title}</DialogTitle>
         </DialogHeader>
+        {header ? (
+          <div>{typeof header === "function" ? header(values, set) : header}</div>
+        ) : null}
+
         <div className="grid gap-4 sm:grid-cols-2">
           {fields.map((f) => (
             <div key={f.name} className={f.full || f.type === "textarea" ? "sm:col-span-2" : ""}>

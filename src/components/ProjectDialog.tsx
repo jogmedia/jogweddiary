@@ -264,6 +264,7 @@ export function ProjectDialog({
   open,
   onOpenChange,
   title,
+  header,
 }: {
   clients: { id: string; name: string }[];
   projectId?: string;
@@ -272,7 +273,10 @@ export function ProjectDialog({
   open?: boolean;
   onOpenChange?: (v: boolean) => void;
   title?: string;
+  /** Optional UI rendered at the very top of the dialog (e.g. a mode switch). */
+  header?: ReactNode;
 }) {
+
   const { data: allEvents = [] } = useProjectEvents(projectId);
   const { data: staff = [] } = useStaff();
   const { data: clientRows = [] } = useClients();
@@ -481,6 +485,8 @@ export function ProjectDialog({
   return (
     <RecordDialog
       title={title ?? (projectId ? "Edit project" : "New project")}
+      header={header}
+
       fields={projectFields(clients, addClient)}
       initial={{ ...initial, advance_date: initial?.advance_date ?? todayISO() }}
       trigger={trigger}

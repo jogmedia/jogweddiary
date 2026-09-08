@@ -177,6 +177,10 @@ export function RecordDialog({
         <DialogHeader>
           <DialogTitle className="font-display text-xl">{title}</DialogTitle>
         </DialogHeader>
+        {header ? (
+          <div>{typeof header === "function" ? header(values, set) : header}</div>
+        ) : null}
+
         <div className="grid gap-4 sm:grid-cols-2">
           {fields.map((f) => (
             <div key={f.name} className={f.full || f.type === "textarea" ? "sm:col-span-2" : ""}>

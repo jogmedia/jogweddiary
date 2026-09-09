@@ -1,5 +1,6 @@
 import { useMemo, useState, useSyncExternalStore } from "react";
 import { Landmark, Lock, Plus, Coins } from "lucide-react";
+import { Link } from "@tanstack/react-router";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";

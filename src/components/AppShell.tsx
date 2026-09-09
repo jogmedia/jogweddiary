@@ -50,6 +50,7 @@ export const NAV = [
   { to: "/travel", label: "Travel & Bookings", icon: Plane, adminOnly: false },
   { to: "/delivery", label: "Delivery", icon: PackageCheck, adminOnly: false },
   { to: "/fixed-deposits", label: "Fixed Deposits (FD)", icon: Landmark, adminOnly: true },
+  { to: "/gold-loans", label: "Gold Loans", icon: Coins, adminOnly: true },
   { to: "/accounts", label: "Accounts", icon: BookOpen, adminOnly: true },
   { to: "/reports", label: "Reports", icon: BarChart3, adminOnly: true },
   { to: "/settings", label: "Settings", icon: SettingsIcon, adminOnly: false },

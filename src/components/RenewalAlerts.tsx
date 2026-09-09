@@ -284,6 +284,25 @@ export function RenewalAlertsWidget({
           ))}
         </ul>
       )}
+
+      <Link
+        to="/gold-loans"
+        onClick={() => onOpenDialog?.()}
+        className={cn(
+          "mt-2 flex items-center justify-between gap-2 rounded-lg px-2 py-1.5 text-[11px] font-medium",
+          compact
+            ? "text-sidebar-foreground/80 hover:bg-sidebar-accent hover:text-sidebar-foreground"
+            : "bg-muted/40 text-muted-foreground hover:bg-muted hover:text-foreground",
+        )}
+      >
+        <span className="flex min-w-0 items-center gap-1.5">
+          <Coins className="h-3.5 w-3.5 shrink-0" />
+          <span className="truncate">Gold Loans</span>
+        </span>
+        <span className="shrink-0 tabular-nums">
+          {loans.filter((l) => l.status !== "closed").length} active →
+        </span>
+      </Link>
     </div>
   );
 }

@@ -19,6 +19,7 @@ import { Route as ReimbursablesRouteImport } from './routes/reimbursables'
 import { Route as RawDataRouteImport } from './routes/raw-data'
 import { Route as PendingPaymentsRouteImport } from './routes/pending-payments'
 import { Route as PaymentsRouteImport } from './routes/payments'
+import { Route as OverdueBalancesRouteImport } from './routes/overdue-balances'
 import { Route as MyAvailabilityRouteImport } from './routes/my-availability'
 import { Route as GoldLoansRouteImport } from './routes/gold-loans'
 import { Route as FixedDepositsRouteImport } from './routes/fixed-deposits'
@@ -82,6 +83,11 @@ const PendingPaymentsRoute = PendingPaymentsRouteImport.update({
 const PaymentsRoute = PaymentsRouteImport.update({
   id: '/payments',
   path: '/payments',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const OverdueBalancesRoute = OverdueBalancesRouteImport.update({
+  id: '/overdue-balances',
+  path: '/overdue-balances',
   getParentRoute: () => rootRouteImport,
 } as any)
 const MyAvailabilityRoute = MyAvailabilityRouteImport.update({
@@ -167,6 +173,7 @@ export interface FileRoutesByFullPath {
   '/fixed-deposits': typeof FixedDepositsRoute
   '/gold-loans': typeof GoldLoansRoute
   '/my-availability': typeof MyAvailabilityRoute
+  '/overdue-balances': typeof OverdueBalancesRoute
   '/payments': typeof PaymentsRoute
   '/pending-payments': typeof PendingPaymentsRoute
   '/raw-data': typeof RawDataRoute
@@ -193,6 +200,7 @@ export interface FileRoutesByTo {
   '/fixed-deposits': typeof FixedDepositsRoute
   '/gold-loans': typeof GoldLoansRoute
   '/my-availability': typeof MyAvailabilityRoute
+  '/overdue-balances': typeof OverdueBalancesRoute
   '/payments': typeof PaymentsRoute
   '/pending-payments': typeof PendingPaymentsRoute
   '/raw-data': typeof RawDataRoute
@@ -220,6 +228,7 @@ export interface FileRoutesById {
   '/fixed-deposits': typeof FixedDepositsRoute
   '/gold-loans': typeof GoldLoansRoute
   '/my-availability': typeof MyAvailabilityRoute
+  '/overdue-balances': typeof OverdueBalancesRoute
   '/payments': typeof PaymentsRoute
   '/pending-payments': typeof PendingPaymentsRoute
   '/raw-data': typeof RawDataRoute
@@ -248,6 +257,7 @@ export interface FileRouteTypes {
     | '/fixed-deposits'
     | '/gold-loans'
     | '/my-availability'
+    | '/overdue-balances'
     | '/payments'
     | '/pending-payments'
     | '/raw-data'
@@ -274,6 +284,7 @@ export interface FileRouteTypes {
     | '/fixed-deposits'
     | '/gold-loans'
     | '/my-availability'
+    | '/overdue-balances'
     | '/payments'
     | '/pending-payments'
     | '/raw-data'
@@ -300,6 +311,7 @@ export interface FileRouteTypes {
     | '/fixed-deposits'
     | '/gold-loans'
     | '/my-availability'
+    | '/overdue-balances'
     | '/payments'
     | '/pending-payments'
     | '/raw-data'
@@ -327,6 +339,7 @@ export interface RootRouteChildren {
   FixedDepositsRoute: typeof FixedDepositsRoute
   GoldLoansRoute: typeof GoldLoansRoute
   MyAvailabilityRoute: typeof MyAvailabilityRoute
+  OverdueBalancesRoute: typeof OverdueBalancesRoute
   PaymentsRoute: typeof PaymentsRoute
   PendingPaymentsRoute: typeof PendingPaymentsRoute
   RawDataRoute: typeof RawDataRoute
@@ -412,6 +425,13 @@ declare module '@tanstack/react-router' {
       path: '/payments'
       fullPath: '/payments'
       preLoaderRoute: typeof PaymentsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/overdue-balances': {
+      id: '/overdue-balances'
+      path: '/overdue-balances'
+      fullPath: '/overdue-balances'
+      preLoaderRoute: typeof OverdueBalancesRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/my-availability': {
@@ -527,6 +547,7 @@ const rootRouteChildren: RootRouteChildren = {
   FixedDepositsRoute: FixedDepositsRoute,
   GoldLoansRoute: GoldLoansRoute,
   MyAvailabilityRoute: MyAvailabilityRoute,
+  OverdueBalancesRoute: OverdueBalancesRoute,
   PaymentsRoute: PaymentsRoute,
   PendingPaymentsRoute: PendingPaymentsRoute,
   RawDataRoute: RawDataRoute,

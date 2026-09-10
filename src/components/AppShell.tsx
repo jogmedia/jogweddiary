@@ -43,6 +43,7 @@ export const NAV = [
   { to: "/daybook", label: "Daily Daybook", icon: BookOpen, adminOnly: true },
   { to: "/payments", label: "Payments", icon: Wallet, adminOnly: true },
   { to: "/pending-payments", label: "Pending Payments", icon: Hourglass, adminOnly: true },
+  { to: "/overdue-balances", label: "Overdue Balances", icon: AlertTriangle, adminOnly: true },
   { to: "/expenses", label: "Expenses", icon: Receipt, adminOnly: true },
   { to: "/reimbursables", label: "Reimbursables", icon: Wallet, adminOnly: true },
   { to: "/tasks", label: "Tasks", icon: ListChecks, adminOnly: false },

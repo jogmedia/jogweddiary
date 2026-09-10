@@ -22,9 +22,6 @@ import {
   AlertTriangle,
   PackageCheck,
   Plane,
-  MessageCircle,
-  Wallet,
-  ArrowRight,
 } from "lucide-react";
 import { AppShell } from "@/components/AppShell";
 import { Button } from "@/components/ui/button";

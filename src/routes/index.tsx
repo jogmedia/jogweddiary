@@ -22,6 +22,9 @@ import {
   AlertTriangle,
   PackageCheck,
   Plane,
+  MessageCircle,
+  Wallet,
+  ArrowRight,
 } from "lucide-react";
 import { AppShell } from "@/components/AppShell";
 import { Button } from "@/components/ui/button";
@@ -45,10 +48,13 @@ import {
   useIncomeTxns,
   useProjectEvents,
   useProjects,
+  useUpsert,
 } from "@/lib/db";
 import { dayOffsetISO, fmtDate, inr, inrShort, monthLabel, todayISO } from "@/lib/format";
 import { monthlySeries } from "@/lib/reports";
-import { eventLabel, eventMeta, fmtTime } from "@/lib/whatsapp";
+import { eventLabel, eventMeta, fmtTime, openWhatsApp } from "@/lib/whatsapp";
+import { RecordDialog, type Field } from "@/components/RecordDialog";
+import { BankAccountField, needsBankAccount } from "@/components/BankAccountField";
 
 export const Route = createFileRoute("/")({
   head: () => ({

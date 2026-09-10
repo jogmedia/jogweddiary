@@ -33,6 +33,8 @@ import { InstallAppButton } from "@/components/InstallAppButton";
 import { BankBalancesWidget, OwnerSalaryWidget } from "@/components/MoneyWidgets";
 import { RenewalAlertsWidget, RenewalDialogsHost } from "@/components/RenewalAlerts";
 import { useProjectEvents, useProjects } from "@/lib/db";
+import { selectOverdueProjects } from "@/components/OverdueBalances";
+import { todayISO } from "@/lib/format";
 
 export const NAV = [
   { to: "/", label: "Dashboard", icon: LayoutDashboard, adminOnly: false },
@@ -64,6 +66,7 @@ function NavList({ onNavigate }: { onNavigate?: () => void }) {
   const { isAdmin } = useAuth();
   const { data: projects = [] } = useProjects();
   const pendingCount = (projects as any[]).filter((p) => Number(p.balance_due ?? 0) > 0).length;
+  const overdueCount = selectOverdueProjects(projects as any[], todayISO()).length;
   const { data: events = [] } = useProjectEvents();
   const today = new Date().toISOString().slice(0, 10);
   const upcomingCount = (events as any[]).filter(

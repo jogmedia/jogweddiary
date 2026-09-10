@@ -20,6 +20,7 @@ import {
   Plane,
   Landmark,
   Hourglass,
+  AlertTriangle,
   Clapperboard,
   CalendarCheck,
   Coins,

@@ -20,6 +20,7 @@ import {
   Plane,
   Landmark,
   Hourglass,
+  AlertTriangle,
   Clapperboard,
   CalendarCheck,
   Coins,
@@ -32,6 +33,8 @@ import { InstallAppButton } from "@/components/InstallAppButton";
 import { BankBalancesWidget, OwnerSalaryWidget } from "@/components/MoneyWidgets";
 import { RenewalAlertsWidget, RenewalDialogsHost } from "@/components/RenewalAlerts";
 import { useProjectEvents, useProjects } from "@/lib/db";
+import { selectOverdueProjects } from "@/components/OverdueBalances";
+import { todayISO } from "@/lib/format";
 
 export const NAV = [
   { to: "/", label: "Dashboard", icon: LayoutDashboard, adminOnly: false },
@@ -43,6 +46,7 @@ export const NAV = [
   { to: "/daybook", label: "Daily Daybook", icon: BookOpen, adminOnly: true },
   { to: "/payments", label: "Payments", icon: Wallet, adminOnly: true },
   { to: "/pending-payments", label: "Pending Payments", icon: Hourglass, adminOnly: true },
+  { to: "/overdue-balances", label: "Overdue Balances", icon: AlertTriangle, adminOnly: true },
   { to: "/expenses", label: "Expenses", icon: Receipt, adminOnly: true },
   { to: "/reimbursables", label: "Reimbursables", icon: Wallet, adminOnly: true },
   { to: "/tasks", label: "Tasks", icon: ListChecks, adminOnly: false },
@@ -62,6 +66,7 @@ function NavList({ onNavigate }: { onNavigate?: () => void }) {
   const { isAdmin } = useAuth();
   const { data: projects = [] } = useProjects();
   const pendingCount = (projects as any[]).filter((p) => Number(p.balance_due ?? 0) > 0).length;
+  const overdueCount = selectOverdueProjects(projects as any[], todayISO()).length;
   const { data: events = [] } = useProjectEvents();
   const today = new Date().toISOString().slice(0, 10);
   const upcomingCount = (events as any[]).filter(
@@ -94,6 +99,11 @@ function NavList({ onNavigate }: { onNavigate?: () => void }) {
             {item.to === "/pending-payments" && pendingCount > 0 && (
               <span className="shrink-0 rounded-full bg-destructive px-2 py-0.5 text-[11px] font-semibold text-destructive-foreground">
                 {pendingCount}
+              </span>
+            )}
+            {item.to === "/overdue-balances" && overdueCount > 0 && (
+              <span className="shrink-0 rounded-full bg-destructive/15 px-2 py-0.5 text-[11px] font-semibold text-destructive">
+                {overdueCount}
               </span>
             )}
           </Link>

@@ -101,6 +101,11 @@ function NavList({ onNavigate }: { onNavigate?: () => void }) {
                 {pendingCount}
               </span>
             )}
+            {item.to === "/overdue-balances" && overdueCount > 0 && (
+              <span className="shrink-0 rounded-full bg-destructive/15 px-2 py-0.5 text-[11px] font-semibold text-destructive">
+                {overdueCount}
+              </span>
+            )}
           </Link>
         );
       })}

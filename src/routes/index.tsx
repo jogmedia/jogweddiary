@@ -52,7 +52,7 @@ import {
 } from "@/lib/db";
 import { dayOffsetISO, fmtDate, inr, inrShort, monthLabel, todayISO } from "@/lib/format";
 import { monthlySeries } from "@/lib/reports";
-import { eventLabel, eventMeta, fmtTime, openWhatsApp } from "@/lib/whatsapp";
+import { eventLabel, eventMeta, fmtTime } from "@/lib/whatsapp";
 import { OverdueBalances, selectOverdueProjects } from "@/components/OverdueBalances";
 
 export const Route = createFileRoute("/")({

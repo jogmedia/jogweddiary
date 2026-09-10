@@ -264,17 +264,7 @@ function Dashboard() {
 
 
       <div className="mt-4 grid gap-4 lg:grid-cols-2">
-        <ListCard
-          title="Overdue balances"
-          icon={<AlertTriangle className="h-4 w-4" />}
-          empty="No overdue balances"
-          rows={overdue.map((p) => ({
-            id: p.id,
-            primary: p.project_name,
-            secondary: `${inr(p.balance_due)} due · event ${fmtDate(p.event_date)}`,
-            badge: "overdue",
-          }))}
-        />
+        <OverdueBalances projects={overdue} today={today} />
         <ListCard
           title="Completed deliveries"
           icon={<PackageCheck className="h-4 w-4" />}

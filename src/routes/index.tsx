@@ -34,6 +34,7 @@ import { BankBalancesWidget, OwnerSalaryWidget } from "@/components/MoneyWidgets
 import { MonthlyFinanceCard } from "@/components/MonthlyFinance";
 import { DashboardMetricCards } from "@/components/DashboardMetrics";
 import { TodayDaybook } from "@/components/TodayDaybook";
+import { ShootCalendarWidget } from "@/components/ShootCalendarWidget";
 
 
 import { currentMonthKey } from "@/lib/month-finance";
@@ -205,6 +206,13 @@ function Dashboard() {
       <div className="mt-4">
         <TodayDaybook />
       </div>
+
+      {/* Shoot calendar & quick booking */}
+      <div className="mt-4">
+        <ShootCalendarWidget />
+      </div>
+
+
 
 
       {/* 2. Crew reminders below daily shoots */}

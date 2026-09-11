@@ -141,13 +141,6 @@ export function BookShootDialog({
     { name: "notes", label: "Notes", type: "textarea" },
   ];
 
-  const quickChips = staff
-    .filter((s) => s.active_status !== false)
-    .sort((a, b) =>
-      a.name.toLowerCase().includes("vipinraj") ? -1 : b.name.toLowerCase().includes("vipinraj") ? 1 : 0,
-    )
-    .slice(0, 6);
-
   return (
     <RecordDialog
       title={`Book shoot — ${fmtDate(date)}`}
@@ -179,35 +172,8 @@ export function BookShootDialog({
         return (
           <div className="space-y-3">
             <VenueAutoFill venue={project?.venue} current={values.location} set={set} />
-            <div className="rounded-xl border border-border p-3">
+            <div className="rounded-md border border-border p-3">
               <Label className="mb-2 block text-xs font-semibold">Assign crew</Label>
-              {quickChips.length > 0 && (
-                <div className="mb-2 flex flex-wrap gap-1.5">
-                  {quickChips.map((s) => {
-                    const on = crew.some((c) => c.staffId === s.id);
-                    return (
-                      <button
-                        key={s.id}
-                        type="button"
-                        onClick={() =>
-                          setCrew(
-                            on
-                              ? crew.filter((c) => c.staffId !== s.id)
-                              : [...crew, { staffId: s.id, role: s.role ?? null }],
-                          )
-                        }
-                        className={`min-h-8 rounded-full border px-3 text-xs ${
-                          on
-                            ? "border-primary bg-primary text-primary-foreground"
-                            : "border-border text-muted-foreground"
-                        }`}
-                      >
-                        {s.name}
-                      </button>
-                    );
-                  })}
-                </div>
-              )}
               <CrewPicker
                 staff={staff}
                 value={crew}

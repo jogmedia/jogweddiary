@@ -313,6 +313,8 @@ export function ProjectDialog({
   const saveAssignment = useUpsert("project_assignments", "Crew assignment");
   const delAssignment = useRemove("project_assignments", "Crew assignment");
   const savePayment = useUpsert("project_payments", "Payment");
+  const { data: allBankAccounts = [] } = useBankAccounts();
+  const bankAccounts = allBankAccounts.filter((b) => b.is_active);
   const { data: existingPayments = [] } = usePayments(projectId);
   const { data: eventTypes = [] } = useEventTypes();
   const subEvents = subEventTypes(eventTypes, events);
@@ -505,7 +507,7 @@ export function ProjectDialog({
       title={title ?? (projectId ? "Edit project" : "New project")}
       header={header}
 
-      fields={projectFields(clients, addClient)}
+      fields={projectFields(clients, addClient, bankAccounts)}
       initial={{ ...initial, advance_date: initial?.advance_date ?? todayISO() }}
       trigger={trigger}
       open={open}

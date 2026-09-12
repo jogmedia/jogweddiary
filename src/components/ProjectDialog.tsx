@@ -75,6 +75,7 @@ export const ADVANCE_ACCOUNTS = PAY_ACCOUNTS.map(({ value, label }) => ({ value,
 export function projectFields(
   clients: { id: string; name: string }[],
   addClient?: (name: string, extra: Record<string, any>) => Promise<string | null>,
+  bankAccounts: { id: string; bank_name: string }[] = [],
 ): Field[] {
   return [
     {

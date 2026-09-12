@@ -417,8 +417,10 @@ export function ProjectDialog({
     const primaryDate = wedding?.date ?? allDates[0] ?? initial?.event_date ?? todayISO();
 
     const cleanItems = deliverables.map((d) => d.trim()).filter(Boolean);
+    // `advance_bank_account_id` is a payment column, not a project column.
+    const { advance_bank_account_id: advanceBankId, ...projectValues } = values;
     const id = await saveProject.mutateAsync({
-      ...values,
+      ...projectValues,
       deliverables: cleanItems,
       travel_required: travel.travel_required,
       travel_booking_status: travel.travel_required ? travel.travel_booking_status : "not_needed",

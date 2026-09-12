@@ -32,6 +32,7 @@ import {
   usePayments,
   useProjectEvents,
   useRemove,
+  useBankAccounts,
   useStaff,
   useUpsert,
   type Assignment,

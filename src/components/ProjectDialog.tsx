@@ -124,6 +124,13 @@ export function projectFields(
       type: "select",
       options: ADVANCE_ACCOUNTS,
     },
+    {
+      name: "advance_bank_account_id",
+      label: "Advance credited into bank account",
+      type: "select",
+      options: bankAccounts.map((b) => ({ value: b.id, label: b.bank_name })),
+      hint: "Leave empty for cash in hand — bank balance updates automatically when selected.",
+    },
     { name: "advance_date", label: "Advance received on", type: "date" },
     { name: "payment_due_date", label: "Balance due date", type: "date" },
     { name: "project_status", label: "Project status", type: "select", options: opts(STATUS_OPTIONS.project) },

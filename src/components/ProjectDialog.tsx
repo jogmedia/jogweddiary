@@ -32,6 +32,7 @@ import {
   usePayments,
   useProjectEvents,
   useRemove,
+  useBankAccounts,
   useStaff,
   useUpsert,
   type Assignment,
@@ -75,6 +76,7 @@ export const ADVANCE_ACCOUNTS = PAY_ACCOUNTS.map(({ value, label }) => ({ value,
 export function projectFields(
   clients: { id: string; name: string }[],
   addClient?: (name: string, extra: Record<string, any>) => Promise<string | null>,
+  bankAccounts: { id: string; bank_name: string }[] = [],
 ): Field[] {
   return [
     {
@@ -122,6 +124,13 @@ export function projectFields(
       label: "Advance payment account / mode",
       type: "select",
       options: ADVANCE_ACCOUNTS,
+    },
+    {
+      name: "advance_bank_account_id",
+      label: "Advance credited into bank account",
+      type: "select",
+      options: bankAccounts.map((b) => ({ value: b.id, label: b.bank_name })),
+      hint: "Leave empty for cash in hand — bank balance updates automatically when selected.",
     },
     { name: "advance_date", label: "Advance received on", type: "date" },
     { name: "payment_due_date", label: "Balance due date", type: "date" },
@@ -305,6 +314,8 @@ export function ProjectDialog({
   const saveAssignment = useUpsert("project_assignments", "Crew assignment");
   const delAssignment = useRemove("project_assignments", "Crew assignment");
   const savePayment = useUpsert("project_payments", "Payment");
+  const { data: allBankAccounts = [] } = useBankAccounts();
+  const bankAccounts = allBankAccounts.filter((b) => b.is_active);
   const { data: existingPayments = [] } = usePayments(projectId);
   const { data: eventTypes = [] } = useEventTypes();
   const subEvents = subEventTypes(eventTypes, events);
@@ -409,8 +420,10 @@ export function ProjectDialog({
     const primaryDate = wedding?.date ?? allDates[0] ?? initial?.event_date ?? todayISO();
 
     const cleanItems = deliverables.map((d) => d.trim()).filter(Boolean);
+    // `advance_bank_account_id` is a payment column, not a project column.
+    const { advance_bank_account_id: advanceBankId, ...projectValues } = values;
     const id = await saveProject.mutateAsync({
-      ...values,
+      ...projectValues,
       deliverables: cleanItems,
       travel_required: travel.travel_required,
       travel_booking_status: travel.travel_required ? travel.travel_booking_status : "not_needed",
@@ -428,16 +441,24 @@ export function ProjectDialog({
     // Editing an existing project never touches the payments table.
     const advance = Number(values.advance_amount ?? 0);
     const isNewProject = !projectId;
-    const alreadyLogged = existingPayments.some((p) => (p.reference_no ?? "") === ADVANCE_REF);
+    // Only an existing project can already carry an advance payment row; for a new
+    // project `existingPayments` holds every payment in the studio, so ignore it.
+    const alreadyLogged =
+      !!projectId &&
+      existingPayments.some(
+        (p) => p.project_id === projectId && (p.reference_no ?? "") === ADVANCE_REF,
+      );
     if (isNewProject && pid && advance > 0 && !alreadyLogged) {
+      const mode = modeForAccount(values.advance_account);
       await savePayment.mutateAsync({
         project_id: pid,
         payment_date: values.advance_date || todayISO(),
         amount: advance,
-        payment_mode: modeForAccount(values.advance_account),
+        payment_mode: mode,
         account: values.advance_account ?? null,
+        bank_account_id: advanceBankId || null,
         reference_no: ADVANCE_REF,
-        notes: "Advance received on booking (auto-recorded)",
+        notes: `Initial advance booking received for ${values.project_name ?? "project"}`,
       });
     }
 
@@ -487,7 +508,7 @@ export function ProjectDialog({
       title={title ?? (projectId ? "Edit project" : "New project")}
       header={header}
 
-      fields={projectFields(clients, addClient)}
+      fields={projectFields(clients, addClient, bankAccounts)}
       initial={{ ...initial, advance_date: initial?.advance_date ?? todayISO() }}
       trigger={trigger}
       open={open}

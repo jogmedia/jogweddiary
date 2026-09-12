@@ -438,16 +438,24 @@ export function ProjectDialog({
     // Editing an existing project never touches the payments table.
     const advance = Number(values.advance_amount ?? 0);
     const isNewProject = !projectId;
-    const alreadyLogged = existingPayments.some((p) => (p.reference_no ?? "") === ADVANCE_REF);
+    // Only an existing project can already carry an advance payment row; for a new
+    // project `existingPayments` holds every payment in the studio, so ignore it.
+    const alreadyLogged =
+      !!projectId &&
+      existingPayments.some(
+        (p) => p.project_id === projectId && (p.reference_no ?? "") === ADVANCE_REF,
+      );
     if (isNewProject && pid && advance > 0 && !alreadyLogged) {
+      const mode = modeForAccount(values.advance_account);
       await savePayment.mutateAsync({
         project_id: pid,
         payment_date: values.advance_date || todayISO(),
         amount: advance,
-        payment_mode: modeForAccount(values.advance_account),
+        payment_mode: mode,
         account: values.advance_account ?? null,
+        bank_account_id: advanceBankId || null,
         reference_no: ADVANCE_REF,
-        notes: "Advance received on booking (auto-recorded)",
+        notes: `Initial advance booking received for ${values.project_name ?? "project"}`,
       });
     }
 

@@ -183,9 +183,11 @@ function ProjectDetail() {
   const [driveEdit, setDriveEdit] = useState<string | null>(null);
   const [secondEdit, setSecondEdit] = useState<string | null>(null);
   const [folderEdit, setFolderEdit] = useState<string | null>(null);
+  const [cloudEdit, setCloudEdit] = useState<string | null>(null);
   const drive = driveEdit ?? project?.primary_hard_disk ?? project?.backup_drive ?? "";
   const second = secondEdit ?? project?.secondary_hard_disk ?? "";
   const folder = folderEdit ?? project?.backup_folder ?? "";
+  const cloud = cloudEdit ?? cloudBackup(project);
   const setDrive = (v: string) => setDriveEdit(v);
 
 

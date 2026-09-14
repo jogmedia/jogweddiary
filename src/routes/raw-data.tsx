@@ -394,10 +394,10 @@ function RawDataPage() {
                 <div className="flex shrink-0 items-start gap-2">
                   <span
                     className={`shrink-0 rounded-lg border px-2.5 py-1 text-xs font-semibold uppercase tracking-wide ${
-                      BACKUP_BADGE[backupState(driveOf(p), secondOf(p))].className
+                      BACKUP_BADGE[backupState(driveOf(p), secondOf(p), cloudOf(p))].className
                     }`}
                   >
-                    {BACKUP_BADGE[backupState(driveOf(p), secondOf(p))].label}
+                    {BACKUP_BADGE[backupState(driveOf(p), secondOf(p), cloudOf(p))].label}
                   </span>
                   {q.trim() ? (
                     editorsFor(p).length === 1 ? (

@@ -56,6 +56,7 @@ export function BackupAlert() {
   const primaryOf = (p: Project) =>
     (drives[p.id] ?? p.primary_hard_disk ?? p.backup_drive ?? "").trim();
   const secondOf = (p: Project) => (seconds[p.id] ?? p.secondary_hard_disk ?? "").trim();
+  const cloudOf = (p: Project) => cloudBackup(p);
 
   const markDone = (p: Project, notify?: Assignment) => {
     const drive = primaryOf(p);

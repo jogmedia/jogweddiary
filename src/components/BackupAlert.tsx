@@ -151,10 +151,10 @@ export function BackupAlert() {
                       </p>
                       <span
                         className={`mt-1 inline-flex rounded-lg border px-2 py-0.5 text-[11px] font-semibold uppercase tracking-wide ${
-                          BACKUP_BADGE[backupState(primaryOf(p), secondOf(p))].className
+                          BACKUP_BADGE[backupState(primaryOf(p), secondOf(p), cloudOf(p))].className
                         }`}
                       >
-                        {BACKUP_BADGE[backupState(primaryOf(p), secondOf(p))].label}
+                        {BACKUP_BADGE[backupState(primaryOf(p), secondOf(p), cloudOf(p))].label}
                       </span>
                       {primaryOf(p) ? (
                         <p className="mt-1 flex items-center gap-1.5 text-xs text-muted-foreground">

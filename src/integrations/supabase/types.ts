@@ -1352,6 +1352,7 @@ export type Database = {
           client_id: string
           client_revision_note: string | null
           client_selection_note: string | null
+          cloud_backup_destination: string
           courier_dispatched_date: string | null
           created_at: string
           deliverables: Json
@@ -1408,6 +1409,7 @@ export type Database = {
           client_id: string
           client_revision_note?: string | null
           client_selection_note?: string | null
+          cloud_backup_destination?: string
           courier_dispatched_date?: string | null
           created_at?: string
           deliverables?: Json
@@ -1464,6 +1466,7 @@ export type Database = {
           client_id?: string
           client_revision_note?: string | null
           client_selection_note?: string | null
+          cloud_backup_destination?: string
           courier_dispatched_date?: string | null
           created_at?: string
           deliverables?: Json

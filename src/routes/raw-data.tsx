@@ -103,6 +103,8 @@ function RawDataPage() {
   const secondOf = (p: Project) => (seconds[p.id] ?? p.secondary_hard_disk ?? "").trim();
   const crewFor = (p: Project) => assignments.filter((a) => a.project_id === p.id);
   const folderOf = (p: Project) => (folders[p.id] ?? p.backup_folder ?? "").trim();
+  const cloudOf = (p: Project) =>
+    (clouds[p.id] ?? p.cloud_backup_destination ?? "none") as CloudBackupDestination;
 
   const isEditorRole = (role?: string | null) => {
     if (!role) return false;

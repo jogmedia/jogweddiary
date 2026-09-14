@@ -128,7 +128,7 @@ export function BackupAlert() {
                     <td>{clientName(p)}</td>
                     <td>{p.project_name}</td>
                     <td>{fmtDate(p.event_date)}</td>
-                    <td>{BACKUP_BADGE[backupState(primaryOf(p), secondOf(p))].label}</td>
+                    <td>{BACKUP_BADGE[backupState(primaryOf(p), secondOf(p), cloudOf(p))].label}</td>
                     <td>{primaryOf(p) || "—"}</td>
                     <td>{secondOf(p) || "—"}</td>
                   </tr>

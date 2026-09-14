@@ -39,7 +39,7 @@ import { Button } from "@/components/ui/button";
 
 import { DrivePicker } from "@/components/DrivePicker";
 import { Input } from "@/components/ui/input";
-import { BACKUP_BADGE, backupState, cloudBackup } from "@/lib/drives";
+import { BACKUP_BADGE, CLOUD_BACKUP_OPTIONS, type CloudBackupDestination, backupState, cloudBackup } from "@/lib/drives";
 import {
   Select,
   SelectContent,

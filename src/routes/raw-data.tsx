@@ -543,6 +543,23 @@ function RawDataPage() {
                     )}
                   </div>
                 </div>
+                <div>
+                  <p className="text-xs font-medium text-muted-foreground">☁️ Cloud Backup</p>
+                  <div className="mt-1 flex items-center gap-1.5 text-sm font-semibold text-foreground">
+                    {cloudOf(p) === "jog_media" || cloudOf(p) === "client_drive" ? (
+                      <>
+                        <span className="text-success">✓</span>
+                        <span>
+                          {cloudOf(p) === "jog_media"
+                            ? "☁️ Jog Media Google Drive"
+                            : "☁️ Client's Google Drive (Party's Mail)"}
+                        </span>
+                      </>
+                    ) : (
+                      <span className="text-muted-foreground">☁️ Not uploaded to cloud</span>
+                    )}
+                  </div>
+                </div>
               </div>
 
               {editing[p.id] ? (

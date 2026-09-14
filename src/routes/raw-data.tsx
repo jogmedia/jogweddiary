@@ -87,6 +87,7 @@ function RawDataPage() {
   const [drives, setDrives] = useState<Record<string, string>>({});
   const [seconds, setSeconds] = useState<Record<string, string>>({});
   const [folders, setFolders] = useState<Record<string, string>>({});
+  const [clouds, setClouds] = useState<Record<string, CloudBackupDestination>>({});
   const [confirms, setConfirms] = useState<Record<string, boolean>>({});
 
   const [filter, setFilter] = useState<Filter>("all");

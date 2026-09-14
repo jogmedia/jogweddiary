@@ -25,9 +25,13 @@ import {
 } from "@/components/ui/select";
 import {
   BACKUP_BADGE,
+  CLOUD_BACKUP_OPTIONS,
   DRIVE_OPTIONS,
+  type CloudBackupDestination,
   backupState,
   buildBackupRecordMessage,
+  cloudBackup,
+  cloudBackupLabel,
 } from "@/lib/drives";
 import { exportPdf } from "@/lib/exporters";
 import { fmtDate, todayISO } from "@/lib/format";
@@ -83,6 +87,7 @@ function RawDataPage() {
   const [drives, setDrives] = useState<Record<string, string>>({});
   const [seconds, setSeconds] = useState<Record<string, string>>({});
   const [folders, setFolders] = useState<Record<string, string>>({});
+  const [clouds, setClouds] = useState<Record<string, CloudBackupDestination>>({});
   const [confirms, setConfirms] = useState<Record<string, boolean>>({});
 
   const [filter, setFilter] = useState<Filter>("all");
@@ -98,6 +103,8 @@ function RawDataPage() {
   const secondOf = (p: Project) => (seconds[p.id] ?? p.secondary_hard_disk ?? "").trim();
   const crewFor = (p: Project) => assignments.filter((a) => a.project_id === p.id);
   const folderOf = (p: Project) => (folders[p.id] ?? p.backup_folder ?? "").trim();
+  const cloudOf = (p: Project) =>
+    (clouds[p.id] ?? p.cloud_backup_destination ?? "none") as CloudBackupDestination;
 
   const isEditorRole = (role?: string | null) => {
     if (!role) return false;
@@ -192,6 +199,7 @@ function RawDataPage() {
     setDrives((d) => ({ ...d, [p.id]: "" }));
     setSeconds((d) => ({ ...d, [p.id]: "" }));
     setFolders((f) => ({ ...f, [p.id]: "" }));
+    setClouds((c) => ({ ...c, [p.id]: "none" }));
     setConfirms((c) => ({ ...c, [p.id]: false }));
     save.mutate({
       id: p.id,
@@ -200,6 +208,7 @@ function RawDataPage() {
       secondary_hard_disk: null,
       backup_drive: null,
       backup_folder: null,
+      cloud_backup_destination: "none",
       workflow_completed_at: workflowStamp(p, false),
     });
     setEditing((e) => ({ ...e, [p.id]: false }));
@@ -209,6 +218,7 @@ function RawDataPage() {
     driveOf(p) !== (p.primary_hard_disk ?? p.backup_drive ?? "").trim() ||
     secondOf(p) !== (p.secondary_hard_disk ?? "").trim() ||
     folderOf(p) !== (p.backup_folder ?? "").trim() ||
+    cloudOf(p) !== (p.cloud_backup_destination ?? "none") ||
     confirmOf(p) !== isBackedUp(p);
 
 
@@ -387,10 +397,10 @@ function RawDataPage() {
                 <div className="flex shrink-0 items-start gap-2">
                   <span
                     className={`shrink-0 rounded-lg border px-2.5 py-1 text-xs font-semibold uppercase tracking-wide ${
-                      BACKUP_BADGE[backupState(driveOf(p), secondOf(p))].className
+                      BACKUP_BADGE[backupState(driveOf(p), secondOf(p), cloudOf(p))].className
                     }`}
                   >
-                    {BACKUP_BADGE[backupState(driveOf(p), secondOf(p))].label}
+                    {BACKUP_BADGE[backupState(driveOf(p), secondOf(p), cloudOf(p))].label}
                   </span>
                   {q.trim() ? (
                     editorsFor(p).length === 1 ? (
@@ -536,6 +546,23 @@ function RawDataPage() {
                     )}
                   </div>
                 </div>
+                <div>
+                  <p className="text-xs font-medium text-muted-foreground">☁️ Cloud Backup</p>
+                  <div className="mt-1 flex items-center gap-1.5 text-sm font-semibold text-foreground">
+                    {cloudOf(p) === "jog_media" || cloudOf(p) === "client_drive" ? (
+                      <>
+                        <span className="text-success">✓</span>
+                        <span>
+                          {cloudOf(p) === "jog_media"
+                            ? "☁️ Jog Media Google Drive"
+                            : "☁️ Client's Google Drive (Party's Mail)"}
+                        </span>
+                      </>
+                    ) : (
+                      <span className="text-muted-foreground">☁️ Not uploaded to cloud</span>
+                    )}
+                  </div>
+                </div>
               </div>
 
               {editing[p.id] ? (
@@ -557,6 +584,31 @@ function RawDataPage() {
                       value={folders[p.id] ?? p.backup_folder ?? ""}
                       onChange={(e) => setFolders((f) => ({ ...f, [p.id]: e.target.value }))}
                     />
+                  </div>
+                  <div>
+                    <p className="mb-2 text-xs font-medium text-muted-foreground">☁️ Google Drive Backup</p>
+                    <div className="flex flex-wrap gap-2">
+                      {CLOUD_BACKUP_OPTIONS.map((o) => {
+                        const active = cloudOf(p) === o.value;
+                        return (
+                          <button
+                            key={o.value}
+                            type="button"
+                            onClick={() =>
+                              setClouds((c) => ({ ...c, [p.id]: o.value }))
+                            }
+                            className={`rounded-full border px-3 py-1.5 text-xs font-medium transition-colors ${
+                              active
+                                ? "border-primary bg-primary text-primary-foreground"
+                                : "border-border bg-background text-foreground hover:bg-muted"
+                            }`}
+                          >
+                            {active && <span className="mr-1">✓</span>}
+                            {o.label}
+                          </button>
+                        );
+                      })}
+                    </div>
                   </div>
                   <div className="flex flex-wrap items-center justify-between gap-2">
                     <label className="flex items-center gap-2 text-xs">
@@ -595,13 +647,14 @@ function RawDataPage() {
                         size="sm"
                         disabled={save.isPending || !dirty(p)}
                         onClick={() => {
-                          const done = confirmOf(p) && Boolean(driveOf(p) && secondOf(p));
+                        const done = confirmOf(p) && Boolean(driveOf(p) && secondOf(p));
                           save.mutate({
                             id: p.id,
                             primary_hard_disk: driveOf(p) || null,
                             secondary_hard_disk: secondOf(p) || null,
                             backup_drive: driveOf(p) || null,
                             backup_folder: folderOf(p) || null,
+                            cloud_backup_destination: cloudOf(p),
                             raw_backup_done: done,
                             workflow_completed_at: workflowStamp(p, done),
                           });

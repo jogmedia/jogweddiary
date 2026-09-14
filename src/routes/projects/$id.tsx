@@ -39,7 +39,7 @@ import { Button } from "@/components/ui/button";
 
 import { DrivePicker } from "@/components/DrivePicker";
 import { Input } from "@/components/ui/input";
-import { BACKUP_BADGE, backupState } from "@/lib/drives";
+import { BACKUP_BADGE, CLOUD_BACKUP_OPTIONS, type CloudBackupDestination, backupState, cloudBackup } from "@/lib/drives";
 import {
   Select,
   SelectContent,
@@ -183,9 +183,11 @@ function ProjectDetail() {
   const [driveEdit, setDriveEdit] = useState<string | null>(null);
   const [secondEdit, setSecondEdit] = useState<string | null>(null);
   const [folderEdit, setFolderEdit] = useState<string | null>(null);
+  const [cloudEdit, setCloudEdit] = useState<string | null>(null);
   const drive = driveEdit ?? project?.primary_hard_disk ?? project?.backup_drive ?? "";
   const second = secondEdit ?? project?.secondary_hard_disk ?? "";
   const folder = folderEdit ?? project?.backup_folder ?? "";
+  const cloud = (cloudEdit as CloudBackupDestination | null) ?? cloudBackup(project);
   const setDrive = (v: string) => setDriveEdit(v);
 
 
@@ -743,10 +745,10 @@ function ProjectDetail() {
           <div className="mb-2 flex flex-wrap items-center gap-2">
             <span
               className={`inline-flex rounded-lg border px-2.5 py-1 text-xs font-semibold uppercase tracking-wide ${
-                BACKUP_BADGE[backupState(drive.trim(), second.trim())].className
+                BACKUP_BADGE[backupState(drive.trim(), second.trim(), cloud)].className
               }`}
             >
-              {BACKUP_BADGE[backupState(drive.trim(), second.trim())].label}
+              {BACKUP_BADGE[backupState(drive.trim(), second.trim(), cloud)].label}
             </span>
             {drive.trim() ? (
               <span className="inline-flex items-center gap-1.5 text-xs text-muted-foreground">
@@ -789,7 +791,8 @@ function ProjectDetail() {
                 saveProject.isPending ||
                 (drive === (project.primary_hard_disk ?? project.backup_drive ?? "") &&
                   second === (project.secondary_hard_disk ?? "") &&
-                  folder === (project.backup_folder ?? ""))
+                  folder === (project.backup_folder ?? "") &&
+                  cloud === cloudBackup(project))
               }
               onClick={() =>
                 saveProject.mutate({
@@ -798,11 +801,36 @@ function ProjectDetail() {
                   secondary_hard_disk: second.trim() || null,
                   backup_drive: drive.trim() || null,
                   backup_folder: folder.trim() || null,
+                  cloud_backup_destination: cloud,
                 })
               }
             >
               Save backup info
             </Button>
+          </div>
+
+          <div className="mt-3">
+            <p className="mb-2 text-xs font-medium">☁️ Google Drive Backup</p>
+            <div className="flex flex-wrap gap-2">
+              {CLOUD_BACKUP_OPTIONS.map((o) => {
+                const active = cloud === o.value;
+                return (
+                  <button
+                    key={o.value}
+                    type="button"
+                    onClick={() => setCloudEdit(o.value)}
+                    className={`rounded-full border px-3 py-1.5 text-xs font-medium transition-colors ${
+                      active
+                        ? "border-primary bg-primary text-primary-foreground"
+                        : "border-border bg-background text-foreground hover:bg-muted"
+                    }`}
+                  >
+                    {active && <span className="mr-1">✓</span>}
+                    {o.label}
+                  </button>
+                );
+              })}
+            </div>
           </div>
 
         </div>

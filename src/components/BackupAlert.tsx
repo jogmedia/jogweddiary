@@ -6,7 +6,7 @@ import { Switch } from "@/components/ui/switch";
 import { fmtDate, todayISO } from "@/lib/format";
 import { openWhatsApp } from "@/lib/whatsapp";
 import { DrivePicker } from "@/components/DrivePicker";
-import { BACKUP_BADGE, backupState, buildBackupRecordMessage } from "@/lib/drives";
+import { BACKUP_BADGE, backupState, buildBackupRecordMessage, cloudBackup } from "@/lib/drives";
 import { useAssignments, useProjects, useUpsert } from "@/lib/db";
 import type { Assignment, Project } from "@/lib/db";
 
@@ -56,6 +56,7 @@ export function BackupAlert() {
   const primaryOf = (p: Project) =>
     (drives[p.id] ?? p.primary_hard_disk ?? p.backup_drive ?? "").trim();
   const secondOf = (p: Project) => (seconds[p.id] ?? p.secondary_hard_disk ?? "").trim();
+  const cloudOf = (p: Project) => cloudBackup(p);
 
   const markDone = (p: Project, notify?: Assignment) => {
     const drive = primaryOf(p);
@@ -127,7 +128,7 @@ export function BackupAlert() {
                     <td>{clientName(p)}</td>
                     <td>{p.project_name}</td>
                     <td>{fmtDate(p.event_date)}</td>
-                    <td>{BACKUP_BADGE[backupState(primaryOf(p), secondOf(p))].label}</td>
+                    <td>{BACKUP_BADGE[backupState(primaryOf(p), secondOf(p), cloudOf(p))].label}</td>
                     <td>{primaryOf(p) || "—"}</td>
                     <td>{secondOf(p) || "—"}</td>
                   </tr>
@@ -150,10 +151,10 @@ export function BackupAlert() {
                       </p>
                       <span
                         className={`mt-1 inline-flex rounded-lg border px-2 py-0.5 text-[11px] font-semibold uppercase tracking-wide ${
-                          BACKUP_BADGE[backupState(primaryOf(p), secondOf(p))].className
+                          BACKUP_BADGE[backupState(primaryOf(p), secondOf(p), cloudOf(p))].className
                         }`}
                       >
-                        {BACKUP_BADGE[backupState(primaryOf(p), secondOf(p))].label}
+                        {BACKUP_BADGE[backupState(primaryOf(p), secondOf(p), cloudOf(p))].label}
                       </span>
                       {primaryOf(p) ? (
                         <p className="mt-1 flex items-center gap-1.5 text-xs text-muted-foreground">

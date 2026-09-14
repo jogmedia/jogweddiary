@@ -791,7 +791,8 @@ function ProjectDetail() {
                 saveProject.isPending ||
                 (drive === (project.primary_hard_disk ?? project.backup_drive ?? "") &&
                   second === (project.secondary_hard_disk ?? "") &&
-                  folder === (project.backup_folder ?? ""))
+                  folder === (project.backup_folder ?? "") &&
+                  cloud === cloudBackup(project))
               }
               onClick={() =>
                 saveProject.mutate({
@@ -800,11 +801,36 @@ function ProjectDetail() {
                   secondary_hard_disk: second.trim() || null,
                   backup_drive: drive.trim() || null,
                   backup_folder: folder.trim() || null,
+                  cloud_backup_destination: cloud,
                 })
               }
             >
               Save backup info
             </Button>
+          </div>
+
+          <div className="mt-3">
+            <p className="mb-2 text-xs font-medium">☁️ Google Drive Backup</p>
+            <div className="flex flex-wrap gap-2">
+              {CLOUD_BACKUP_OPTIONS.map((o) => {
+                const active = cloud === o.value;
+                return (
+                  <button
+                    key={o.value}
+                    type="button"
+                    onClick={() => setCloudEdit(o.value)}
+                    className={`rounded-full border px-3 py-1.5 text-xs font-medium transition-colors ${
+                      active
+                        ? "border-primary bg-primary text-primary-foreground"
+                        : "border-border bg-background text-foreground hover:bg-muted"
+                    }`}
+                  >
+                    {active && <span className="mr-1">✓</span>}
+                    {o.label}
+                  </button>
+                );
+              })}
+            </div>
           </div>
 
         </div>

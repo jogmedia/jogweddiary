@@ -745,10 +745,10 @@ function ProjectDetail() {
           <div className="mb-2 flex flex-wrap items-center gap-2">
             <span
               className={`inline-flex rounded-lg border px-2.5 py-1 text-xs font-semibold uppercase tracking-wide ${
-                BACKUP_BADGE[backupState(drive.trim(), second.trim())].className
+                BACKUP_BADGE[backupState(drive.trim(), second.trim(), cloud)].className
               }`}
             >
-              {BACKUP_BADGE[backupState(drive.trim(), second.trim())].label}
+              {BACKUP_BADGE[backupState(drive.trim(), second.trim(), cloud)].label}
             </span>
             {drive.trim() ? (
               <span className="inline-flex items-center gap-1.5 text-xs text-muted-foreground">

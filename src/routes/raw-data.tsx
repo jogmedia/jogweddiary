@@ -218,6 +218,7 @@ function RawDataPage() {
     driveOf(p) !== (p.primary_hard_disk ?? p.backup_drive ?? "").trim() ||
     secondOf(p) !== (p.secondary_hard_disk ?? "").trim() ||
     folderOf(p) !== (p.backup_folder ?? "").trim() ||
+    cloudOf(p) !== (p.cloud_backup_destination ?? "none") ||
     confirmOf(p) !== isBackedUp(p);
 
 

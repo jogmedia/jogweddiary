@@ -647,13 +647,14 @@ function RawDataPage() {
                         size="sm"
                         disabled={save.isPending || !dirty(p)}
                         onClick={() => {
-                          const done = confirmOf(p) && Boolean(driveOf(p) && secondOf(p));
+                        const done = confirmOf(p) && Boolean(driveOf(p) && secondOf(p));
                           save.mutate({
                             id: p.id,
                             primary_hard_disk: driveOf(p) || null,
                             secondary_hard_disk: secondOf(p) || null,
                             backup_drive: driveOf(p) || null,
                             backup_folder: folderOf(p) || null,
+                            cloud_backup_destination: cloudOf(p),
                             raw_backup_done: done,
                             workflow_completed_at: workflowStamp(p, done),
                           });

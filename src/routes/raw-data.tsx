@@ -582,6 +582,31 @@ function RawDataPage() {
                       onChange={(e) => setFolders((f) => ({ ...f, [p.id]: e.target.value }))}
                     />
                   </div>
+                  <div>
+                    <p className="mb-2 text-xs font-medium text-muted-foreground">☁️ Google Drive Backup</p>
+                    <div className="flex flex-wrap gap-2">
+                      {CLOUD_BACKUP_OPTIONS.map((o) => {
+                        const active = cloudOf(p) === o.value;
+                        return (
+                          <button
+                            key={o.value}
+                            type="button"
+                            onClick={() =>
+                              setClouds((c) => ({ ...c, [p.id]: o.value }))
+                            }
+                            className={`rounded-full border px-3 py-1.5 text-xs font-medium transition-colors ${
+                              active
+                                ? "border-primary bg-primary text-primary-foreground"
+                                : "border-border bg-background text-foreground hover:bg-muted"
+                            }`}
+                          >
+                            {active && <span className="mr-1">✓</span>}
+                            {o.label}
+                          </button>
+                        );
+                      })}
+                    </div>
+                  </div>
                   <div className="flex flex-wrap items-center justify-between gap-2">
                     <label className="flex items-center gap-2 text-xs">
                       <Switch

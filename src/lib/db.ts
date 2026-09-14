@@ -36,6 +36,7 @@ export type Project = {
   backup_folder?: string | null;
   primary_hard_disk?: string | null;
   secondary_hard_disk?: string | null;
+  cloud_backup_destination?: string | null;
 
   photo_selection_done?: boolean;
   album_editing_done?: boolean;

@@ -199,6 +199,7 @@ function RawDataPage() {
     setDrives((d) => ({ ...d, [p.id]: "" }));
     setSeconds((d) => ({ ...d, [p.id]: "" }));
     setFolders((f) => ({ ...f, [p.id]: "" }));
+    setClouds((c) => ({ ...c, [p.id]: "none" }));
     setConfirms((c) => ({ ...c, [p.id]: false }));
     save.mutate({
       id: p.id,
@@ -207,6 +208,7 @@ function RawDataPage() {
       secondary_hard_disk: null,
       backup_drive: null,
       backup_folder: null,
+      cloud_backup_destination: "none",
       workflow_completed_at: workflowStamp(p, false),
     });
     setEditing((e) => ({ ...e, [p.id]: false }));

@@ -6,7 +6,7 @@ import { Switch } from "@/components/ui/switch";
 import { fmtDate, todayISO } from "@/lib/format";
 import { openWhatsApp } from "@/lib/whatsapp";
 import { DrivePicker } from "@/components/DrivePicker";
-import { BACKUP_BADGE, backupState, buildBackupRecordMessage } from "@/lib/drives";
+import { BACKUP_BADGE, backupState, buildBackupRecordMessage, cloudBackup } from "@/lib/drives";
 import { useAssignments, useProjects, useUpsert } from "@/lib/db";
 import type { Assignment, Project } from "@/lib/db";
 

@@ -187,7 +187,7 @@ function ProjectDetail() {
   const drive = driveEdit ?? project?.primary_hard_disk ?? project?.backup_drive ?? "";
   const second = secondEdit ?? project?.secondary_hard_disk ?? "";
   const folder = folderEdit ?? project?.backup_folder ?? "";
-  const cloud = cloudEdit ?? cloudBackup(project);
+  const cloud = (cloudEdit as CloudBackupDestination | null) ?? cloudBackup(project);
   const setDrive = (v: string) => setDriveEdit(v);
 
 

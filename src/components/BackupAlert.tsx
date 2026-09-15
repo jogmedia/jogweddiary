@@ -107,8 +107,9 @@ export function BackupAlert() {
         <div className="min-w-0 flex-1">
           <div className="flex flex-wrap items-center justify-between gap-2">
             <p className="text-sm font-bold uppercase tracking-wide text-destructive">
-              Warning: {pending.length} {pending.length === 1 ? "shoot has" : "shoots have"} pending
-              raw data backups!
+              {pending.length > 0
+                ? `Warning: ${pending.length} ${pending.length === 1 ? "shoot has" : "shoots have"} pending raw data backups!`
+                : "Warning: raw photo / video handovers are still pending!"}
             </p>
             <Button
               size="sm"

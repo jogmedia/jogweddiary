@@ -6,7 +6,13 @@ import { Switch } from "@/components/ui/switch";
 import { fmtDate, todayISO } from "@/lib/format";
 import { openWhatsApp } from "@/lib/whatsapp";
 import { DrivePicker } from "@/components/DrivePicker";
-import { BACKUP_BADGE, backupState, buildBackupRecordMessage, cloudBackup } from "@/lib/drives";
+import {
+  BACKUP_BADGE,
+  backupState,
+  buildBackupRecordMessage,
+  buildHandoverReminder,
+  cloudBackup,
+} from "@/lib/drives";
 import { handoverAlerts } from "@/components/BackupHandover";
 import { prettyRole } from "@/lib/roles";
 import { useAssignments, useProjects, useStaff, useUpsert } from "@/lib/db";
@@ -153,6 +159,43 @@ export function BackupAlert() {
             </table>
           </div>
 
+
+          {handoverRows.length > 0 && (
+            <ul className="mt-3 space-y-1.5">
+              {handoverRows.map((r) => (
+                <li
+                  key={`${r.project.id}-${r.kind}`}
+                  className="flex flex-wrap items-center gap-2 rounded-lg border border-warning/40 bg-warning/10 px-2.5 py-1.5 text-xs text-warning-foreground"
+                >
+                  <span className="min-w-0">
+                    ⚠️ {r.kind === "photo" ? "Photo" : "Video"} backup pending:{" "}
+                    <span className="font-semibold">{r.crew.name ?? "crew not assigned"}</span>
+                    {r.crew.role ? ` (${prettyRole(r.crew.role)})` : ""} for {clientName(r.project)}
+                  </span>
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    className="ml-auto h-8 bg-card px-2 text-xs"
+                    disabled={!r.crew.phone}
+                    onClick={() =>
+                      openWhatsApp(
+                        r.crew.phone,
+                        buildHandoverReminder({
+                          kind: r.kind,
+                          crewName: r.crew.name ?? "team",
+                          clientName: clientName(r.project),
+                          eventDate: fmtDate(r.project.event_date),
+                          functionType: r.project.project_name,
+                        }),
+                      )
+                    }
+                  >
+                    <MessageCircle className="mr-1 h-3.5 w-3.5" /> Remind
+                  </Button>
+                </li>
+              ))}
+            </ul>
+          )}
 
           <ul className="mt-3 space-y-3">
             {pending.map((p) => {

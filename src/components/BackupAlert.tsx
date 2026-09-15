@@ -7,7 +7,9 @@ import { fmtDate, todayISO } from "@/lib/format";
 import { openWhatsApp } from "@/lib/whatsapp";
 import { DrivePicker } from "@/components/DrivePicker";
 import { BACKUP_BADGE, backupState, buildBackupRecordMessage, cloudBackup } from "@/lib/drives";
-import { useAssignments, useProjects, useUpsert } from "@/lib/db";
+import { handoverAlerts } from "@/components/BackupHandover";
+import { prettyRole } from "@/lib/roles";
+import { useAssignments, useProjects, useStaff, useUpsert } from "@/lib/db";
 import type { Assignment, Project } from "@/lib/db";
 
 const reminderMsg = (crew: string, client: string, date: string) =>
@@ -48,7 +50,19 @@ export function BackupAlert() {
     .slice(0, 5);
 
 
-  if (pending.length === 0) return null;
+  // Shoots finished more than 24h ago that still owe photo or video raw data.
+  const cutoff = new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString().slice(0, 10);
+  const handoverRows = projects
+    .filter(
+      (p) =>
+        p.project_status !== "cancelled" &&
+        (p.shoot_status === "completed" || p.event_date < cutoff),
+    )
+    .flatMap((p) =>
+      handoverAlerts(p, assignments, staff).map((a) => ({ project: p, ...a })),
+    );
+
+  if (pending.length === 0 && handoverRows.length === 0) return null;
 
   const crewFor = (p: Project) => assignments.filter((a) => a.project_id === p.id);
   const clientName = (p: Project) => p.clients?.name ?? p.project_name;

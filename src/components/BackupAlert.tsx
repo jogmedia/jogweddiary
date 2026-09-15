@@ -33,6 +33,7 @@ const doneMsg = (
 export function BackupAlert() {
   const { data: projects = [] } = useProjects();
   const { data: assignments = [] } = useAssignments();
+  const { data: staff = [] } = useStaff();
   const save = useUpsert("projects", "Backup status");
   const [drives, setDrives] = useState<Record<string, string>>({});
   const [seconds, setSeconds] = useState<Record<string, string>>({});

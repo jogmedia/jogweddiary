@@ -84,6 +84,7 @@ const backupMsg = (
 function RawDataPage() {
   const { data: projects = [], isLoading } = useProjects();
   const { data: assignments = [] } = useAssignments();
+  const { data: staff = [] } = useStaff();
   const save = useUpsert("projects", "Backup status");
   const [drives, setDrives] = useState<Record<string, string>>({});
   const [seconds, setSeconds] = useState<Record<string, string>>({});

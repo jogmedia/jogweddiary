@@ -1368,6 +1368,10 @@ export type Database = {
           package_name: string | null
           payment_due_date: string | null
           payment_status: string
+          photo_backup_disk: string | null
+          photo_cloud_uploaded: boolean
+          photo_handover_staff_id: string | null
+          photo_handover_status: string
           photo_selection_done: boolean
           place_district: string | null
           primary_hard_disk: string | null
@@ -1391,7 +1395,11 @@ export type Database = {
           venue: string | null
           venue_contact_name: string | null
           venue_contact_phone: string | null
+          video_backup_disk: string | null
+          video_cloud_uploaded: boolean
           video_editing_done: boolean
+          video_handover_staff_id: string | null
+          video_handover_status: string
           workflow_completed_at: Json
         }
         Insert: {
@@ -1425,6 +1433,10 @@ export type Database = {
           package_name?: string | null
           payment_due_date?: string | null
           payment_status?: string
+          photo_backup_disk?: string | null
+          photo_cloud_uploaded?: boolean
+          photo_handover_staff_id?: string | null
+          photo_handover_status?: string
           photo_selection_done?: boolean
           place_district?: string | null
           primary_hard_disk?: string | null
@@ -1448,7 +1460,11 @@ export type Database = {
           venue?: string | null
           venue_contact_name?: string | null
           venue_contact_phone?: string | null
+          video_backup_disk?: string | null
+          video_cloud_uploaded?: boolean
           video_editing_done?: boolean
+          video_handover_staff_id?: string | null
+          video_handover_status?: string
           workflow_completed_at?: Json
         }
         Update: {
@@ -1482,6 +1498,10 @@ export type Database = {
           package_name?: string | null
           payment_due_date?: string | null
           payment_status?: string
+          photo_backup_disk?: string | null
+          photo_cloud_uploaded?: boolean
+          photo_handover_staff_id?: string | null
+          photo_handover_status?: string
           photo_selection_done?: boolean
           place_district?: string | null
           primary_hard_disk?: string | null
@@ -1505,7 +1525,11 @@ export type Database = {
           venue?: string | null
           venue_contact_name?: string | null
           venue_contact_phone?: string | null
+          video_backup_disk?: string | null
+          video_cloud_uploaded?: boolean
           video_editing_done?: boolean
+          video_handover_staff_id?: string | null
+          video_handover_status?: string
           workflow_completed_at?: Json
         }
         Relationships: [
@@ -1514,6 +1538,20 @@ export type Database = {
             columns: ["client_id"]
             isOneToOne: false
             referencedRelation: "clients"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "projects_photo_handover_staff_id_fkey"
+            columns: ["photo_handover_staff_id"]
+            isOneToOne: false
+            referencedRelation: "staff"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "projects_video_handover_staff_id_fkey"
+            columns: ["video_handover_staff_id"]
+            isOneToOne: false
+            referencedRelation: "staff"
             referencedColumns: ["id"]
           },
         ]

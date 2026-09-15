@@ -36,7 +36,8 @@ import {
 import { exportPdf } from "@/lib/exporters";
 import { fmtDate, todayISO } from "@/lib/format";
 import { openWhatsApp } from "@/lib/whatsapp";
-import { useAssignments, useProjects, useUpsert } from "@/lib/db";
+import { BackupHandover } from "@/components/BackupHandover";
+import { useAssignments, useProjects, useStaff, useUpsert } from "@/lib/db";
 import type { Project } from "@/lib/db";
 
 export const Route = createFileRoute("/raw-data")({
@@ -83,6 +84,7 @@ const backupMsg = (
 function RawDataPage() {
   const { data: projects = [], isLoading } = useProjects();
   const { data: assignments = [] } = useAssignments();
+  const { data: staff = [] } = useStaff();
   const save = useUpsert("projects", "Backup status");
   const [drives, setDrives] = useState<Record<string, string>>({});
   const [seconds, setSeconds] = useState<Record<string, string>>({});
@@ -563,6 +565,16 @@ function RawDataPage() {
                     )}
                   </div>
                 </div>
+              </div>
+
+              <div className="mt-4 border-t border-border pt-3">
+                <BackupHandover
+                  project={p}
+                  assignments={assignments}
+                  staff={staff}
+                  saving={save.isPending}
+                  onSave={(patch) => save.mutate(patch)}
+                />
               </div>
 
               {editing[p.id] ? (

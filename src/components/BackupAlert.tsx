@@ -6,8 +6,16 @@ import { Switch } from "@/components/ui/switch";
 import { fmtDate, todayISO } from "@/lib/format";
 import { openWhatsApp } from "@/lib/whatsapp";
 import { DrivePicker } from "@/components/DrivePicker";
-import { BACKUP_BADGE, backupState, buildBackupRecordMessage, cloudBackup } from "@/lib/drives";
-import { useAssignments, useProjects, useUpsert } from "@/lib/db";
+import {
+  BACKUP_BADGE,
+  backupState,
+  buildBackupRecordMessage,
+  buildHandoverReminder,
+  cloudBackup,
+} from "@/lib/drives";
+import { handoverAlerts } from "@/components/BackupHandover";
+import { prettyRole } from "@/lib/roles";
+import { useAssignments, useProjects, useStaff, useUpsert } from "@/lib/db";
 import type { Assignment, Project } from "@/lib/db";
 
 const reminderMsg = (crew: string, client: string, date: string) =>
@@ -31,6 +39,7 @@ const doneMsg = (
 export function BackupAlert() {
   const { data: projects = [] } = useProjects();
   const { data: assignments = [] } = useAssignments();
+  const { data: staff = [] } = useStaff();
   const save = useUpsert("projects", "Backup status");
   const [drives, setDrives] = useState<Record<string, string>>({});
   const [seconds, setSeconds] = useState<Record<string, string>>({});
@@ -48,7 +57,19 @@ export function BackupAlert() {
     .slice(0, 5);
 
 
-  if (pending.length === 0) return null;
+  // Shoots finished more than 24h ago that still owe photo or video raw data.
+  const cutoff = new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString().slice(0, 10);
+  const handoverRows = projects
+    .filter(
+      (p) =>
+        p.project_status !== "cancelled" &&
+        (p.shoot_status === "completed" || p.event_date < cutoff),
+    )
+    .flatMap((p) =>
+      handoverAlerts(p, assignments, staff).map((a) => ({ project: p, ...a })),
+    );
+
+  if (pending.length === 0 && handoverRows.length === 0) return null;
 
   const crewFor = (p: Project) => assignments.filter((a) => a.project_id === p.id);
   const clientName = (p: Project) => p.clients?.name ?? p.project_name;
@@ -92,8 +113,9 @@ export function BackupAlert() {
         <div className="min-w-0 flex-1">
           <div className="flex flex-wrap items-center justify-between gap-2">
             <p className="text-sm font-bold uppercase tracking-wide text-destructive">
-              Warning: {pending.length} {pending.length === 1 ? "shoot has" : "shoots have"} pending
-              raw data backups!
+              {pending.length > 0
+                ? `Warning: ${pending.length} ${pending.length === 1 ? "shoot has" : "shoots have"} pending raw data backups!`
+                : "Warning: raw photo / video handovers are still pending!"}
             </p>
             <Button
               size="sm"
@@ -137,6 +159,43 @@ export function BackupAlert() {
             </table>
           </div>
 
+
+          {handoverRows.length > 0 && (
+            <ul className="mt-3 space-y-1.5">
+              {handoverRows.map((r) => (
+                <li
+                  key={`${r.project.id}-${r.kind}`}
+                  className="flex flex-wrap items-center gap-2 rounded-lg border border-warning/40 bg-warning/10 px-2.5 py-1.5 text-xs text-warning-foreground"
+                >
+                  <span className="min-w-0">
+                    ⚠️ {r.kind === "photo" ? "Photo" : "Video"} backup pending:{" "}
+                    <span className="font-semibold">{r.crew.name ?? "crew not assigned"}</span>
+                    {r.crew.role ? ` (${prettyRole(r.crew.role)})` : ""} for {clientName(r.project)}
+                  </span>
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    className="ml-auto h-8 bg-card px-2 text-xs"
+                    disabled={!r.crew.phone}
+                    onClick={() =>
+                      openWhatsApp(
+                        r.crew.phone,
+                        buildHandoverReminder({
+                          kind: r.kind,
+                          crewName: r.crew.name ?? "team",
+                          clientName: clientName(r.project),
+                          eventDate: fmtDate(r.project.event_date),
+                          functionType: r.project.project_name,
+                        }),
+                      )
+                    }
+                  >
+                    <MessageCircle className="mr-1 h-3.5 w-3.5" /> Remind
+                  </Button>
+                </li>
+              ))}
+            </ul>
+          )}
 
           <ul className="mt-3 space-y-3">
             {pending.map((p) => {

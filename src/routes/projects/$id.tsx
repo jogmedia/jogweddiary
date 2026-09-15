@@ -38,6 +38,7 @@ import { RecordDialog, type Field } from "@/components/RecordDialog";
 import { Button } from "@/components/ui/button";
 
 import { DrivePicker } from "@/components/DrivePicker";
+import { BackupHandover } from "@/components/BackupHandover";
 import { Input } from "@/components/ui/input";
 import { BACKUP_BADGE, CLOUD_BACKUP_OPTIONS, type CloudBackupDestination, backupState, cloudBackup } from "@/lib/drives";
 import {
@@ -831,6 +832,16 @@ function ProjectDetail() {
                 );
               })}
             </div>
+          </div>
+
+          <div className="mt-4 border-t border-border pt-3">
+            <BackupHandover
+              project={project}
+              assignments={assignments}
+              staff={staff}
+              saving={saveProject.isPending}
+              onSave={(patch) => saveProject.mutate(patch as any)}
+            />
           </div>
 
         </div>

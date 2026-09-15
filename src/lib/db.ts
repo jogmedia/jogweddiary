@@ -37,6 +37,15 @@ export type Project = {
   primary_hard_disk?: string | null;
   secondary_hard_disk?: string | null;
   cloud_backup_destination?: string | null;
+  photo_handover_status?: string | null;
+  photo_handover_staff_id?: string | null;
+  photo_backup_disk?: string | null;
+  photo_cloud_uploaded?: boolean | null;
+  video_handover_status?: string | null;
+  video_handover_staff_id?: string | null;
+  video_backup_disk?: string | null;
+  video_cloud_uploaded?: boolean | null;
+
 
   photo_selection_done?: boolean;
   album_editing_done?: boolean;

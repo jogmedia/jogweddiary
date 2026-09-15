@@ -70,6 +70,85 @@ export const BACKUP_BADGE: Record<BackupState, { label: string; className: strin
   },
 };
 
+/* ------------------------------------------------------------------ */
+/* Photo & video raw handover tracking                                 */
+/* ------------------------------------------------------------------ */
+
+export type HandoverKind = "photo" | "video";
+
+export type HandoverFields = {
+  photo_handover_status?: string | null;
+  photo_handover_staff_id?: string | null;
+  photo_backup_disk?: string | null;
+  photo_cloud_uploaded?: boolean | null;
+  video_handover_status?: string | null;
+  video_handover_staff_id?: string | null;
+  video_backup_disk?: string | null;
+  video_cloud_uploaded?: boolean | null;
+};
+
+/** A handover counts as received once the crew member has handed the cards over. */
+export const handoverReceived = (p: HandoverFields | null | undefined, kind: HandoverKind) =>
+  ((kind === "photo" ? p?.photo_handover_status : p?.video_handover_status) ?? "pending") ===
+  "received";
+
+export const handoverDisk = (p: HandoverFields | null | undefined, kind: HandoverKind) =>
+  clean(kind === "photo" ? p?.photo_backup_disk : p?.video_backup_disk);
+
+export const handoverCloud = (p: HandoverFields | null | undefined, kind: HandoverKind) =>
+  Boolean(kind === "photo" ? p?.photo_cloud_uploaded : p?.video_cloud_uploaded);
+
+/** Roles that hand over photo cards vs. video cards. */
+export const isPhotoRole = (role?: string | null) => {
+  const r = (role ?? "").toLowerCase();
+  return r.includes("photo") && !r.includes("video");
+};
+export const isVideoRole = (role?: string | null) => {
+  const r = (role ?? "").toLowerCase();
+  return r.includes("video") || r.includes("cinema") || r.includes("drone");
+};
+
+/** Unified photo + video backup badge shown at the top of the backup view. */
+export const handoverBadge = (o: {
+  photoDone: boolean;
+  videoDone: boolean;
+  photographer?: string | null;
+  videographer?: string | null;
+}) => {
+  if (o.photoDone && o.videoDone)
+    return {
+      label: "✅ 100% Photo & Video backed up",
+      className: "border-success/30 bg-success/10 text-success",
+    };
+  if (o.photoDone)
+    return {
+      label: `⚠️ Photo backed up · Video pending${o.videographer ? ` (${o.videographer})` : ""}`,
+      className: "border-warning/40 bg-warning/10 text-warning-foreground",
+    };
+  if (o.videoDone)
+    return {
+      label: `⚠️ Video backed up · Photo pending${o.photographer ? ` (${o.photographer})` : ""}`,
+      className: "border-warning/40 bg-warning/10 text-warning-foreground",
+    };
+  return {
+    label: "🔴 Backup pending (photo & video)",
+    className: "border-destructive/40 bg-destructive/10 text-destructive",
+  };
+};
+
+/** WhatsApp handover reminder text for a crew member. */
+export const buildHandoverReminder = (o: {
+  kind: HandoverKind;
+  crewName: string;
+  clientName: string;
+  eventDate: string;
+  functionType: string;
+  businessName?: string;
+}) =>
+  o.kind === "photo"
+    ? `Hi ${o.crewName}, please handover the raw photos/SD cards for ${o.clientName}'s shoot (${o.eventDate} - ${o.functionType}) for studio backup. — ${o.businessName ?? "Jog Media"}`
+    : `Hi ${o.crewName}, please handover the raw video footage/memory cards for ${o.clientName}'s shoot (${o.eventDate} - ${o.functionType}) for studio backup. — ${o.businessName ?? "Jog Media"}`;
+
 /** WhatsApp backup record template shared by all backup screens. */
 export const buildBackupRecordMessage = (o: {
   projectName: string;

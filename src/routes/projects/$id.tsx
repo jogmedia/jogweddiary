@@ -833,6 +833,16 @@ function ProjectDetail() {
             </div>
           </div>
 
+          <div className="mt-4 border-t border-border pt-3">
+            <BackupHandover
+              project={project}
+              assignments={assignments}
+              staff={staff}
+              saving={saveProject.isPending}
+              onSave={(patch) => saveProject.mutate(patch)}
+            />
+          </div>
+
         </div>
       </div>
 

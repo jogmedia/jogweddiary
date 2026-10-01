@@ -746,3 +746,47 @@ export function useCreateJournalEntry() {
     onError: (e: any) => toast.error(e?.message ?? "Could not post entry"),
   });
 }
+
+export type CrewHandover = {
+  id: string;
+  project_id: string;
+  event_id: string;
+  staff_id: string;
+  kind: "photo" | "video";
+  status: "pending" | "received";
+  received_at: string | null;
+};
+
+export const useCrewHandovers = (projectId?: string) =>
+  useQuery({
+    queryKey: ["crew_handovers", projectId ?? "all"],
+    queryFn: async () => {
+      let q = anyDb.from("crew_handovers").select("*");
+      if (projectId) q = q.eq("project_id", projectId);
+      const { data, error } = await q;
+      if (error) throw error;
+      return (data ?? []) as CrewHandover[];
+    },
+  });
+
+/** Upserts one crew member's handover status for an event (unique per event/staff/kind). */
+export function useSetCrewHandover() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: async (v: {
+      project_id: string;
+      event_id: string;
+      staff_id: string;
+      kind: "photo" | "video";
+      status: "pending" | "received";
+    }) => {
+      const { error } = await anyDb.from("crew_handovers").upsert(
+        { ...v, received_at: v.status === "received" ? new Date().toISOString() : null },
+        { onConflict: "event_id,staff_id,kind" },
+      );
+      if (error) throw error;
+    },
+    onSuccess: () => qc.invalidateQueries({ queryKey: ["crew_handovers"] }),
+    onError: (e: any) => toast.error(e?.message ?? "Could not save handover"),
+  });
+}

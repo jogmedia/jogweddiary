@@ -9,130 +9,35 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
-import { Route as IndexRouteImport } from './routes/index'
-import { Route as AccountsRouteImport } from './routes/accounts'
-import { Route as AuthRouteImport } from './routes/auth'
-import { Route as CalendarRouteImport } from './routes/calendar'
-import { Route as ClientsRouteImport } from './routes/clients'
-import { Route as DaybookRouteImport } from './routes/daybook'
-import { Route as DeliveryRouteImport } from './routes/delivery'
-import { Route as ExpensesRouteImport } from './routes/expenses'
-import { Route as FixedDepositsRouteImport } from './routes/fixed-deposits'
-import { Route as GoldLoansRouteImport } from './routes/gold-loans'
-import { Route as MyAvailabilityRouteImport } from './routes/my-availability'
-import { Route as OverdueBalancesRouteImport } from './routes/overdue-balances'
-import { Route as PaymentsRouteImport } from './routes/payments'
-import { Route as PendingPaymentsRouteImport } from './routes/pending-payments'
-import { Route as RawDataRouteImport } from './routes/raw-data'
-import { Route as ReimbursablesRouteImport } from './routes/reimbursables'
-import { Route as ReportsRouteImport } from './routes/reports'
-import { Route as SettingsRouteImport } from './routes/settings'
-import { Route as StaffRouteImport } from './routes/staff'
-import { Route as TasksRouteImport } from './routes/tasks'
-import { Route as TravelRouteImport } from './routes/travel'
 import { Route as UpcomingEventsRouteImport } from './routes/upcoming-events'
-import { Route as PortalIdRouteImport } from './routes/portal/$id'
+import { Route as TravelRouteImport } from './routes/travel'
+import { Route as TasksRouteImport } from './routes/tasks'
+import { Route as StaffRouteImport } from './routes/staff'
+import { Route as SettingsRouteImport } from './routes/settings'
+import { Route as ReportsRouteImport } from './routes/reports'
+import { Route as ReimbursablesRouteImport } from './routes/reimbursables'
+import { Route as RawDataRouteImport } from './routes/raw-data'
+import { Route as PendingPaymentsRouteImport } from './routes/pending-payments'
+import { Route as PaymentsRouteImport } from './routes/payments'
+import { Route as OverdueBalancesRouteImport } from './routes/overdue-balances'
+import { Route as MyAvailabilityRouteImport } from './routes/my-availability'
+import { Route as GoldLoansRouteImport } from './routes/gold-loans'
+import { Route as FixedDepositsRouteImport } from './routes/fixed-deposits'
+import { Route as ExpensesRouteImport } from './routes/expenses'
+import { Route as DeliveryRouteImport } from './routes/delivery'
+import { Route as DaybookRouteImport } from './routes/daybook'
+import { Route as ClientsRouteImport } from './routes/clients'
+import { Route as CalendarRouteImport } from './routes/calendar'
+import { Route as AuthRouteImport } from './routes/auth'
+import { Route as AccountsRouteImport } from './routes/accounts'
+import { Route as IndexRouteImport } from './routes/index'
 import { Route as ProjectsIndexRouteImport } from './routes/projects/index'
 import { Route as ProjectsIdRouteImport } from './routes/projects/$id'
+import { Route as PortalIdRouteImport } from './routes/portal/$id'
 
-const IndexRoute = IndexRouteImport.update({
-  id: '/',
-  path: '/',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const AccountsRoute = AccountsRouteImport.update({
-  id: '/accounts',
-  path: '/accounts',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const AuthRoute = AuthRouteImport.update({
-  id: '/auth',
-  path: '/auth',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const CalendarRoute = CalendarRouteImport.update({
-  id: '/calendar',
-  path: '/calendar',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ClientsRoute = ClientsRouteImport.update({
-  id: '/clients',
-  path: '/clients',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const DaybookRoute = DaybookRouteImport.update({
-  id: '/daybook',
-  path: '/daybook',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const DeliveryRoute = DeliveryRouteImport.update({
-  id: '/delivery',
-  path: '/delivery',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ExpensesRoute = ExpensesRouteImport.update({
-  id: '/expenses',
-  path: '/expenses',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const FixedDepositsRoute = FixedDepositsRouteImport.update({
-  id: '/fixed-deposits',
-  path: '/fixed-deposits',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const GoldLoansRoute = GoldLoansRouteImport.update({
-  id: '/gold-loans',
-  path: '/gold-loans',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const MyAvailabilityRoute = MyAvailabilityRouteImport.update({
-  id: '/my-availability',
-  path: '/my-availability',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const OverdueBalancesRoute = OverdueBalancesRouteImport.update({
-  id: '/overdue-balances',
-  path: '/overdue-balances',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const PaymentsRoute = PaymentsRouteImport.update({
-  id: '/payments',
-  path: '/payments',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const PendingPaymentsRoute = PendingPaymentsRouteImport.update({
-  id: '/pending-payments',
-  path: '/pending-payments',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const RawDataRoute = RawDataRouteImport.update({
-  id: '/raw-data',
-  path: '/raw-data',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ReimbursablesRoute = ReimbursablesRouteImport.update({
-  id: '/reimbursables',
-  path: '/reimbursables',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ReportsRoute = ReportsRouteImport.update({
-  id: '/reports',
-  path: '/reports',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const SettingsRoute = SettingsRouteImport.update({
-  id: '/settings',
-  path: '/settings',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const StaffRoute = StaffRouteImport.update({
-  id: '/staff',
-  path: '/staff',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const TasksRoute = TasksRouteImport.update({
-  id: '/tasks',
-  path: '/tasks',
+const UpcomingEventsRoute = UpcomingEventsRouteImport.update({
+  id: '/upcoming-events',
+  path: '/upcoming-events',
   getParentRoute: () => rootRouteImport,
 } as any)
 const TravelRoute = TravelRouteImport.update({
@@ -140,14 +45,104 @@ const TravelRoute = TravelRouteImport.update({
   path: '/travel',
   getParentRoute: () => rootRouteImport,
 } as any)
-const UpcomingEventsRoute = UpcomingEventsRouteImport.update({
-  id: '/upcoming-events',
-  path: '/upcoming-events',
+const TasksRoute = TasksRouteImport.update({
+  id: '/tasks',
+  path: '/tasks',
   getParentRoute: () => rootRouteImport,
 } as any)
-const PortalIdRoute = PortalIdRouteImport.update({
-  id: '/portal/$id',
-  path: '/portal/$id',
+const StaffRoute = StaffRouteImport.update({
+  id: '/staff',
+  path: '/staff',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SettingsRoute = SettingsRouteImport.update({
+  id: '/settings',
+  path: '/settings',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ReportsRoute = ReportsRouteImport.update({
+  id: '/reports',
+  path: '/reports',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ReimbursablesRoute = ReimbursablesRouteImport.update({
+  id: '/reimbursables',
+  path: '/reimbursables',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const RawDataRoute = RawDataRouteImport.update({
+  id: '/raw-data',
+  path: '/raw-data',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PendingPaymentsRoute = PendingPaymentsRouteImport.update({
+  id: '/pending-payments',
+  path: '/pending-payments',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PaymentsRoute = PaymentsRouteImport.update({
+  id: '/payments',
+  path: '/payments',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const OverdueBalancesRoute = OverdueBalancesRouteImport.update({
+  id: '/overdue-balances',
+  path: '/overdue-balances',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const MyAvailabilityRoute = MyAvailabilityRouteImport.update({
+  id: '/my-availability',
+  path: '/my-availability',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const GoldLoansRoute = GoldLoansRouteImport.update({
+  id: '/gold-loans',
+  path: '/gold-loans',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const FixedDepositsRoute = FixedDepositsRouteImport.update({
+  id: '/fixed-deposits',
+  path: '/fixed-deposits',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ExpensesRoute = ExpensesRouteImport.update({
+  id: '/expenses',
+  path: '/expenses',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const DeliveryRoute = DeliveryRouteImport.update({
+  id: '/delivery',
+  path: '/delivery',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const DaybookRoute = DaybookRouteImport.update({
+  id: '/daybook',
+  path: '/daybook',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ClientsRoute = ClientsRouteImport.update({
+  id: '/clients',
+  path: '/clients',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const CalendarRoute = CalendarRouteImport.update({
+  id: '/calendar',
+  path: '/calendar',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AuthRoute = AuthRouteImport.update({
+  id: '/auth',
+  path: '/auth',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AccountsRoute = AccountsRouteImport.update({
+  id: '/accounts',
+  path: '/accounts',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const IndexRoute = IndexRouteImport.update({
+  id: '/',
+  path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ProjectsIndexRoute = ProjectsIndexRouteImport.update({
@@ -158,6 +153,11 @@ const ProjectsIndexRoute = ProjectsIndexRouteImport.update({
 const ProjectsIdRoute = ProjectsIdRouteImport.update({
   id: '/projects/$id',
   path: '/projects/$id',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PortalIdRoute = PortalIdRouteImport.update({
+  id: '/portal/$id',
+  path: '/portal/$id',
   getParentRoute: () => rootRouteImport,
 } as any)
 
@@ -357,144 +357,11 @@ export interface RootRouteChildren {
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
-    '/': {
-      id: '/'
-      path: '/'
-      fullPath: '/'
-      preLoaderRoute: typeof IndexRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/accounts': {
-      id: '/accounts'
-      path: '/accounts'
-      fullPath: '/accounts'
-      preLoaderRoute: typeof AccountsRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/auth': {
-      id: '/auth'
-      path: '/auth'
-      fullPath: '/auth'
-      preLoaderRoute: typeof AuthRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/calendar': {
-      id: '/calendar'
-      path: '/calendar'
-      fullPath: '/calendar'
-      preLoaderRoute: typeof CalendarRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/clients': {
-      id: '/clients'
-      path: '/clients'
-      fullPath: '/clients'
-      preLoaderRoute: typeof ClientsRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/daybook': {
-      id: '/daybook'
-      path: '/daybook'
-      fullPath: '/daybook'
-      preLoaderRoute: typeof DaybookRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/delivery': {
-      id: '/delivery'
-      path: '/delivery'
-      fullPath: '/delivery'
-      preLoaderRoute: typeof DeliveryRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/expenses': {
-      id: '/expenses'
-      path: '/expenses'
-      fullPath: '/expenses'
-      preLoaderRoute: typeof ExpensesRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/fixed-deposits': {
-      id: '/fixed-deposits'
-      path: '/fixed-deposits'
-      fullPath: '/fixed-deposits'
-      preLoaderRoute: typeof FixedDepositsRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/gold-loans': {
-      id: '/gold-loans'
-      path: '/gold-loans'
-      fullPath: '/gold-loans'
-      preLoaderRoute: typeof GoldLoansRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/my-availability': {
-      id: '/my-availability'
-      path: '/my-availability'
-      fullPath: '/my-availability'
-      preLoaderRoute: typeof MyAvailabilityRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/overdue-balances': {
-      id: '/overdue-balances'
-      path: '/overdue-balances'
-      fullPath: '/overdue-balances'
-      preLoaderRoute: typeof OverdueBalancesRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/payments': {
-      id: '/payments'
-      path: '/payments'
-      fullPath: '/payments'
-      preLoaderRoute: typeof PaymentsRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/pending-payments': {
-      id: '/pending-payments'
-      path: '/pending-payments'
-      fullPath: '/pending-payments'
-      preLoaderRoute: typeof PendingPaymentsRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/raw-data': {
-      id: '/raw-data'
-      path: '/raw-data'
-      fullPath: '/raw-data'
-      preLoaderRoute: typeof RawDataRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/reimbursables': {
-      id: '/reimbursables'
-      path: '/reimbursables'
-      fullPath: '/reimbursables'
-      preLoaderRoute: typeof ReimbursablesRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/reports': {
-      id: '/reports'
-      path: '/reports'
-      fullPath: '/reports'
-      preLoaderRoute: typeof ReportsRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/settings': {
-      id: '/settings'
-      path: '/settings'
-      fullPath: '/settings'
-      preLoaderRoute: typeof SettingsRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/staff': {
-      id: '/staff'
-      path: '/staff'
-      fullPath: '/staff'
-      preLoaderRoute: typeof StaffRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/tasks': {
-      id: '/tasks'
-      path: '/tasks'
-      fullPath: '/tasks'
-      preLoaderRoute: typeof TasksRouteImport
+    '/upcoming-events': {
+      id: '/upcoming-events'
+      path: '/upcoming-events'
+      fullPath: '/upcoming-events'
+      preLoaderRoute: typeof UpcomingEventsRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/travel': {
@@ -504,18 +371,144 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof TravelRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/upcoming-events': {
-      id: '/upcoming-events'
-      path: '/upcoming-events'
-      fullPath: '/upcoming-events'
-      preLoaderRoute: typeof UpcomingEventsRouteImport
+    '/tasks': {
+      id: '/tasks'
+      path: '/tasks'
+      fullPath: '/tasks'
+      preLoaderRoute: typeof TasksRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/portal/$id': {
-      id: '/portal/$id'
-      path: '/portal/$id'
-      fullPath: '/portal/$id'
-      preLoaderRoute: typeof PortalIdRouteImport
+    '/staff': {
+      id: '/staff'
+      path: '/staff'
+      fullPath: '/staff'
+      preLoaderRoute: typeof StaffRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/settings': {
+      id: '/settings'
+      path: '/settings'
+      fullPath: '/settings'
+      preLoaderRoute: typeof SettingsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/reports': {
+      id: '/reports'
+      path: '/reports'
+      fullPath: '/reports'
+      preLoaderRoute: typeof ReportsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/reimbursables': {
+      id: '/reimbursables'
+      path: '/reimbursables'
+      fullPath: '/reimbursables'
+      preLoaderRoute: typeof ReimbursablesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/raw-data': {
+      id: '/raw-data'
+      path: '/raw-data'
+      fullPath: '/raw-data'
+      preLoaderRoute: typeof RawDataRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/pending-payments': {
+      id: '/pending-payments'
+      path: '/pending-payments'
+      fullPath: '/pending-payments'
+      preLoaderRoute: typeof PendingPaymentsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/payments': {
+      id: '/payments'
+      path: '/payments'
+      fullPath: '/payments'
+      preLoaderRoute: typeof PaymentsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/overdue-balances': {
+      id: '/overdue-balances'
+      path: '/overdue-balances'
+      fullPath: '/overdue-balances'
+      preLoaderRoute: typeof OverdueBalancesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/my-availability': {
+      id: '/my-availability'
+      path: '/my-availability'
+      fullPath: '/my-availability'
+      preLoaderRoute: typeof MyAvailabilityRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/gold-loans': {
+      id: '/gold-loans'
+      path: '/gold-loans'
+      fullPath: '/gold-loans'
+      preLoaderRoute: typeof GoldLoansRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/fixed-deposits': {
+      id: '/fixed-deposits'
+      path: '/fixed-deposits'
+      fullPath: '/fixed-deposits'
+      preLoaderRoute: typeof FixedDepositsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/expenses': {
+      id: '/expenses'
+      path: '/expenses'
+      fullPath: '/expenses'
+      preLoaderRoute: typeof ExpensesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/delivery': {
+      id: '/delivery'
+      path: '/delivery'
+      fullPath: '/delivery'
+      preLoaderRoute: typeof DeliveryRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/daybook': {
+      id: '/daybook'
+      path: '/daybook'
+      fullPath: '/daybook'
+      preLoaderRoute: typeof DaybookRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/clients': {
+      id: '/clients'
+      path: '/clients'
+      fullPath: '/clients'
+      preLoaderRoute: typeof ClientsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/calendar': {
+      id: '/calendar'
+      path: '/calendar'
+      fullPath: '/calendar'
+      preLoaderRoute: typeof CalendarRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/auth': {
+      id: '/auth'
+      path: '/auth'
+      fullPath: '/auth'
+      preLoaderRoute: typeof AuthRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/accounts': {
+      id: '/accounts'
+      path: '/accounts'
+      fullPath: '/accounts'
+      preLoaderRoute: typeof AccountsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/': {
+      id: '/'
+      path: '/'
+      fullPath: '/'
+      preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/projects/': {
@@ -530,6 +523,13 @@ declare module '@tanstack/react-router' {
       path: '/projects/$id'
       fullPath: '/projects/$id'
       preLoaderRoute: typeof ProjectsIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/portal/$id': {
+      id: '/portal/$id'
+      path: '/portal/$id'
+      fullPath: '/portal/$id'
+      preLoaderRoute: typeof PortalIdRouteImport
       parentRoute: typeof rootRouteImport
     }
   }

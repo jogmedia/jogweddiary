@@ -231,6 +231,64 @@ export type Database = {
         }
         Relationships: []
       }
+      crew_handovers: {
+        Row: {
+          created_at: string
+          event_id: string
+          id: string
+          kind: string
+          project_id: string
+          received_at: string | null
+          staff_id: string
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          event_id: string
+          id?: string
+          kind: string
+          project_id: string
+          received_at?: string | null
+          staff_id: string
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          event_id?: string
+          id?: string
+          kind?: string
+          project_id?: string
+          received_at?: string | null
+          staff_id?: string
+          status?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "crew_handovers_event_id_fkey"
+            columns: ["event_id"]
+            isOneToOne: false
+            referencedRelation: "project_events"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "crew_handovers_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "projects"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "crew_handovers_staff_id_fkey"
+            columns: ["staff_id"]
+            isOneToOne: false
+            referencedRelation: "staff"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       delivery_records: {
         Row: {
           created_at: string

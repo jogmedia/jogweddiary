@@ -145,9 +145,7 @@ export const buildHandoverReminder = (o: {
   functionType: string;
   businessName?: string;
 }) =>
-  o.kind === "photo"
-    ? `Hi ${o.crewName}, please handover the raw photos/SD cards for ${o.clientName}'s shoot (${o.eventDate} - ${o.functionType}) for studio backup. — ${o.businessName ?? "Jog Media"}`
-    : `Hi ${o.crewName}, please handover the raw video footage/memory cards for ${o.clientName}'s shoot (${o.eventDate} - ${o.functionType}) for studio backup. — ${o.businessName ?? "Jog Media"}`;
+  `Hi ${o.crewName}, please handover the raw ${o.kind} files/SD cards for ${o.clientName}'s shoot (${o.functionType} on ${o.eventDate}) for studio backup. — ${o.businessName ?? "Jog Media"}`;
 
 /** WhatsApp backup record template shared by all backup screens. */
 export const buildBackupRecordMessage = (o: {

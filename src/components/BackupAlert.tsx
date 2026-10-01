@@ -14,6 +14,7 @@ import {
   cloudBackup,
 } from "@/lib/drives";
 import { handoverAlerts } from "@/components/BackupHandover";
+import { useCrewHandovers, useProjectEvents } from "@/lib/db";
 import { prettyRole } from "@/lib/roles";
 import { useAssignments, useProjects, useStaff, useUpsert } from "@/lib/db";
 import type { Assignment, Project } from "@/lib/db";
@@ -40,6 +41,8 @@ export function BackupAlert() {
   const { data: projects = [] } = useProjects();
   const { data: assignments = [] } = useAssignments();
   const { data: staff = [] } = useStaff();
+  const { data: allEvents = [] } = useProjectEvents();
+  const { data: handovers = [] } = useCrewHandovers();
   const save = useUpsert("projects", "Backup status");
   const [drives, setDrives] = useState<Record<string, string>>({});
   const [seconds, setSeconds] = useState<Record<string, string>>({});
@@ -60,13 +63,11 @@ export function BackupAlert() {
   // Shoots finished more than 24h ago that still owe photo or video raw data.
   const cutoff = new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString().slice(0, 10);
   const handoverRows = projects
-    .filter(
-      (p) =>
-        p.project_status !== "cancelled" &&
-        (p.shoot_status === "completed" || p.event_date < cutoff),
-    )
+    .filter((p) => p.project_status !== "cancelled")
     .flatMap((p) =>
-      handoverAlerts(p, assignments, staff).map((a) => ({ project: p, ...a })),
+      handoverAlerts(p, assignments, allEvents, handovers)
+        .filter((a) => a.date < cutoff)
+        .map((a) => ({ project: p, ...a })),
     );
 
   if (pending.length === 0 && handoverRows.length === 0) return null;
@@ -164,13 +165,13 @@ export function BackupAlert() {
             <ul className="mt-3 space-y-1.5">
               {handoverRows.map((r) => (
                 <li
-                  key={`${r.project.id}-${r.kind}`}
+                  key={r.key}
                   className="flex flex-wrap items-center gap-2 rounded-lg border border-warning/40 bg-warning/10 px-2.5 py-1.5 text-xs text-warning-foreground"
                 >
                   <span className="min-w-0">
                     ⚠️ {r.kind === "photo" ? "Photo" : "Video"} backup pending:{" "}
                     <span className="font-semibold">{r.crew.name ?? "crew not assigned"}</span>
-                    {r.crew.role ? ` (${prettyRole(r.crew.role)})` : ""} for {clientName(r.project)}
+                    {r.crew.role ? ` (${prettyRole(r.crew.role)})` : ""} for {clientName(r.project)} · {r.eventLabel}
                   </span>
                   <Button
                     size="sm"
@@ -184,8 +185,8 @@ export function BackupAlert() {
                           kind: r.kind,
                           crewName: r.crew.name ?? "team",
                           clientName: clientName(r.project),
-                          eventDate: fmtDate(r.project.event_date),
-                          functionType: r.project.project_name,
+                          eventDate: fmtDate(r.date),
+                          functionType: r.eventLabel,
                         }),
                       )
                     }

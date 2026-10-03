@@ -210,27 +210,32 @@ export function BackupHandover({
     );
   };
 
+  const hasPhoto = rows.some((r) => r.kind === "photo");
+  const hasVideo = rows.some((r) => r.kind === "video");
+  const scope = hasPhoto && hasVideo ? "PHOTO & VIDEO" : hasPhoto ? "PHOTO ONLY" : "VIDEO ONLY";
+  const allReceived = rows.length > 0 && pendingNames.length === 0;
+
   return (
     <div className="space-y-3">
       <span
         className={`inline-flex rounded-lg border px-2.5 py-1 text-xs font-semibold uppercase tracking-wide ${
-          complete
+          allReceived
             ? "border-success/30 bg-success/10 text-success"
             : "border-destructive/30 bg-destructive/10 text-destructive"
         }`}
       >
-        {complete
-          ? "✅ Backup: Completed"
-          : pendingNames.length > 0
-            ? `⚠️ Pending handover: ${pendingNames.join(", ")}`
-            : !disksOk
-              ? "Backup: Pending (select both disks)"
-              : "Backup: Pending (no crew assigned)"}
+        {rows.length === 0
+          ? "Backup: Pending (no photographer / videographer assigned)"
+          : allReceived
+            ? "🟢 All raw footage received"
+            : `🔴 Backup pending (${scope})${pendingNames.length ? ` · ${pendingNames.join(", ")}` : ""}`}
       </span>
-      <div className="grid grid-cols-1 gap-3 lg:grid-cols-2">
-        {section("photo")}
-        {section("video")}
-      </div>
+      {(hasPhoto || hasVideo) && (
+        <div className={`grid grid-cols-1 gap-3 ${hasPhoto && hasVideo ? "lg:grid-cols-2" : ""}`}>
+          {hasPhoto && section("photo")}
+          {hasVideo && section("video")}
+        </div>
+      )}
     </div>
   );
 }

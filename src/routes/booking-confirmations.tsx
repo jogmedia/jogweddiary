@@ -100,7 +100,7 @@ function BookingConfirmationsPage() {
 
   return (
     <AppShell>
-      <PageHeader title="🎟️ Confirmed Bookings & Tickets" description="Send booking confirmations to clients on WhatsApp." />
+      <PageHeader title="🎟️ Confirmed Bookings & Tickets" subtitle="Send booking confirmations to clients on WhatsApp." />
       <div className="relative mb-4">
         <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
         <Input value={q} onChange={(e) => setQ(e.target.value)} placeholder="Search client name or phone…" className="h-11 pl-9" />

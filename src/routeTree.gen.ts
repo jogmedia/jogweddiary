@@ -12,6 +12,7 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AccountsRouteImport } from './routes/accounts'
 import { Route as AuthRouteImport } from './routes/auth'
+import { Route as BookingConfirmationsRouteImport } from './routes/booking-confirmations'
 import { Route as CalendarRouteImport } from './routes/calendar'
 import { Route as ClientsRouteImport } from './routes/clients'
 import { Route as DaybookRouteImport } from './routes/daybook'
@@ -48,6 +49,11 @@ const AccountsRoute = AccountsRouteImport.update({
 const AuthRoute = AuthRouteImport.update({
   id: '/auth',
   path: '/auth',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const BookingConfirmationsRoute = BookingConfirmationsRouteImport.update({
+  id: '/booking-confirmations',
+  path: '/booking-confirmations',
   getParentRoute: () => rootRouteImport,
 } as any)
 const CalendarRoute = CalendarRouteImport.update({
@@ -165,6 +171,7 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/accounts': typeof AccountsRoute
   '/auth': typeof AuthRoute
+  '/booking-confirmations': typeof BookingConfirmationsRoute
   '/calendar': typeof CalendarRoute
   '/clients': typeof ClientsRoute
   '/daybook': typeof DaybookRoute
@@ -192,6 +199,7 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/accounts': typeof AccountsRoute
   '/auth': typeof AuthRoute
+  '/booking-confirmations': typeof BookingConfirmationsRoute
   '/calendar': typeof CalendarRoute
   '/clients': typeof ClientsRoute
   '/daybook': typeof DaybookRoute
@@ -220,6 +228,7 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/accounts': typeof AccountsRoute
   '/auth': typeof AuthRoute
+  '/booking-confirmations': typeof BookingConfirmationsRoute
   '/calendar': typeof CalendarRoute
   '/clients': typeof ClientsRoute
   '/daybook': typeof DaybookRoute
@@ -249,6 +258,7 @@ export interface FileRouteTypes {
     | '/'
     | '/accounts'
     | '/auth'
+    | '/booking-confirmations'
     | '/calendar'
     | '/clients'
     | '/daybook'
@@ -276,6 +286,7 @@ export interface FileRouteTypes {
     | '/'
     | '/accounts'
     | '/auth'
+    | '/booking-confirmations'
     | '/calendar'
     | '/clients'
     | '/daybook'
@@ -303,6 +314,7 @@ export interface FileRouteTypes {
     | '/'
     | '/accounts'
     | '/auth'
+    | '/booking-confirmations'
     | '/calendar'
     | '/clients'
     | '/daybook'
@@ -331,6 +343,7 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AccountsRoute: typeof AccountsRoute
   AuthRoute: typeof AuthRoute
+  BookingConfirmationsRoute: typeof BookingConfirmationsRoute
   CalendarRoute: typeof CalendarRoute
   ClientsRoute: typeof ClientsRoute
   DaybookRoute: typeof DaybookRoute
@@ -376,6 +389,13 @@ declare module '@tanstack/react-router' {
       path: '/auth'
       fullPath: '/auth'
       preLoaderRoute: typeof AuthRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/booking-confirmations': {
+      id: '/booking-confirmations'
+      path: '/booking-confirmations'
+      fullPath: '/booking-confirmations'
+      preLoaderRoute: typeof BookingConfirmationsRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/calendar': {
@@ -539,6 +559,7 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AccountsRoute: AccountsRoute,
   AuthRoute: AuthRoute,
+  BookingConfirmationsRoute: BookingConfirmationsRoute,
   CalendarRoute: CalendarRoute,
   ClientsRoute: ClientsRoute,
   DaybookRoute: DaybookRoute,

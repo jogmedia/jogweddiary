@@ -8,3 +8,5 @@
 > Commits you push to the connected branch sync back to Lovable and show up in
 > the editor, so keep the branch in a working state.
 <!-- LOVABLE:END -->
+
+- Keep booking confirmation name normalization and payment calculations in the shared booking-confirmation helper so previews and WhatsApp messages use identical data rules.

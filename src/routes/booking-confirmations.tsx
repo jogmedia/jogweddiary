@@ -8,11 +8,11 @@ import { PageHeader } from "@/components/ui-kit";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { useProjectEvents, useProjects, useSettings } from "@/lib/db";
+import { useEventTypes, usePayments, useProjectEvents, useProjects, useSettings } from "@/lib/db";
 import { fmtDate, fmtPhone, inr } from "@/lib/format";
-import { eventMeta, openWhatsApp } from "@/lib/whatsapp";
+import { openWhatsApp } from "@/lib/whatsapp";
 import { toDeliverables } from "@/lib/packages";
-import { buildBookingConfirmation, type ConfirmationInput } from "@/lib/booking-confirmation";
+import { buildBookingConfirmation, confirmationFunctionName, uniqueConfirmationValues, type ConfirmationInput } from "@/lib/booking-confirmation";
 
 export const Route = createFileRoute("/booking-confirmations")({
   head: () => ({
@@ -41,6 +41,8 @@ function BookingConfirmationsPage() {
   const { data: projects = [], isLoading } = useProjects();
   const { data: events = [] } = useProjectEvents();
   const { data: settings } = useSettings();
+  const { data: eventTypes = [] } = useEventTypes();
+  const { data: payments = [], isLoading: paymentsLoading } = usePayments();
   const [q, setQ] = useState("");
   const [preview, setPreview] = useState<Row | null>(null);
 
@@ -52,32 +54,30 @@ function BookingConfirmationsPage() {
           .filter((e) => e.project_id === p.id && e.status !== "cancelled")
           .sort((a, b) => a.event_date.localeCompare(b.event_date));
         const dates = Array.from(new Set(evs.map((e) => e.event_date)));
-        const functions = Array.from(
-          new Set(evs.map((e) => eventMeta(e.event_type)?.label ?? e.event_type)),
-        );
-        const venues = Array.from(
-          new Set([...evs.map((e) => e.location), p.venue].filter(Boolean) as string[]),
-        );
+        const functions = uniqueConfirmationValues(evs.map((e) => confirmationFunctionName(e, eventTypes)));
+        const venues = uniqueConfirmationValues([...evs.map((e) => e.location), p.venue]);
         const total = Number(p.total_amount ?? 0);
         const balance = Number(p.balance_due ?? 0);
+        const received = payments.filter((payment) => payment.project_id === p.id)
+          .reduce((amount, payment) => amount + Number(payment.amount ?? 0), 0);
         return {
           project: p,
           phone: p.clients?.whatsapp || p.clients?.phone || null,
           input: {
             clientName: p.clients?.name ?? "Client",
             dates: dates.length ? dates : [p.event_date].filter(Boolean),
-            functions: functions.length ? functions : [p.project_name].filter(Boolean),
+            functions: functions.length ? functions : [p.project_name?.trim() || "Custom event"],
             venues,
             deliverables: toDeliverables(p.deliverables),
             total,
-            advance: Math.max(0, total - balance),
+            advance: received,
             balance,
             studioContact: settings?.phone ?? null,
           },
         };
       })
       .sort((a, b) => (b.input.dates[0] ?? "").localeCompare(a.input.dates[0] ?? ""));
-  }, [projects, events, settings]);
+  }, [projects, events, settings, eventTypes, payments]);
 
   const filtered = rows.filter((r) => {
     const s = q.trim().toLowerCase();
@@ -106,7 +106,7 @@ function BookingConfirmationsPage() {
         <Input value={q} onChange={(e) => setQ(e.target.value)} placeholder="Search client name or phone…" className="h-11 pl-9" />
       </div>
 
-      {isLoading ? (
+      {isLoading || paymentsLoading ? (
         <p className="text-sm text-muted-foreground">Loading…</p>
       ) : filtered.length === 0 ? (
         <p className="rounded-2xl border border-border bg-card p-6 text-center text-sm text-muted-foreground">No bookings found.</p>

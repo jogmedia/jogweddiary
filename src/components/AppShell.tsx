@@ -24,6 +24,7 @@ import {
   Clapperboard,
   CalendarCheck,
   Coins,
+  Ticket,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useAuth } from "@/lib/auth";
@@ -41,6 +42,7 @@ export const NAV = [
   { to: "/clients", label: "Clients", icon: Users, adminOnly: true },
   { to: "/projects", label: "Projects", icon: FolderKanban, adminOnly: false },
   { to: "/upcoming-events", label: "Upcoming Events", icon: Clapperboard, adminOnly: false },
+  { to: "/booking-confirmations", label: "Booking Confirmations", icon: Ticket, adminOnly: true },
   { to: "/calendar", label: "Calendar", icon: CalendarDays, adminOnly: false },
   { to: "/my-availability", label: "My Free Dates", icon: CalendarCheck, adminOnly: false },
   { to: "/daybook", label: "Daily Daybook", icon: BookOpen, adminOnly: true },

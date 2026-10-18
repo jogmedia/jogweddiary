@@ -35,8 +35,9 @@ export function uniqueConfirmationValues(values: (string | null | undefined)[]):
   });
 }
 
-export function bookingPaymentSchedule(total: number, advance: number) {
-  return { weddingDayPayable: total * 0.9 - advance, albumDeliveryPayable: total * 0.1 };
+export function bookingPaymentSchedule(total: number, advance: number, balance?: number) {
+  const balancePayable = balance && balance > 0 ? balance : Math.max(0, total - advance);
+  return { balancePayable, weddingDayPayable: total * 0.9 - advance, albumDeliveryPayable: total * 0.1 };
 }
 
 /** The exact WhatsApp booking confirmation template requested by the studio. */
@@ -64,10 +65,12 @@ export function buildBookingConfirmation(p: ConfirmationInput): string {
     "📦 *Package Deliverables:*",
     items,
     "",
-    "💰 *Payment Details & Schedule:*",
+    "💰 *Payment Details:*",
     `• Total Agreed Amount: ₹${rupees(p.total)}`,
     `• Advance Received: ₹${rupees(p.advance)} (Confirmed)`,
+    `• Total Balance Payable: ₹${rupees(schedule.balancePayable)}`,
     "───────────────────────",
+    "*📋 Balance Payment Schedule:*",
     `• *On Wedding Day (90% Completion):* ₹${rupees(schedule.weddingDayPayable)}`,
     `• *On Album Printing & Delivery (Balance):* ₹${rupees(schedule.albumDeliveryPayable)}`,
     line,

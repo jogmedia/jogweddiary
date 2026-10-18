@@ -1,5 +1,5 @@
 import { describe, expect, test } from "bun:test";
-import { bookingPaymentSchedule, confirmationFunctionName, uniqueConfirmationValues } from "./booking-confirmation";
+import { bookingPaymentSchedule, buildBookingConfirmation, confirmationFunctionName, uniqueConfirmationValues } from "./booking-confirmation";
 
 describe("booking confirmation data", () => {
   test("wedding-day payment reaches 90% after received advance", () => {
@@ -19,5 +19,28 @@ describe("booking confirmation data", () => {
   });
   test("duplicate venues ignore whitespace and casing", () => {
     expect(uniqueConfirmationValues([" PANTHEERANKAV ", "pantheerankav", "", null])).toEqual(["PANTHEERANKAV"]);
+  });
+  test("payment block lists balance payable then the split schedule", () => {
+    const text = buildBookingConfirmation({
+      clientName: "Anjali",
+      dates: [],
+      functions: ["Wedding"],
+      venues: ["Pantheerankav"],
+      deliverables: ["2 albums"],
+      total: 40000,
+      advance: 3000,
+      balance: 37000,
+    });
+    const block = text.slice(text.indexOf("💰"));
+    expect(block.split("\n").slice(0, 8)).toEqual([
+      "💰 *Payment Details:*",
+      "• Total Agreed Amount: ₹40,000",
+      "• Advance Received: ₹3,000 (Confirmed)",
+      "• Total Balance Payable: ₹37,000",
+      "───────────────────────",
+      "*📋 Balance Payment Schedule:*",
+      "• *On Wedding Day (90% Completion):* ₹33,000",
+      "• *On Album Printing & Delivery (Balance):* ₹4,000",
+    ]);
   });
 });

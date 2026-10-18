@@ -73,6 +73,8 @@ export function RecordDialog({
   extra,
   header,
   onReset,
+  renderField,
+  afterField,
 }: {
   title: string;
   fields: Field[];
@@ -92,6 +94,8 @@ export function RecordDialog({
     | ((values: Record<string, any>, set: (name: string, value: any) => void) => ReactNode);
   /** Called whenever the dialog opens, so parents can reset their own extra state. */
   onReset?: () => void;
+  renderField?: (field: Field, values: Record<string, any>, set: (name: string, value: any) => void) => ReactNode;
+  afterField?: (field: Field, values: Record<string, any>, set: (name: string, value: any) => void) => ReactNode;
 }) {
   const [uncontrolled, setUncontrolled] = useState(false);
   const open = controlledOpen ?? uncontrolled;
@@ -183,12 +187,12 @@ export function RecordDialog({
 
         <div className="grid gap-4 sm:grid-cols-2">
           {fields.map((f) => (
-            <div key={f.name} className={f.full || f.type === "textarea" ? "sm:col-span-2" : ""}>
+            <div key={f.name} className={`min-w-0 ${f.full || f.type === "textarea" ? "sm:col-span-2" : ""}`}>
               <Label htmlFor={f.name} className="mb-1.5 block text-xs font-medium">
                 {f.label}
                 {f.required && <span className="text-destructive"> *</span>}
               </Label>
-              {f.type === "textarea" ? (
+              {renderField?.(f, values, set) ?? (f.type === "textarea" ? (
                 <Textarea
                   id={f.name}
                   value={values[f.name] ?? ""}
@@ -266,7 +270,8 @@ export function RecordDialog({
                   className={errors[f.name] ? "border-destructive" : undefined}
                   onChange={(e) => set(f.name, e.target.value)}
                 />
-              )}
+              ))}
+              {afterField?.(f, values, set)}
               {errors[f.name] ? (
                 <p className="mt-1 text-xs text-destructive">{errors[f.name]}</p>
               ) : f.hint ? (

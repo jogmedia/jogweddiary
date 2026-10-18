@@ -1,0 +1,14 @@
+CREATE TABLE public.booking_name_presets (id uuid PRIMARY KEY DEFAULT gen_random_uuid(), name text NOT NULL CHECK (length(trim(name)) > 0), created_at timestamptz NOT NULL DEFAULT now());
+GRANT SELECT, INSERT, UPDATE, DELETE ON public.booking_name_presets TO authenticated;
+GRANT ALL ON public.booking_name_presets TO service_role;
+ALTER TABLE public.booking_name_presets ENABLE ROW LEVEL SECURITY;
+CREATE POLICY booking_name_read ON public.booking_name_presets FOR SELECT TO authenticated USING (true);
+CREATE POLICY booking_name_admin ON public.booking_name_presets FOR ALL TO authenticated USING (public.is_admin()) WITH CHECK (public.is_admin());
+CREATE UNIQUE INDEX booking_name_unique ON public.booking_name_presets (lower(trim(name)));
+CREATE TABLE public.booking_package_templates (id uuid PRIMARY KEY DEFAULT gen_random_uuid(), name text NOT NULL CHECK (length(trim(name)) > 0), amount numeric NOT NULL CHECK (amount >= 0), items jsonb NOT NULL DEFAULT '[]'::jsonb CHECK (jsonb_typeof(items) = 'array'), created_at timestamptz NOT NULL DEFAULT now());
+GRANT SELECT, INSERT, UPDATE, DELETE ON public.booking_package_templates TO authenticated;
+GRANT ALL ON public.booking_package_templates TO service_role;
+ALTER TABLE public.booking_package_templates ENABLE ROW LEVEL SECURITY;
+CREATE POLICY booking_package_read ON public.booking_package_templates FOR SELECT TO authenticated USING (true);
+CREATE POLICY booking_package_admin ON public.booking_package_templates FOR ALL TO authenticated USING (public.is_admin()) WITH CHECK (public.is_admin());
+CREATE UNIQUE INDEX booking_package_unique ON public.booking_package_templates (lower(trim(name)));

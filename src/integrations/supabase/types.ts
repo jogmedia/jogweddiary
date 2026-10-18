@@ -154,6 +154,48 @@ export type Database = {
         }
         Relationships: []
       }
+      booking_name_presets: {
+        Row: {
+          created_at: string
+          id: string
+          name: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          name: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          name?: string
+        }
+        Relationships: []
+      }
+      booking_package_templates: {
+        Row: {
+          amount: number
+          created_at: string
+          id: string
+          items: Json
+          name: string
+        }
+        Insert: {
+          amount: number
+          created_at?: string
+          id?: string
+          items?: Json
+          name: string
+        }
+        Update: {
+          amount?: number
+          created_at?: string
+          id?: string
+          items?: Json
+          name?: string
+        }
+        Relationships: []
+      }
       chart_of_accounts: {
         Row: {
           account_code: string | null

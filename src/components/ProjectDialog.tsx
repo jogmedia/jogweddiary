@@ -6,6 +6,7 @@ import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
+import { ProjectNamePresets, BookingPackageSelector } from "@/components/BookingPresetFields";
 import {
   Select,
   SelectContent,
@@ -18,12 +19,7 @@ import { ADVANCE_REF, PAY_ACCOUNTS, modeForAccount } from "@/lib/accounts";
 import { isMapsUrl, todayISO, waNumber } from "@/lib/format";
 import { TicketUpload } from "@/components/TicketUpload";
 import { BookingReceiptButton } from "@/components/BookingReceiptButton";
-import {
-  PRESET_PACKAGES,
-  findPackage,
-  packageByName,
-  toDeliverables,
-} from "@/lib/packages";
+import { toDeliverables } from "@/lib/packages";
 import { EventTypesManager } from "@/components/EventTypesManager";
 import {
   useAssignments,
@@ -51,23 +47,6 @@ export const STATUS_OPTIONS = {
 
 const opts = (list: string[]) => list.map((v) => ({ value: v, label: v.replace(/_/g, " ") }));
 
-/** Pull the first money-looking number out of typed package text (e.g. "₹80,000 — ..." → 80000). */
-const parseAmount = (text: string | null | undefined): number | null => {
-  const m = (text ?? "").match(/[\d][\d,.]*/);
-  if (!m) return null;
-  const n = Number(m[0].replace(/,/g, ""));
-  return Number.isFinite(n) && n > 0 ? n : null;
-};
-
-const matchPackages = (query: string | null | undefined) => {
-  const q = (query ?? "").trim().toLowerCase();
-  if (!q) return PRESET_PACKAGES;
-  const terms = q.split(/\s+/);
-  return PRESET_PACKAGES.filter((p) => {
-    const hay = `${p.label} ${p.category} ${p.amount}`.toLowerCase();
-    return terms.every((t) => hay.includes(t));
-  });
-};
 
 
 export const ADVANCE_ACCOUNTS = PAY_ACCOUNTS.map(({ value, label }) => ({ value, label }));
@@ -99,7 +78,7 @@ export function projectFields(
           }
         : {}),
     },
-    { name: "project_name", label: "Project name", required: true },
+    { name: "project_name", label: "Project name", required: true, full: true },
     { name: "venue", label: "Main venue" },
     { name: "place_district", label: "Place / District", placeholder: "e.g. Kozhikode, Thalassery" },
     {
@@ -115,7 +94,7 @@ export function projectFields(
       placeholder: "https://maps.app.goo.gl/…",
       validate: (v) => (isMapsUrl(v) ? null : "Enter a valid https link"),
     },
-    { name: "package_name", label: "Package" },
+    { name: "package_name", label: "Package", full: true },
 
     { name: "total_amount", label: "Total agreed amount", type: "number" },
     { name: "advance_amount", label: "Advance amount", type: "number" },
@@ -340,19 +319,6 @@ export function ProjectDialog({
   const [deliverables, setDeliverables] = useState<string[]>(() =>
     toDeliverables(initial?.deliverables),
   );
-  const [packageId, setPackageId] = useState<string>(
-    () => packageByName(initial?.package_name)?.id ?? "",
-  );
-  const [pkgOpen, setPkgOpen] = useState(false);
-
-  const applyPackage = (id: string, set: (name: string, value: any) => void) => {
-    setPackageId(id);
-    const preset = findPackage(id);
-    if (!preset) return;
-    set("package_name", preset.label);
-    set("total_amount", preset.amount);
-    setDeliverables([...preset.items]);
-  };
 
 
   const setItem = (index: number, value: string) =>
@@ -509,6 +475,8 @@ export function ProjectDialog({
       header={header}
 
       fields={projectFields(clients, addClient, bankAccounts)}
+      afterField={(field, values, set) => field.name === "project_name" ? <ProjectNamePresets value={values.project_name ?? ""} set={set} /> : null}
+      renderField={(field, values, set) => field.name === "package_name" ? <BookingPackageSelector value={values.package_name ?? ""} set={set} onDeliverables={setDeliverables} /> : null}
       initial={{ ...initial, advance_date: initial?.advance_date ?? todayISO() }}
       trigger={trigger}
       open={open}
@@ -518,7 +486,6 @@ export function ProjectDialog({
         setCustomEvents(buildCustomRows(events, assignments));
         setTravel(buildTravel(initial));
         setDeliverables(toDeliverables(initial?.deliverables));
-        setPackageId(packageByName(initial?.package_name)?.id ?? "");
       }}
       onSubmit={submit}
       extra={(values, set) => {
@@ -531,56 +498,6 @@ export function ProjectDialog({
           <div className="mb-2 flex items-center gap-2">
             <PackageIcon className="h-4 w-4 text-primary" />
             <p className="text-sm font-semibold">Package Details &amp; Deliverables</p>
-          </div>
-          <div className="mb-3">
-            <Label htmlFor="pkg-combo" className="mb-1.5 block text-xs font-medium">
-              Package
-            </Label>
-            <div className="relative">
-              <Input
-                id="pkg-combo"
-                autoComplete="off"
-                value={values.package_name ?? ""}
-                placeholder="Choose or type a package e.g. ₹70,000 — Photography"
-                onChange={(e) => {
-                  const text = e.target.value;
-                  set("package_name", text);
-                  setPkgOpen(true);
-                  const amount = parseAmount(text);
-                  if (amount !== null) set("total_amount", amount);
-                }}
-                onFocus={() => setPkgOpen(true)}
-                onBlur={() => window.setTimeout(() => setPkgOpen(false), 150)}
-              />
-              {pkgOpen && (
-                <div className="absolute left-0 right-0 top-full z-50 mt-1 max-h-60 overflow-y-auto rounded-xl border border-border bg-popover p-1 shadow-lg">
-                  {matchPackages(values.package_name).length === 0 ? (
-                    <p className="px-2 py-1.5 text-xs text-muted-foreground">
-                      No preset match — your typed package is kept as-is.
-                    </p>
-                  ) : (
-                    matchPackages(values.package_name).map((p) => (
-                      <button
-                        key={p.id}
-                        type="button"
-                        className="block w-full rounded-lg px-2 py-1.5 text-left text-sm hover:bg-accent"
-                        onMouseDown={(e) => e.preventDefault()}
-                        onClick={() => {
-                          applyPackage(p.id, set);
-                          setPkgOpen(false);
-                        }}
-                      >
-                        {p.label}
-                      </button>
-                    ))
-                  )}
-                </div>
-              )}
-            </div>
-            <p className="mt-1 text-xs text-muted-foreground">
-              Pick a package to fill deliverables, then edit the text (e.g. ₹80,000) right here — the
-              amount saved follows what you type.
-            </p>
           </div>
 
 

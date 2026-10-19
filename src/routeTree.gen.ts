@@ -35,6 +35,7 @@ import { Route as UpcomingEventsRouteImport } from './routes/upcoming-events'
 import { Route as PortalIdRouteImport } from './routes/portal/$id'
 import { Route as ProjectsIndexRouteImport } from './routes/projects/index'
 import { Route as ProjectsIdRouteImport } from './routes/projects/$id'
+import { Route as ApiPublicBankExpenseWebhookRouteImport } from './routes/api/public/bank-expense-webhook'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -166,6 +167,12 @@ const ProjectsIdRoute = ProjectsIdRouteImport.update({
   path: '/projects/$id',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiPublicBankExpenseWebhookRoute =
+  ApiPublicBankExpenseWebhookRouteImport.update({
+    id: '/api/public/bank-expense-webhook',
+    path: '/api/public/bank-expense-webhook',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -194,6 +201,7 @@ export interface FileRoutesByFullPath {
   '/portal/$id': typeof PortalIdRoute
   '/projects/$id': typeof ProjectsIdRoute
   '/projects/': typeof ProjectsIndexRoute
+  '/api/public/bank-expense-webhook': typeof ApiPublicBankExpenseWebhookRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -222,6 +230,7 @@ export interface FileRoutesByTo {
   '/portal/$id': typeof PortalIdRoute
   '/projects/$id': typeof ProjectsIdRoute
   '/projects': typeof ProjectsIndexRoute
+  '/api/public/bank-expense-webhook': typeof ApiPublicBankExpenseWebhookRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -251,6 +260,7 @@ export interface FileRoutesById {
   '/portal/$id': typeof PortalIdRoute
   '/projects/$id': typeof ProjectsIdRoute
   '/projects/': typeof ProjectsIndexRoute
+  '/api/public/bank-expense-webhook': typeof ApiPublicBankExpenseWebhookRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -281,6 +291,7 @@ export interface FileRouteTypes {
     | '/portal/$id'
     | '/projects/$id'
     | '/projects/'
+    | '/api/public/bank-expense-webhook'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -309,6 +320,7 @@ export interface FileRouteTypes {
     | '/portal/$id'
     | '/projects/$id'
     | '/projects'
+    | '/api/public/bank-expense-webhook'
   id:
     | '__root__'
     | '/'
@@ -337,6 +349,7 @@ export interface FileRouteTypes {
     | '/portal/$id'
     | '/projects/$id'
     | '/projects/'
+    | '/api/public/bank-expense-webhook'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -366,6 +379,7 @@ export interface RootRouteChildren {
   PortalIdRoute: typeof PortalIdRoute
   ProjectsIdRoute: typeof ProjectsIdRoute
   ProjectsIndexRoute: typeof ProjectsIndexRoute
+  ApiPublicBankExpenseWebhookRoute: typeof ApiPublicBankExpenseWebhookRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -552,6 +566,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ProjectsIdRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/public/bank-expense-webhook': {
+      id: '/api/public/bank-expense-webhook'
+      path: '/api/public/bank-expense-webhook'
+      fullPath: '/api/public/bank-expense-webhook'
+      preLoaderRoute: typeof ApiPublicBankExpenseWebhookRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -582,6 +603,7 @@ const rootRouteChildren: RootRouteChildren = {
   PortalIdRoute: PortalIdRoute,
   ProjectsIdRoute: ProjectsIdRoute,
   ProjectsIndexRoute: ProjectsIndexRoute,
+  ApiPublicBankExpenseWebhookRoute: ApiPublicBankExpenseWebhookRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

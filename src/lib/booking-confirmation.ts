@@ -77,8 +77,10 @@ const roleCategory = (role: string) => {
 
 function plannedCoverage(deliverables: string[]): EventCoverage["roles"] {
   const terms = deliverables.join(" ").toLowerCase();
-  const roles: EventCoverage["roles"] = [{ label: "Traditional Photographer", count: 1 }];
-  if (/video|videograph|cinema/.test(terms)) roles.push({ label: "Traditional Videographer", count: 1 });
+  const hasVideo = /video|videograph|cinema/.test(terms);
+  const roles: EventCoverage["roles"] = [];
+  if (!hasVideo || /photo|photograph|candid/.test(terms)) roles.push({ label: "Traditional Photographer", count: 1 });
+  if (hasVideo) roles.push({ label: "Traditional Videographer", count: 1 });
   if (/candid/.test(terms)) roles.push({ label: "Candid Photographer", count: 1 });
   if (/drone|uav/.test(terms)) roles.push({ label: "Drone Pilot", count: 1 });
   return roles;

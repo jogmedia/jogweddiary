@@ -24,10 +24,10 @@ describe("booking confirmation data", () => {
     const coverage = buildEventCoverage(
       [{ id: "e1", event_type: "wedding_day", event_date: "2026-12-19" }],
       [
-        { event_id: "e1", staff_id: "s1", role_in_project: "Traditional Photographer", staff: { role: "photographer" } },
-        { event_id: "e1", staff_id: "s2", role_in_project: "Traditional Photographer", staff: { role: "photographer" } },
-        { event_id: "e1", staff_id: "s3", role_in_project: "Traditional Videographer", staff: { role: "videographer" } },
-        { event_id: "e1", staff_id: "s4", role_in_project: "Drone Operator", staff: { role: "drone" } },
+        { event_id: "e1", staff_id: "s1", role_in_project: "Traditional Photographer", staff: { name: "Vipin", role: "photographer" } },
+        { event_id: "e1", staff_id: "s2", role_in_project: "Traditional Photographer", staff: { name: "Diljith", role: "photographer" } },
+        { event_id: "e1", staff_id: "s3", role_in_project: "Traditional Videographer", staff: { name: "Sajeesh", role: "videographer" } },
+        { event_id: "e1", staff_id: "s4", role_in_project: "Drone Operator", staff: { name: "Crew Member", role: "drone" } },
       ],
       [],
       [{ slug: "wedding_day", label: "Wedding Day / Muhurtham" }],

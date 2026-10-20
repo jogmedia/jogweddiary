@@ -8,11 +8,11 @@ import { PageHeader } from "@/components/ui-kit";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { useEventTypes, usePayments, useProjectEvents, useProjects, useSettings } from "@/lib/db";
+import { useAssignments, useEventTypes, usePayments, useProjectEvents, useProjects, useSettings } from "@/lib/db";
 import { fmtDate, fmtPhone, inr } from "@/lib/format";
 import { openWhatsApp } from "@/lib/whatsapp";
 import { toDeliverables } from "@/lib/packages";
-import { buildBookingConfirmation, confirmationFunctionName, uniqueConfirmationValues, type ConfirmationInput } from "@/lib/booking-confirmation";
+import { buildBookingConfirmation, buildEventCoverage, confirmationFunctionName, uniqueConfirmationValues, type ConfirmationInput } from "@/lib/booking-confirmation";
 
 export const Route = createFileRoute("/booking-confirmations")({
   head: () => ({
@@ -40,6 +40,7 @@ type Row = {
 function BookingConfirmationsPage() {
   const { data: projects = [], isLoading } = useProjects();
   const { data: events = [] } = useProjectEvents();
+  const { data: assignments = [] } = useAssignments();
   const { data: settings } = useSettings();
   const { data: eventTypes = [] } = useEventTypes();
   const { data: payments = [], isLoading: paymentsLoading } = usePayments();
@@ -69,6 +70,12 @@ function BookingConfirmationsPage() {
             functions: functions.length ? functions : [p.project_name?.trim() || "Custom event"],
             venues,
             deliverables: toDeliverables(p.deliverables),
+            eventCoverage: buildEventCoverage(
+              evs,
+              assignments.filter((assignment) => assignment.project_id === p.id),
+              toDeliverables(p.deliverables),
+              eventTypes,
+            ),
             total,
             advance: received,
             balance,
@@ -77,7 +84,7 @@ function BookingConfirmationsPage() {
         };
       })
       .sort((a, b) => (b.input.dates[0] ?? "").localeCompare(a.input.dates[0] ?? ""));
-  }, [projects, events, settings, eventTypes, payments]);
+  }, [projects, events, assignments, settings, eventTypes, payments]);
 
   const filtered = rows.filter((r) => {
     const s = q.trim().toLowerCase();

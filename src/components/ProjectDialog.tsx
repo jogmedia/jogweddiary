@@ -662,10 +662,19 @@ export function ProjectDialog({
               return (
                 <div key={s.slug} className="rounded-lg border border-border bg-card p-2.5">
                   <div className="flex items-center justify-between gap-2">
-                    <Label htmlFor={`ev-${s.slug}`} className="text-xs font-medium">
-                      {s.emoji ? `${s.emoji} ` : ""}
-                      {s.label}
-                    </Label>
+                    <div className="flex min-w-0 flex-1 items-center gap-1">
+                      <span className="shrink-0 text-xs" aria-hidden>
+                        {s.emoji ?? "✨"}
+                      </span>
+                      <Input
+                        className="h-7 border-none bg-transparent px-1 text-xs font-medium shadow-none focus-visible:border-border focus-visible:bg-background"
+                        value={row.label ?? s.label}
+                        placeholder={s.label}
+                        aria-label={`Rename ${s.label}`}
+                        onChange={(e) => setRow(s.slug, { label: e.target.value })}
+                      />
+                      <Pencil className="h-3 w-3 shrink-0 text-muted-foreground/60" aria-hidden />
+                    </div>
                     <Switch
                       id={`ev-${s.slug}`}
                       checked={row.enabled}

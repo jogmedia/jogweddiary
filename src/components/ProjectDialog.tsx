@@ -1,5 +1,5 @@
 import { useEffect, useState, type ReactNode } from "react";
-import { CalendarDays, Package as PackageIcon, Plane, Plus, Trash2 } from "lucide-react";
+import { CalendarDays, Package as PackageIcon, Pencil, Plane, Plus, Trash2 } from "lucide-react";
 import { RecordDialog, type Field } from "@/components/RecordDialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -173,6 +173,8 @@ type Row = {
   time: string;
   location: string;
   name?: string;
+  /** Per-event custom title; falls back to the preset label when blank. */
+  label?: string;
   id?: string;
   crew: CrewMember[];
 };
@@ -200,7 +202,7 @@ function buildRows(
   assignments: Assignment[] = [],
 ) {
   const rows: Record<string, Row> = {};
-  types.forEach(({ slug }) => {
+  types.forEach(({ slug, label }) => {
     const e = events.find((ev) => ev.event_type === slug);
     rows[slug] = e
       ? {
@@ -208,6 +210,7 @@ function buildRows(
           date: e.event_date ?? "",
           time: (e.event_time ?? "").slice(0, 5),
           location: e.location ?? "",
+          label: e.event_label ?? label,
           id: e.id,
           crew: crewFor(assignments, e.id),
         }

@@ -26,8 +26,7 @@ export type HandoverRow = {
   crew: { id: string; name: string; phone: string | null; role: string | null };
 };
 
-const eventName = (e: ProjectEvent) =>
-  (e.event_type ?? "Event").replace(/_/g, " ").replace(/\b\w/g, (c) => c.toUpperCase());
+const eventName = (e: ProjectEvent) => eventLabel(e);
 
 /** One checklist row per crew member, per event, per photo/video duty. */
 export function handoverChecklist(

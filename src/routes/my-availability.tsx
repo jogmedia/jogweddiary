@@ -8,7 +8,6 @@ import { BookShootDialog } from "@/components/BookShootDialog";
 import { useClients } from "@/lib/db";
 import { useCrewBookings, type Booking } from "@/lib/crew";
 import { fmtDate } from "@/lib/format";
-import { eventLabel } from "@/lib/whatsapp";
 
 export const Route = createFileRoute("/my-availability")({
   head: () => ({

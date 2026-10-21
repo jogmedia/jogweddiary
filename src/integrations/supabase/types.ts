@@ -1012,6 +1012,7 @@ export type Database = {
           contact_phone: string | null
           created_at: string
           event_date: string
+          event_label: string | null
           event_time: string | null
           event_type: string
           google_maps_link: string | null
@@ -1030,6 +1031,7 @@ export type Database = {
           contact_phone?: string | null
           created_at?: string
           event_date: string
+          event_label?: string | null
           event_time?: string | null
           event_type: string
           google_maps_link?: string | null
@@ -1048,6 +1050,7 @@ export type Database = {
           contact_phone?: string | null
           created_at?: string
           event_date?: string
+          event_label?: string | null
           event_time?: string | null
           event_type?: string
           google_maps_link?: string | null

@@ -8,7 +8,6 @@ import { BookShootDialog } from "@/components/BookShootDialog";
 import { useClients } from "@/lib/db";
 import { useCrewBookings, type Booking } from "@/lib/crew";
 import { fmtDate } from "@/lib/format";
-import { eventLabel } from "@/lib/whatsapp";
 
 export const Route = createFileRoute("/my-availability")({
   head: () => ({
@@ -279,7 +278,7 @@ function AvailabilityPage() {
                 >
                   <p className="truncate text-sm font-medium">{b.projectName}</p>
                   <p className="truncate text-xs text-muted-foreground">
-                    {eventLabel({ event_type: b.eventLabel } as any)}
+                    {b.eventLabel ?? "Event"}
                     {b.time ? ` · ${b.time.slice(0, 5)}` : ""}
                     {b.role ? ` · ${b.role}` : ""}
                   </p>

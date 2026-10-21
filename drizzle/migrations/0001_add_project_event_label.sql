@@ -1,0 +1,2 @@
+ALTER TABLE public.project_events ADD COLUMN event_label text;
+COMMENT ON COLUMN public.project_events.event_label IS 'Custom per-event display title that overrides the event type label across the app';

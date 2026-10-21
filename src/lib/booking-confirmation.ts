@@ -24,9 +24,11 @@ const rupees = (n: number) => Math.round(n || 0).toLocaleString("en-IN");
 
 /** Preserve the selected title, including custom names stored in event notes. */
 export function confirmationFunctionName(
-  event: { event_type: string; notes?: string | null },
+  event: { event_label?: string | null; event_type: string; notes?: string | null },
   types: { slug: string; label: string }[] = [],
 ): string {
+  const customTitle = event.event_label?.trim();
+  if (customTitle) return customTitle;
   if (event.event_type === "custom") return event.notes?.trim() || "Custom event";
   return types.find((t) => t.slug === event.event_type)?.label.trim() || eventLabel(event).trim() || "Custom event";
 }

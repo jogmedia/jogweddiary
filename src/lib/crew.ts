@@ -1,5 +1,6 @@
 import { useMemo } from "react";
 import { useAssignments, useProjectEvents, type Assignment, type ProjectEvent } from "@/lib/db";
+import { eventLabel } from "@/lib/whatsapp";
 
 export type Booking = {
   staffId: string;
@@ -59,7 +60,7 @@ export function useCrewBookings() {
           a.projects?.project_name ??
           "Project",
         eventId: a.event_id,
-        eventLabel: (ev.event_type ?? null) as string | null,
+        eventLabel: eventLabel(ev),
       });
     });
 

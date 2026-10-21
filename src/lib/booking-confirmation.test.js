@@ -17,6 +17,16 @@ describe("booking confirmation data", () => {
   test("selected studio event titles take precedence", () => {
     expect(confirmationFunctionName({ event_type: "wedding_day" }, [{ slug: "wedding_day", label: "Wedding" }])).toBe("Wedding");
   });
+  test("a renamed sub-event title overrides the preset label everywhere", () => {
+    const renamed = { event_label: "Groom's Reception", event_type: "reception" };
+    expect(confirmationFunctionName(renamed, [{ slug: "reception", label: "Reception" }])).toBe("Groom's Reception");
+    const coverage = buildEventCoverage(
+      [{ id: "e1", event_label: "Groom's Reception", event_type: "reception", event_date: "2026-12-20" }],
+      [],
+      ["Wedding photography"],
+    );
+    expect(coverage[0]?.eventName).toBe("Groom's Reception");
+  });
   test("duplicate venues ignore whitespace and casing", () => {
     expect(uniqueConfirmationValues([" PANTHEERANKAV ", "pantheerankav", "", null])).toEqual(["PANTHEERANKAV"]);
   });

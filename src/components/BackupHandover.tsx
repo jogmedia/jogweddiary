@@ -2,7 +2,7 @@ import { Camera, Check, MessageCircle, Video } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { buildHandoverReminder, isPhotoRole, isVideoRole, primaryDisk, secondaryDisk, type HandoverKind } from "@/lib/drives";
 import { fmtDate } from "@/lib/format";
-import { openWhatsApp } from "@/lib/whatsapp";
+import { eventLabel, openWhatsApp } from "@/lib/whatsapp";
 import { prettyRole } from "@/lib/roles";
 import {
   useCrewHandovers,
@@ -26,8 +26,7 @@ export type HandoverRow = {
   crew: { id: string; name: string; phone: string | null; role: string | null };
 };
 
-const eventName = (e: ProjectEvent) =>
-  (e.event_type ?? "Event").replace(/_/g, " ").replace(/\b\w/g, (c) => c.toUpperCase());
+const eventName = (e: ProjectEvent) => eventLabel(e);
 
 /** One checklist row per crew member, per event, per photo/video duty. */
 export function handoverChecklist(

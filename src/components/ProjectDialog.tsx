@@ -1,5 +1,5 @@
 import { useEffect, useState, type ReactNode } from "react";
-import { CalendarDays, Package as PackageIcon, Plane, Plus, Trash2 } from "lucide-react";
+import { CalendarDays, Package as PackageIcon, Pencil, Plane, Plus, Trash2 } from "lucide-react";
 import { RecordDialog, type Field } from "@/components/RecordDialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -173,6 +173,8 @@ type Row = {
   time: string;
   location: string;
   name?: string;
+  /** Per-event custom title; falls back to the preset label when blank. */
+  label?: string;
   id?: string;
   crew: CrewMember[];
 };
@@ -200,7 +202,7 @@ function buildRows(
   assignments: Assignment[] = [],
 ) {
   const rows: Record<string, Row> = {};
-  types.forEach(({ slug }) => {
+  types.forEach(({ slug, label }) => {
     const e = events.find((ev) => ev.event_type === slug);
     rows[slug] = e
       ? {
@@ -208,6 +210,7 @@ function buildRows(
           date: e.event_date ?? "",
           time: (e.event_time ?? "").slice(0, 5),
           location: e.location ?? "",
+          label: e.event_label ?? label,
           id: e.id,
           crew: crewFor(assignments, e.id),
         }
@@ -432,10 +435,15 @@ export function ProjectDialog({
 
     for (const [key, row] of Object.entries(rows)) {
       if (row.enabled && row.date) {
+        const preset = subEvents.find((t) => t.slug === key)?.label ?? key;
+        const label = row.label?.trim();
         const evId = (await saveEvent.mutateAsync({
           ...(row.id ? { id: row.id } : {}),
           project_id: pid,
           event_type: key,
+          // Only store a title when it was renamed from the preset, so later
+          // edits to the shared event type still flow through.
+          event_label: label && label !== preset ? label : null,
           event_date: row.date,
           event_time: row.time || null,
           location: row.location || null,
@@ -654,10 +662,19 @@ export function ProjectDialog({
               return (
                 <div key={s.slug} className="rounded-lg border border-border bg-card p-2.5">
                   <div className="flex items-center justify-between gap-2">
-                    <Label htmlFor={`ev-${s.slug}`} className="text-xs font-medium">
-                      {s.emoji ? `${s.emoji} ` : ""}
-                      {s.label}
-                    </Label>
+                    <div className="flex min-w-0 flex-1 items-center gap-1">
+                      <span className="shrink-0 text-xs" aria-hidden>
+                        {s.emoji ?? "✨"}
+                      </span>
+                      <Input
+                        className="h-7 border-none bg-transparent px-1 text-xs font-medium shadow-none focus-visible:border-border focus-visible:bg-background"
+                        value={row.label ?? s.label}
+                        placeholder={s.label}
+                        aria-label={`Rename ${s.label}`}
+                        onChange={(e) => setRow(s.slug, { label: e.target.value })}
+                      />
+                      <Pencil className="h-3 w-3 shrink-0 text-muted-foreground/60" aria-hidden />
+                    </div>
                     <Switch
                       id={`ev-${s.slug}`}
                       checked={row.enabled}

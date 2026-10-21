@@ -42,8 +42,14 @@ export const eventMeta = (type: string) =>
   dynamicTypes.find((t) => t.value === type) ??
   EVENT_TYPES.find((t) => t.value === type) ?? { value: type, label: prettify(type), emoji: "✨" };
 
-/** Label for an event — custom events use their own name (stored in notes). */
-export const eventLabel = (e: { event_type: string; notes?: string | null }) => {
+/** Label for an event — a saved custom title wins, custom events fall back to their own name. */
+export const eventLabel = (e: {
+  event_label?: string | null;
+  event_type: string;
+  notes?: string | null;
+}) => {
+  const custom = e.event_label?.trim();
+  if (custom) return custom;
   if (e.event_type === "custom" && e.notes?.trim()) return e.notes.trim();
   return eventMeta(e.event_type).label;
 };

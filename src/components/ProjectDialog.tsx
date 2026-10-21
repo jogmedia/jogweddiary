@@ -435,10 +435,15 @@ export function ProjectDialog({
 
     for (const [key, row] of Object.entries(rows)) {
       if (row.enabled && row.date) {
+        const preset = subEvents.find((t) => t.slug === key)?.label ?? key;
+        const label = row.label?.trim();
         const evId = (await saveEvent.mutateAsync({
           ...(row.id ? { id: row.id } : {}),
           project_id: pid,
           event_type: key,
+          // Only store a title when it was renamed from the preset, so later
+          // edits to the shared event type still flow through.
+          event_label: label && label !== preset ? label : null,
           event_date: row.date,
           event_time: row.time || null,
           location: row.location || null,

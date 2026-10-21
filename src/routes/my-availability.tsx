@@ -279,7 +279,7 @@ function AvailabilityPage() {
                 >
                   <p className="truncate text-sm font-medium">{b.projectName}</p>
                   <p className="truncate text-xs text-muted-foreground">
-                    {eventLabel({ event_type: b.eventLabel } as any)}
+                    {b.eventLabel ?? "Event"}
                     {b.time ? ` · ${b.time.slice(0, 5)}` : ""}
                     {b.role ? ` · ${b.role}` : ""}
                   </p>

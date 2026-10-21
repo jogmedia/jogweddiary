@@ -128,6 +128,7 @@ export type ProjectEvent = {
   id: string;
   project_id: string;
   event_type: string;
+  event_label: string | null;
   event_date: string;
   event_time: string | null;
   arrival_time: string | null;

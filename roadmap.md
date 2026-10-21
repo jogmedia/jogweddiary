@@ -4,6 +4,6 @@
 - [x] Test prices, persistence, and the booking form on mobile.
 
 # Booking confirmation crew coverage
-- [ ] Add event-wise crew role counts to booking confirmations without personal names.
-- [ ] Use assigned event/project roles first and planned package coverage as fallback.
-- [ ] Add tests for role aggregation, fallback coverage, and message privacy.
+- [x] Add event-wise crew role counts to booking confirmations without personal names.
+- [x] Use assigned event/project roles first and planned package coverage as fallback.
+- [x] Add tests for role aggregation, fallback coverage, and message privacy.

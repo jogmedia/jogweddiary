@@ -2,7 +2,7 @@ import { Camera, Check, MessageCircle, Video } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { buildHandoverReminder, isPhotoRole, isVideoRole, primaryDisk, secondaryDisk, type HandoverKind } from "@/lib/drives";
 import { fmtDate } from "@/lib/format";
-import { openWhatsApp } from "@/lib/whatsapp";
+import { eventLabel, openWhatsApp } from "@/lib/whatsapp";
 import { prettyRole } from "@/lib/roles";
 import {
   useCrewHandovers,

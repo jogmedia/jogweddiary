@@ -149,7 +149,7 @@ export function buildBookingConfirmation(p: ConfirmationInput): string {
     "Thank you for choosing Jog Media for your big day! Your booking is officially confirmed.",
     "",
     "🗓️ *Event Schedule & Coverage Breakdown:*",
-    eventSchedule,
+    ...eventSchedule,
     `📍 *Venue:* ${venue}`,
     "",
     "📦 *Package Deliverables:*",

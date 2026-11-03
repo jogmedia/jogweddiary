@@ -25,6 +25,7 @@ import {
   CalendarCheck,
   Coins,
   Ticket,
+  Fuel,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useAuth } from "@/lib/auth";
@@ -50,6 +51,7 @@ export const NAV = [
   { to: "/pending-payments", label: "Pending Payments", icon: Hourglass, adminOnly: true },
   { to: "/overdue-balances", label: "Overdue Balances", icon: AlertTriangle, adminOnly: true },
   { to: "/expenses", label: "Expenses", icon: Receipt, adminOnly: true },
+  { to: "/fuel", label: "Petrol / Fuel", icon: Fuel, adminOnly: true },
   { to: "/reimbursables", label: "Reimbursables", icon: Wallet, adminOnly: true },
   { to: "/tasks", label: "Tasks", icon: ListChecks, adminOnly: false },
   { to: "/staff", label: "Staff", icon: UserCog, adminOnly: true },

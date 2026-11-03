@@ -19,6 +19,7 @@ import { Route as DaybookRouteImport } from './routes/daybook'
 import { Route as DeliveryRouteImport } from './routes/delivery'
 import { Route as ExpensesRouteImport } from './routes/expenses'
 import { Route as FixedDepositsRouteImport } from './routes/fixed-deposits'
+import { Route as FuelRouteImport } from './routes/fuel'
 import { Route as GoldLoansRouteImport } from './routes/gold-loans'
 import { Route as MyAvailabilityRouteImport } from './routes/my-availability'
 import { Route as OverdueBalancesRouteImport } from './routes/overdue-balances'
@@ -85,6 +86,11 @@ const ExpensesRoute = ExpensesRouteImport.update({
 const FixedDepositsRoute = FixedDepositsRouteImport.update({
   id: '/fixed-deposits',
   path: '/fixed-deposits',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const FuelRoute = FuelRouteImport.update({
+  id: '/fuel',
+  path: '/fuel',
   getParentRoute: () => rootRouteImport,
 } as any)
 const GoldLoansRoute = GoldLoansRouteImport.update({
@@ -185,6 +191,7 @@ export interface FileRoutesByFullPath {
   '/delivery': typeof DeliveryRoute
   '/expenses': typeof ExpensesRoute
   '/fixed-deposits': typeof FixedDepositsRoute
+  '/fuel': typeof FuelRoute
   '/gold-loans': typeof GoldLoansRoute
   '/my-availability': typeof MyAvailabilityRoute
   '/overdue-balances': typeof OverdueBalancesRoute
@@ -214,6 +221,7 @@ export interface FileRoutesByTo {
   '/delivery': typeof DeliveryRoute
   '/expenses': typeof ExpensesRoute
   '/fixed-deposits': typeof FixedDepositsRoute
+  '/fuel': typeof FuelRoute
   '/gold-loans': typeof GoldLoansRoute
   '/my-availability': typeof MyAvailabilityRoute
   '/overdue-balances': typeof OverdueBalancesRoute
@@ -244,6 +252,7 @@ export interface FileRoutesById {
   '/delivery': typeof DeliveryRoute
   '/expenses': typeof ExpensesRoute
   '/fixed-deposits': typeof FixedDepositsRoute
+  '/fuel': typeof FuelRoute
   '/gold-loans': typeof GoldLoansRoute
   '/my-availability': typeof MyAvailabilityRoute
   '/overdue-balances': typeof OverdueBalancesRoute
@@ -275,6 +284,7 @@ export interface FileRouteTypes {
     | '/delivery'
     | '/expenses'
     | '/fixed-deposits'
+    | '/fuel'
     | '/gold-loans'
     | '/my-availability'
     | '/overdue-balances'
@@ -304,6 +314,7 @@ export interface FileRouteTypes {
     | '/delivery'
     | '/expenses'
     | '/fixed-deposits'
+    | '/fuel'
     | '/gold-loans'
     | '/my-availability'
     | '/overdue-balances'
@@ -333,6 +344,7 @@ export interface FileRouteTypes {
     | '/delivery'
     | '/expenses'
     | '/fixed-deposits'
+    | '/fuel'
     | '/gold-loans'
     | '/my-availability'
     | '/overdue-balances'
@@ -363,6 +375,7 @@ export interface RootRouteChildren {
   DeliveryRoute: typeof DeliveryRoute
   ExpensesRoute: typeof ExpensesRoute
   FixedDepositsRoute: typeof FixedDepositsRoute
+  FuelRoute: typeof FuelRoute
   GoldLoansRoute: typeof GoldLoansRoute
   MyAvailabilityRoute: typeof MyAvailabilityRoute
   OverdueBalancesRoute: typeof OverdueBalancesRoute
@@ -452,6 +465,13 @@ declare module '@tanstack/react-router' {
       path: '/fixed-deposits'
       fullPath: '/fixed-deposits'
       preLoaderRoute: typeof FixedDepositsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/fuel': {
+      id: '/fuel'
+      path: '/fuel'
+      fullPath: '/fuel'
+      preLoaderRoute: typeof FuelRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/gold-loans': {
@@ -587,6 +607,7 @@ const rootRouteChildren: RootRouteChildren = {
   DeliveryRoute: DeliveryRoute,
   ExpensesRoute: ExpensesRoute,
   FixedDepositsRoute: FixedDepositsRoute,
+  FuelRoute: FuelRoute,
   GoldLoansRoute: GoldLoansRoute,
   MyAvailabilityRoute: MyAvailabilityRoute,
   OverdueBalancesRoute: OverdueBalancesRoute,

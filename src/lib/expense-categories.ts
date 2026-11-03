@@ -9,6 +9,7 @@ export const DEFAULT_EXPENSE_CATEGORIES = [
   "Album Cost & Printing",
   "Staff & Freelance Bata (Cameraman / Drone Pilot)",
   "Equipment Rent & Purchase",
+  "Fuel / Petrol",
   "Travel & Fuel",
   "Food & Accommodation",
   "Owner Salary / Personal Draw",

@@ -24,6 +24,7 @@ import {
   Plane,
 } from "lucide-react";
 import { AppShell } from "@/components/AppShell";
+import { DashboardQuickSearch } from "@/components/DashboardQuickSearch";
 import { Button } from "@/components/ui/button";
 import { FixedDepositAlert } from "@/components/FixedDepositAlert";
 import { BackupAlert } from "@/components/BackupAlert";
@@ -179,6 +180,7 @@ function Dashboard() {
 
   return (
     <AppShell>
+      <DashboardQuickSearch />
       <PageHeader
         hideBack
         title="Studio Dashboard"

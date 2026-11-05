@@ -440,9 +440,10 @@ function DaybookPage() {
           initial={{ expense_date: date, payment_mode: "cash" }}
           open={addExpense}
           onOpenChange={setAddExpense}
+          header={kindHeader}
           extra={bankExtra}
           onSubmit={async (v) => {
-            await saveExpense.mutateAsync(withBank(v));
+            await saveExpense.mutateAsync(withExpenseKind(v));
             setAddExpense(false);
           }}
         />
@@ -456,9 +457,10 @@ function DaybookPage() {
           initial={editExpense}
           open={!!editExpense}
           onOpenChange={(v) => !v && setEditExpense(null)}
+          header={kindHeader}
           extra={bankExtra}
           onSubmit={async (v) => {
-            await saveExpense.mutateAsync({ ...withBank(v), id: editExpense.id });
+            await saveExpense.mutateAsync({ ...withExpenseKind(v), id: editExpense.id });
             setEditExpense(null);
           }}
         />

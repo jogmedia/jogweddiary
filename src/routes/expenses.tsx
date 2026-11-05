@@ -12,7 +12,7 @@ import { exportCsv, exportExcel } from "@/lib/exporters";
 import { BankAccountField, needsBankAccount } from "@/components/BankAccountField";
 import { useExpenseCategories } from "@/lib/expense-categories";
 import { ExpenseKindBadge, ExpenseKindToggle } from "@/components/ExpenseKind";
-import { PERSONAL_CATEGORIES, categoryTotals, kindOf, splitKinds, type ExpenseKind } from "@/lib/expenses";
+import { PERSONAL_CATEGORIES, kindOf, splitKinds, type ExpenseKind } from "@/lib/expenses";
 
 const MODE_LABELS: Record<string, string> = {
   cash: "Cash in Hand",

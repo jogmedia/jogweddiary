@@ -162,6 +162,8 @@ function ExpensesPage() {
               fields={expenseFields}
               initial={{ expense_date: todayISO(), payment_mode: "cash" }}
               extra={bankExtra}
+              header={kindHeader}
+              onReset={() => setKind("studio")}
               onSubmit={submitExpense}
               trigger={
                 <Button size="sm">
@@ -283,6 +285,8 @@ function ExpensesPage() {
           open={!!editing}
           onOpenChange={(v) => !v && setEditing(null)}
           extra={bankExtra}
+          header={kindHeader}
+          onReset={() => setKind(editing ? kindOf(editing as any) : "studio")}
           onSubmit={async (v) => {
             await submitExpense({ ...v, id: editing.id });
             setEditing(null);

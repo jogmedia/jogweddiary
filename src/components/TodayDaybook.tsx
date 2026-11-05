@@ -175,6 +175,7 @@ export function TodayDaybook() {
           amount: Number(e.amount ?? 0),
           mode: modeLabel(e.payment_mode),
           projectId: (e as any).project_id,
+          kind: kindOf(e as any),
           raw: e as any,
         })),
     [expenses, today],
@@ -200,14 +201,20 @@ export function TodayDaybook() {
             params={{ id: row.projectId }}
             className="group block cursor-pointer"
           >
-            <p className="truncate text-sm font-medium text-foreground group-hover:underline">{row.title}</p>
+            <p className="flex items-center gap-1.5 truncate text-sm font-medium text-foreground group-hover:underline">
+              {row.title}
+              {variant === "expense" && row.kind && <ExpenseKindBadge kind={row.kind} />}
+            </p>
             <p className="mt-0.5 block max-w-full truncate text-xs text-muted-foreground group-hover:underline">
               {row.sub} · {row.mode}
             </p>
           </Link>
         ) : (
           <div className="min-w-0">
-            <p className="truncate text-sm font-medium text-foreground">{row.title}</p>
+            <p className="flex items-center gap-1.5 truncate text-sm font-medium text-foreground">
+              {row.title}
+              {variant === "expense" && row.kind && <ExpenseKindBadge kind={row.kind} />}
+            </p>
             <p className="mt-0.5 block max-w-full truncate text-xs text-muted-foreground">
               {row.sub} · {row.mode}
             </p>

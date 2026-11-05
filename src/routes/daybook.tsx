@@ -21,6 +21,8 @@ import { cn } from "@/lib/utils";
 import { PAY_ACCOUNTS } from "@/lib/accounts";
 import { BankAccountField, needsBankAccount } from "@/components/BankAccountField";
 import { useExpenseCategories } from "@/lib/expense-categories";
+import { ExpenseKindBadge, ExpenseKindToggle } from "@/components/ExpenseKind";
+import { PERSONAL_CATEGORIES, kindOf, type ExpenseKind } from "@/lib/expenses";
 
 const MODE_LABELS: Record<string, string> = {
   cash: "Cash in Hand",
@@ -63,6 +65,7 @@ type Row = {
   mode: string;
   note?: string | null;
   projectId?: string | null;
+  kind?: ExpenseKind;
   raw: Record<string, any>;
 };
 

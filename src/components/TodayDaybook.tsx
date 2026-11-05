@@ -7,6 +7,8 @@ import { RecordDialog, type Field } from "@/components/RecordDialog";
 import { BankAccountField, needsBankAccount } from "@/components/BankAccountField";
 import { useExpenses, usePayments, useProjects, useRemove, useUpsert } from "@/lib/db";
 import { useExpenseCategories } from "@/lib/expense-categories";
+import { ExpenseKindBadge, ExpenseKindToggle } from "@/components/ExpenseKind";
+import { PERSONAL_CATEGORIES, kindOf, type ExpenseKind } from "@/lib/expenses";
 import { PAY_ACCOUNTS } from "@/lib/accounts";
 import { fmtDate, inr, todayISO } from "@/lib/format";
 import { cn } from "@/lib/utils";
@@ -31,6 +33,7 @@ type Row = {
   amount: number;
   mode: string;
   projectId?: string | null;
+  kind?: ExpenseKind;
   raw: Record<string, any>;
 };
 
@@ -53,6 +56,7 @@ export function TodayDaybook() {
   const [addExpense, setAddExpense] = useState(false);
   const [editIncome, setEditIncome] = useState<Record<string, any> | null>(null);
   const [editExpense, setEditExpense] = useState<Record<string, any> | null>(null);
+  const [kind, setKind] = useState<ExpenseKind>("studio");
 
   const projectOptions = projects.map((p) => ({
     value: p.id,

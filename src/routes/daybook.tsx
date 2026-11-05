@@ -219,9 +219,14 @@ function DaybookPage() {
           mode: modeLabel(e.payment_mode),
           note: e.notes ?? e.paid_to ?? null,
           projectId: (e as any).project_id,
+          kind: kindOf(e as any),
           raw: e as any,
         })),
     [expenses, date],
+  );
+  const shownOutflow = useMemo(
+    () => (kindFilter === "all" ? outflow : outflow.filter((r) => r.kind === kindFilter)),
+    [outflow, kindFilter],
   );
 
   const inTotal = income.reduce((a, r) => a + r.amount, 0);

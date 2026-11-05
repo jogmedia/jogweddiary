@@ -540,6 +540,7 @@ function Column({
                   </div>
                 )}
                 <div className="mt-1 flex flex-wrap items-center gap-1.5">
+                  {r.kind && <ExpenseKindBadge kind={r.kind} />}
                   <span className="shrink-0 rounded-full border border-border px-2 py-0.5 text-xs text-muted-foreground">
                     {r.mode}
                   </span>

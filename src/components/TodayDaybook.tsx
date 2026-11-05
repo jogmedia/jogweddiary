@@ -232,7 +232,13 @@ export function TodayDaybook() {
             className="h-9 w-9 flex-shrink-0 p-1.5 text-muted-foreground hover:text-foreground"
             aria-label="Edit transaction"
             title="Edit transaction"
-            onClick={() => (variant === "income" ? setEditIncome(row.raw) : setEditExpense(row.raw))}
+            onClick={() => {
+              if (variant === "income") setEditIncome(row.raw);
+              else {
+                setKind(row.kind ?? "studio");
+                setEditExpense(row.raw);
+              }
+            }}
           >
             <Pencil className="h-4 w-4" />
           </Button>
@@ -264,7 +270,7 @@ export function TodayDaybook() {
           <Button size="sm" onClick={() => setAddIncome(true)}>
             <Plus className="mr-1.5 h-4 w-4" /> Income
           </Button>
-          <Button size="sm" variant="outline" onClick={() => setAddExpense(true)}>
+          <Button size="sm" variant="outline" onClick={() => { setKind("studio"); setAddExpense(true); }}>
             <Plus className="mr-1.5 h-4 w-4" /> Expense
           </Button>
           <Button size="sm" variant="ghost" asChild>
@@ -433,9 +439,10 @@ export function TodayDaybook() {
           initial={{ expense_date: today, payment_mode: "cash" }}
           open={addExpense}
           onOpenChange={setAddExpense}
+          header={kindHeader}
           extra={bankExtra}
           onSubmit={async (v) => {
-            await saveExpense.mutateAsync(withBank(v));
+            await saveExpense.mutateAsync(withExpenseKind(v));
             setAddExpense(false);
           }}
         />
@@ -449,9 +456,10 @@ export function TodayDaybook() {
           initial={editExpense}
           open={!!editExpense}
           onOpenChange={(v) => !v && setEditExpense(null)}
+          header={kindHeader}
           extra={bankExtra}
           onSubmit={async (v) => {
-            await saveExpense.mutateAsync({ ...withBank(v), id: editExpense.id });
+            await saveExpense.mutateAsync({ ...withExpenseKind(v), id: editExpense.id });
             setEditExpense(null);
           }}
         />

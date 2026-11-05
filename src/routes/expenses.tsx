@@ -12,7 +12,7 @@ import { exportCsv, exportExcel } from "@/lib/exporters";
 import { BankAccountField, needsBankAccount } from "@/components/BankAccountField";
 import { useExpenseCategories } from "@/lib/expense-categories";
 import { ExpenseKindBadge, ExpenseKindToggle } from "@/components/ExpenseKind";
-import { PERSONAL_CATEGORIES, categoryTotals, kindOf, type ExpenseKind } from "@/lib/expenses";
+import { PERSONAL_CATEGORIES, categoryTotals, kindOf, splitKinds, type ExpenseKind } from "@/lib/expenses";
 
 const MODE_LABELS: Record<string, string> = {
   cash: "Cash in Hand",
@@ -49,21 +49,25 @@ function ExpensesPage() {
   const [to, setTo] = useState("");
 
   const expenseFields: Field[] = [
-    {
-      name: "project_id",
-      label: "Project (leave blank for studio overhead)",
-      type: "select",
-      options: projects.map((p) => ({ value: p.id, label: p.project_name })),
-      full: true,
-    },
+    ...(kind === "studio"
+      ? [
+          {
+            name: "project_id",
+            label: "Project (leave blank for studio overhead)",
+            type: "select" as const,
+            options: projects.map((p) => ({ value: p.id, label: p.project_name })),
+            full: true,
+          },
+        ]
+      : []),
     { name: "expense_date", label: "Date", type: "date", required: true },
     {
       name: "category",
-      label: "Category",
+      label: kind === "personal" ? "Personal / Home sub-category" : "Category",
       type: "select",
       required: true,
-      options: categoryOptions,
-      onAddOption: addCategory,
+      options: kind === "personal" ? PERSONAL_CATEGORIES : categoryOptions,
+      onAddOption: kind === "personal" ? undefined : addCategory,
       addOptionTitle: "Add expense category",
       addOptionLabel: "Category name",
     },

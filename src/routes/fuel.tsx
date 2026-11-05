@@ -96,6 +96,7 @@ function FuelPage() {
     await save.mutateAsync({
       id: form.id,
       category: FUEL_CATEGORY,
+      expense_kind: "studio",
       expense_date: form.expense_date,
       amount,
       payment_mode: form.payment_mode,

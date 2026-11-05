@@ -15,6 +15,13 @@
       "when": 1792594251922,
       "tag": "0001_add_project_event_label",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1793841184907,
+      "tag": "0002_add_expense_kind",
+      "breakpoints": true
     }
   ]
 }

@@ -177,6 +177,29 @@ function ExpensesPage() {
       <div className="mb-4 grid grid-cols-2 gap-3 lg:grid-cols-4">
         <StatCard label="Entries" value={String(rows.length)} />
         <StatCard label="Total spent" value={inr(total)} tone="destructive" />
+        <StatCard label="🏢 Studio spent" value={inr(split.studio)} />
+        <StatCard label="🏠 Personal spent" value={inr(split.personal)} />
+      </div>
+
+      <div className="mb-4 grid grid-cols-3 gap-1 rounded-xl border border-border bg-card p-1">
+        {([
+          ["all", "All Expenses"],
+          ["studio", "🏢 Studio Only"],
+          ["personal", "🏠 Personal Only"],
+        ] as const).map(([key, label]) => (
+          <button
+            key={key}
+            type="button"
+            onClick={() => setKindFilter(key)}
+            aria-pressed={kindFilter === key}
+            className={cn(
+              "min-h-11 rounded-lg px-2 text-xs font-medium transition-colors",
+              kindFilter === key ? "bg-primary text-primary-foreground" : "text-muted-foreground",
+            )}
+          >
+            {label}
+          </button>
+        ))}
       </div>
 
       <div className="mb-4 flex flex-wrap gap-2">
@@ -205,11 +228,14 @@ function ExpensesPage() {
                   <p className="truncate text-sm font-medium">
                     {e.category} · {inr(e.amount)}
                   </p>
-                  <p className="truncate text-xs text-muted-foreground">
-                    <span className="font-semibold text-primary">
-                      {(e.projects as any)?.clients?.name ?? "Studio Overhead"}
+                  <p className="mt-0.5 flex items-center gap-1.5">
+                    <ExpenseKindBadge kind={kindOf(e as any)} />
+                    <span className="min-w-0 truncate text-xs text-muted-foreground">
+                      <span className="font-semibold text-primary">
+                        {(e.projects as any)?.clients?.name ?? (kindOf(e as any) === "personal" ? "Personal / Home" : "Studio Overhead")}
+                      </span>
+                      {e.projects?.project_name ? ` · ${e.projects.project_name}` : ""}
                     </span>
-                    {e.projects?.project_name ? ` · ${e.projects.project_name}` : ""}
                   </p>
                 </button>
                 <div className="flex shrink-0 items-center gap-1">

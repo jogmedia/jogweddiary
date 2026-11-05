@@ -11,6 +11,8 @@ import { fmtDate, inr, todayISO } from "@/lib/format";
 import { exportCsv, exportExcel } from "@/lib/exporters";
 import { BankAccountField, needsBankAccount } from "@/components/BankAccountField";
 import { useExpenseCategories } from "@/lib/expense-categories";
+import { ExpenseKindBadge, ExpenseKindToggle } from "@/components/ExpenseKind";
+import { PERSONAL_CATEGORIES, categoryTotals, kindOf, type ExpenseKind } from "@/lib/expenses";
 
 const MODE_LABELS: Record<string, string> = {
   cash: "Cash in Hand",
@@ -89,27 +91,43 @@ function ExpensesPage() {
   const submitExpense = (v: Record<string, any>) =>
     save.mutateAsync({
       ...v,
+      expense_kind: kind,
+      project_id: kind === "personal" ? null : (v.project_id ?? null),
       bank_account_id:
         needsBankAccount(v.payment_mode) || v.category === "Owner Salary / Personal Draw"
           ? (v.bank_account_id ?? null)
           : null,
     });
 
+  const kindHeader = (_values: Record<string, any>, set: (n: string, v: any) => void) => (
+    <ExpenseKindToggle
+      value={kind}
+      onChange={(k) => {
+        setKind(k);
+        set("expense_kind", k);
+        set("category", "");
+      }}
+    />
+  );
 
   const rows = useMemo(
     () =>
-      expenses.filter((e) => {
-        const text = `${e.category} ${e.paid_to ?? ""} ${e.projects?.project_name ?? ""} ${
-          (e.projects as any)?.clients?.name ?? ""
-        }`.toLowerCase();
-        return (
-          (!q || text.includes(q.toLowerCase())) &&
-          (!from || e.expense_date >= from) &&
-          (!to || e.expense_date <= to)
-        );
-      }),
-    [expenses, q, from, to],
+      expenses
+        .filter((e) => kindFilter === "all" || kindOf(e as any) === kindFilter)
+        .filter((e) => {
+          const text = `${e.category} ${e.paid_to ?? ""} ${e.projects?.project_name ?? ""} ${
+            (e.projects as any)?.clients?.name ?? ""
+          }`.toLowerCase();
+          return (
+            (!q || text.includes(q.toLowerCase())) &&
+            (!from || e.expense_date >= from) &&
+            (!to || e.expense_date <= to)
+          );
+        }),
+    [expenses, q, from, to, kindFilter],
   );
+
+  const split = useMemo(() => splitKinds(rows as any[]), [rows]);
 
   const total = rows.reduce((a, e) => a + Number(e.amount ?? 0), 0);
   const exportRows = rows.map((e) => ({

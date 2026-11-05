@@ -11,6 +11,8 @@ import { fmtDate, inr, todayISO } from "@/lib/format";
 import { exportCsv, exportExcel } from "@/lib/exporters";
 import { BankAccountField, needsBankAccount } from "@/components/BankAccountField";
 import { useExpenseCategories } from "@/lib/expense-categories";
+import { ExpenseKindBadge, ExpenseKindToggle } from "@/components/ExpenseKind";
+import { PERSONAL_CATEGORIES, kindOf, splitKinds, type ExpenseKind } from "@/lib/expenses";
 
 const MODE_LABELS: Record<string, string> = {
   cash: "Cash in Hand",
@@ -47,21 +49,25 @@ function ExpensesPage() {
   const [to, setTo] = useState("");
 
   const expenseFields: Field[] = [
-    {
-      name: "project_id",
-      label: "Project (leave blank for studio overhead)",
-      type: "select",
-      options: projects.map((p) => ({ value: p.id, label: p.project_name })),
-      full: true,
-    },
+    ...(kind === "studio"
+      ? [
+          {
+            name: "project_id",
+            label: "Project (leave blank for studio overhead)",
+            type: "select" as const,
+            options: projects.map((p) => ({ value: p.id, label: p.project_name })),
+            full: true,
+          },
+        ]
+      : []),
     { name: "expense_date", label: "Date", type: "date", required: true },
     {
       name: "category",
-      label: "Category",
+      label: kind === "personal" ? "Personal / Home sub-category" : "Category",
       type: "select",
       required: true,
-      options: categoryOptions,
-      onAddOption: addCategory,
+      options: kind === "personal" ? PERSONAL_CATEGORIES : categoryOptions,
+      onAddOption: kind === "personal" ? undefined : addCategory,
       addOptionTitle: "Add expense category",
       addOptionLabel: "Category name",
     },
@@ -89,32 +95,49 @@ function ExpensesPage() {
   const submitExpense = (v: Record<string, any>) =>
     save.mutateAsync({
       ...v,
+      expense_kind: kind,
+      project_id: kind === "personal" ? null : (v.project_id ?? null),
       bank_account_id:
         needsBankAccount(v.payment_mode) || v.category === "Owner Salary / Personal Draw"
           ? (v.bank_account_id ?? null)
           : null,
     });
 
+  const kindHeader = (_values: Record<string, any>, set: (n: string, v: any) => void) => (
+    <ExpenseKindToggle
+      value={kind}
+      onChange={(k) => {
+        setKind(k);
+        set("expense_kind", k);
+        set("category", "");
+      }}
+    />
+  );
 
   const rows = useMemo(
     () =>
-      expenses.filter((e) => {
-        const text = `${e.category} ${e.paid_to ?? ""} ${e.projects?.project_name ?? ""} ${
-          (e.projects as any)?.clients?.name ?? ""
-        }`.toLowerCase();
-        return (
-          (!q || text.includes(q.toLowerCase())) &&
-          (!from || e.expense_date >= from) &&
-          (!to || e.expense_date <= to)
-        );
-      }),
-    [expenses, q, from, to],
+      expenses
+        .filter((e) => kindFilter === "all" || kindOf(e as any) === kindFilter)
+        .filter((e) => {
+          const text = `${e.category} ${e.paid_to ?? ""} ${e.projects?.project_name ?? ""} ${
+            (e.projects as any)?.clients?.name ?? ""
+          }`.toLowerCase();
+          return (
+            (!q || text.includes(q.toLowerCase())) &&
+            (!from || e.expense_date >= from) &&
+            (!to || e.expense_date <= to)
+          );
+        }),
+    [expenses, q, from, to, kindFilter],
   );
+
+  const split = useMemo(() => splitKinds(rows as any[]), [rows]);
 
   const total = rows.reduce((a, e) => a + Number(e.amount ?? 0), 0);
   const exportRows = rows.map((e) => ({
     Date: e.expense_date,
-    Project: e.projects?.project_name ?? "Studio (no project)",
+    Kind: kindOf(e as any) === "personal" ? "Personal / Home" : "Studio",
+    Project: e.projects?.project_name ?? (kindOf(e as any) === "personal" ? "Personal / Home" : "Studio (no project)"),
     Category: e.category,
     PaidTo: e.paid_to ?? "",
     Mode: e.payment_mode ?? "",
@@ -139,6 +162,8 @@ function ExpensesPage() {
               fields={expenseFields}
               initial={{ expense_date: todayISO(), payment_mode: "cash" }}
               extra={bankExtra}
+              header={kindHeader}
+              onReset={() => setKind("studio")}
               onSubmit={submitExpense}
               trigger={
                 <Button size="sm">
@@ -154,6 +179,29 @@ function ExpensesPage() {
       <div className="mb-4 grid grid-cols-2 gap-3 lg:grid-cols-4">
         <StatCard label="Entries" value={String(rows.length)} />
         <StatCard label="Total spent" value={inr(total)} tone="destructive" />
+        <StatCard label="🏢 Studio spent" value={inr(split.studio)} />
+        <StatCard label="🏠 Personal spent" value={inr(split.personal)} />
+      </div>
+
+      <div className="mb-4 grid grid-cols-3 gap-1 rounded-xl border border-border bg-card p-1">
+        {([
+          ["all", "All Expenses"],
+          ["studio", "🏢 Studio Only"],
+          ["personal", "🏠 Personal Only"],
+        ] as const).map(([key, label]) => (
+          <button
+            key={key}
+            type="button"
+            onClick={() => setKindFilter(key)}
+            aria-pressed={kindFilter === key}
+            className={cn(
+              "min-h-11 rounded-lg px-2 text-xs font-medium transition-colors",
+              kindFilter === key ? "bg-primary text-primary-foreground" : "text-muted-foreground",
+            )}
+          >
+            {label}
+          </button>
+        ))}
       </div>
 
       <div className="mb-4 flex flex-wrap gap-2">
@@ -182,11 +230,14 @@ function ExpensesPage() {
                   <p className="truncate text-sm font-medium">
                     {e.category} · {inr(e.amount)}
                   </p>
-                  <p className="truncate text-xs text-muted-foreground">
-                    <span className="font-semibold text-primary">
-                      {(e.projects as any)?.clients?.name ?? "Studio Overhead"}
+                  <p className="mt-0.5 flex items-center gap-1.5">
+                    <ExpenseKindBadge kind={kindOf(e as any)} />
+                    <span className="min-w-0 truncate text-xs text-muted-foreground">
+                      <span className="font-semibold text-primary">
+                        {(e.projects as any)?.clients?.name ?? (kindOf(e as any) === "personal" ? "Personal / Home" : "Studio Overhead")}
+                      </span>
+                      {e.projects?.project_name ? ` · ${e.projects.project_name}` : ""}
                     </span>
-                    {e.projects?.project_name ? ` · ${e.projects.project_name}` : ""}
                   </p>
                 </button>
                 <div className="flex shrink-0 items-center gap-1">
@@ -234,6 +285,8 @@ function ExpensesPage() {
           open={!!editing}
           onOpenChange={(v) => !v && setEditing(null)}
           extra={bankExtra}
+          header={kindHeader}
+          onReset={() => setKind(editing ? kindOf(editing as any) : "studio")}
           onSubmit={async (v) => {
             await submitExpense({ ...v, id: editing.id });
             setEditing(null);

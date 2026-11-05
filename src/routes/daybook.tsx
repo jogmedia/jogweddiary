@@ -21,6 +21,8 @@ import { cn } from "@/lib/utils";
 import { PAY_ACCOUNTS } from "@/lib/accounts";
 import { BankAccountField, needsBankAccount } from "@/components/BankAccountField";
 import { useExpenseCategories } from "@/lib/expense-categories";
+import { ExpenseKindBadge, ExpenseKindToggle } from "@/components/ExpenseKind";
+import { PERSONAL_CATEGORIES, kindOf, type ExpenseKind } from "@/lib/expenses";
 
 const MODE_LABELS: Record<string, string> = {
   cash: "Cash in Hand",
@@ -63,6 +65,7 @@ type Row = {
   mode: string;
   note?: string | null;
   projectId?: string | null;
+  kind?: ExpenseKind;
   raw: Record<string, any>;
 };
 
@@ -84,6 +87,8 @@ function DaybookPage() {
   const [addExpense, setAddExpense] = useState(false);
   const [editIncome, setEditIncome] = useState<Record<string, any> | null>(null);
   const [editExpense, setEditExpense] = useState<Record<string, any> | null>(null);
+  const [kind, setKind] = useState<ExpenseKind>("studio");
+  const [kindFilter, setKindFilter] = useState<"all" | ExpenseKind>("all");
 
   const projectOptions = projects.map((p) => ({
     value: p.id,
@@ -123,20 +128,24 @@ function DaybookPage() {
   ];
 
   const expenseFields: Field[] = [
-    {
-      name: "project_id",
-      label: "Project / Client (leave blank for Studio Overhead / General)",
-      type: "select",
-      options: projectOptions,
-      full: true,
-    },
+    ...(kind === "studio"
+      ? [
+          {
+            name: "project_id",
+            label: "Project / Client (leave blank for Studio Overhead / General)",
+            type: "select" as const,
+            options: projectOptions,
+            full: true,
+          },
+        ]
+      : []),
     {
       name: "category",
-      label: "Category",
+      label: kind === "personal" ? "Personal / Home sub-category" : "Category",
       type: "select",
       required: true,
-      options: categoryOptions,
-      onAddOption: addCategory,
+      options: kind === "personal" ? PERSONAL_CATEGORIES : categoryOptions,
+      onAddOption: kind === "personal" ? undefined : addCategory,
       addOptionTitle: "Add expense category",
       addOptionLabel: "Category name",
     },
@@ -159,6 +168,24 @@ function DaybookPage() {
     ...v,
     bank_account_id: needsBankAccount(v.payment_mode) ? (v.bank_account_id ?? null) : null,
   });
+
+  /** Expense rows also carry the mandatory Studio / Personal classification. */
+  const withExpenseKind = (v: Record<string, any>) => ({
+    ...withBank(v),
+    expense_kind: kind,
+    project_id: kind === "personal" ? null : (v.project_id ?? null),
+  });
+
+  const kindHeader = (_values: Record<string, any>, set: (n: string, v: any) => void) => (
+    <ExpenseKindToggle
+      value={kind}
+      onChange={(k) => {
+        setKind(k);
+        set("expense_kind", k);
+        set("category", "");
+      }}
+    />
+  );
 
   const income: Row[] = useMemo(
     () =>
@@ -192,9 +219,14 @@ function DaybookPage() {
           mode: modeLabel(e.payment_mode),
           note: e.notes ?? e.paid_to ?? null,
           projectId: (e as any).project_id,
+          kind: kindOf(e as any),
           raw: e as any,
         })),
     [expenses, date],
+  );
+  const shownOutflow = useMemo(
+    () => (kindFilter === "all" ? outflow : outflow.filter((r) => r.kind === kindFilter)),
+    [outflow, kindFilter],
   );
 
   const inTotal = income.reduce((a, r) => a + r.amount, 0);
@@ -307,6 +339,28 @@ function DaybookPage() {
         ))}
       </div>
 
+      {/* Studio vs Personal filter for expenses */}
+      <div className="mt-4 grid grid-cols-3 gap-1 rounded-xl border border-border bg-card p-1">
+        {([
+          ["all", "All Expenses"],
+          ["studio", "🏢 Studio Only"],
+          ["personal", "🏠 Personal Only"],
+        ] as const).map(([key, label]) => (
+          <button
+            key={key}
+            type="button"
+            onClick={() => setKindFilter(key)}
+            aria-pressed={kindFilter === key}
+            className={cn(
+              "min-h-11 rounded-lg px-2 text-xs font-medium transition-colors",
+              kindFilter === key ? "bg-primary text-primary-foreground" : "text-muted-foreground",
+            )}
+          >
+            {label}
+          </button>
+        ))}
+      </div>
+
       <div className="mt-4 grid gap-4 lg:grid-cols-2">
         <div className={cn(tab === "expense" && "hidden lg:block")}>
           <Column
@@ -327,14 +381,20 @@ function DaybookPage() {
           <Column
             title="EXPENSES / OUTFLOW (ചിലവ്)"
             dot="🔴"
-            rows={outflow}
+            rows={shownOutflow}
             total={outTotal}
             totalLabel="Day's expenses"
             tone="destructive"
             empty="No expenses recorded for this day"
             addLabel="Add Expense"
-            onAdd={() => setAddExpense(true)}
-            onEdit={(r) => setEditExpense(r.raw)}
+            onAdd={() => {
+              setKind("studio");
+              setAddExpense(true);
+            }}
+            onEdit={(r) => {
+              setKind(r.kind ?? "studio");
+              setEditExpense(r.raw);
+            }}
             onDelete={(r) => confirmDelete(() => removeExpense.mutate(r.id))}
           />
         </div>
@@ -380,9 +440,10 @@ function DaybookPage() {
           initial={{ expense_date: date, payment_mode: "cash" }}
           open={addExpense}
           onOpenChange={setAddExpense}
+          header={kindHeader}
           extra={bankExtra}
           onSubmit={async (v) => {
-            await saveExpense.mutateAsync(withBank(v));
+            await saveExpense.mutateAsync(withExpenseKind(v));
             setAddExpense(false);
           }}
         />
@@ -396,9 +457,10 @@ function DaybookPage() {
           initial={editExpense}
           open={!!editExpense}
           onOpenChange={(v) => !v && setEditExpense(null)}
+          header={kindHeader}
           extra={bankExtra}
           onSubmit={async (v) => {
-            await saveExpense.mutateAsync({ ...withBank(v), id: editExpense.id });
+            await saveExpense.mutateAsync({ ...withExpenseKind(v), id: editExpense.id });
             setEditExpense(null);
           }}
         />
@@ -478,6 +540,7 @@ function Column({
                   </div>
                 )}
                 <div className="mt-1 flex flex-wrap items-center gap-1.5">
+                  {r.kind && <ExpenseKindBadge kind={r.kind} />}
                   <span className="shrink-0 rounded-full border border-border px-2 py-0.5 text-xs text-muted-foreground">
                     {r.mode}
                   </span>

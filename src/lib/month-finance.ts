@@ -1,5 +1,6 @@
 import { useBankAccounts, useExpenses, usePayments } from "@/lib/db";
 import { todayISO } from "@/lib/format";
+import { categoryTotals, kindOf } from "@/lib/expenses";
 
 export const OWNER_DRAW = "Owner Salary / Personal Draw";
 
@@ -101,8 +102,14 @@ export function useMonthFinance(month: string) {
 
   const totalIncome = paymentRows.reduce((a, r) => a + r.amount, 0);
   const ownerDraw = expenseRows.filter((r) => r.isDraw).reduce((a, r) => a + r.amount, 0);
-  const businessExpenses = expenseRows.filter((r) => !r.isDraw).reduce((a, r) => a + r.amount, 0);
+  const personalSpend = expenseRows
+    .filter((r) => !r.isDraw && kindOf(r.row) === "personal")
+    .reduce((a, r) => a + r.amount, 0);
+  const businessExpenses = expenseRows
+    .filter((r) => !r.isDraw && kindOf(r.row) !== "personal")
+    .reduce((a, r) => a + r.amount, 0);
   const totalExpenses = businessExpenses + ownerDraw;
+  const breakdown = categoryTotals(expenseRows.filter((r) => !r.isDraw));
 
   return {
     paymentRows,
@@ -111,7 +118,9 @@ export function useMonthFinance(month: string) {
     businessExpenses,
     totalExpenses,
     ownerDraw,
+    personalSpend,
+    breakdown,
     netProfit: totalIncome - businessExpenses,
-    retention: totalIncome - businessExpenses - ownerDraw,
+    retention: totalIncome - businessExpenses - ownerDraw - personalSpend,
   };
 }

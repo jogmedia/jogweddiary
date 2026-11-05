@@ -101,6 +101,7 @@ export function ProjectExpensesDialog({
       ...v,
       ...extraProps,
       project_id: projectId,
+      expense_kind: "studio",
       bank_account_id:
         needsBankAccount(v.payment_mode) || v.category === SALARY_CATEGORY
           ? (v.bank_account_id ?? null)

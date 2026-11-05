@@ -38,6 +38,7 @@ export const Route = createFileRoute("/api/public/bank-expense-webhook")({
         const { error } = await supabaseAdmin.from("project_expenses").insert({
           amount,
           category: "UPI / Studio Expense",
+          expense_kind: "studio",
           expense_date: today,
           payment_mode: "upi",
           paid_to: payee ?? "GPay Expense",

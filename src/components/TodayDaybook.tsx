@@ -7,6 +7,8 @@ import { RecordDialog, type Field } from "@/components/RecordDialog";
 import { BankAccountField, needsBankAccount } from "@/components/BankAccountField";
 import { useExpenses, usePayments, useProjects, useRemove, useUpsert } from "@/lib/db";
 import { useExpenseCategories } from "@/lib/expense-categories";
+import { ExpenseKindBadge, ExpenseKindToggle } from "@/components/ExpenseKind";
+import { PERSONAL_CATEGORIES, kindOf, type ExpenseKind } from "@/lib/expenses";
 import { PAY_ACCOUNTS } from "@/lib/accounts";
 import { fmtDate, inr, todayISO } from "@/lib/format";
 import { cn } from "@/lib/utils";
@@ -31,6 +33,7 @@ type Row = {
   amount: number;
   mode: string;
   projectId?: string | null;
+  kind?: ExpenseKind;
   raw: Record<string, any>;
 };
 
@@ -53,6 +56,7 @@ export function TodayDaybook() {
   const [addExpense, setAddExpense] = useState(false);
   const [editIncome, setEditIncome] = useState<Record<string, any> | null>(null);
   const [editExpense, setEditExpense] = useState<Record<string, any> | null>(null);
+  const [kind, setKind] = useState<ExpenseKind>("studio");
 
   const projectOptions = projects.map((p) => ({
     value: p.id,
@@ -86,20 +90,24 @@ export function TodayDaybook() {
   ];
 
   const expenseFields: Field[] = [
-    {
-      name: "project_id",
-      label: "Project / Client (leave blank for Studio Overhead / General)",
-      type: "select",
-      options: projectOptions,
-      full: true,
-    },
+    ...(kind === "studio"
+      ? [
+          {
+            name: "project_id",
+            label: "Project / Client (leave blank for Studio Overhead / General)",
+            type: "select" as const,
+            options: projectOptions,
+            full: true,
+          },
+        ]
+      : []),
     {
       name: "category",
-      label: "Category",
+      label: kind === "personal" ? "Personal / Home sub-category" : "Category",
       type: "select",
       required: true,
-      options: categoryOptions,
-      onAddOption: addCategory,
+      options: kind === "personal" ? PERSONAL_CATEGORIES : categoryOptions,
+      onAddOption: kind === "personal" ? undefined : addCategory,
       addOptionTitle: "Add expense category",
       addOptionLabel: "Category name",
     },
@@ -119,6 +127,23 @@ export function TodayDaybook() {
     ...v,
     bank_account_id: needsBankAccount(v.payment_mode) ? (v.bank_account_id ?? null) : null,
   });
+
+  const withExpenseKind = (v: Record<string, any>) => ({
+    ...withBank(v),
+    expense_kind: kind,
+    project_id: kind === "personal" ? null : (v.project_id ?? null),
+  });
+
+  const kindHeader = (_values: Record<string, any>, set: (n: string, v: any) => void) => (
+    <ExpenseKindToggle
+      value={kind}
+      onChange={(k) => {
+        setKind(k);
+        set("expense_kind", k);
+        set("category", "");
+      }}
+    />
+  );
 
   const income: Row[] = useMemo(
     () =>
@@ -150,6 +175,7 @@ export function TodayDaybook() {
           amount: Number(e.amount ?? 0),
           mode: modeLabel(e.payment_mode),
           projectId: (e as any).project_id,
+          kind: kindOf(e as any),
           raw: e as any,
         })),
     [expenses, today],
@@ -175,14 +201,20 @@ export function TodayDaybook() {
             params={{ id: row.projectId }}
             className="group block cursor-pointer"
           >
-            <p className="truncate text-sm font-medium text-foreground group-hover:underline">{row.title}</p>
+            <p className="flex items-center gap-1.5 truncate text-sm font-medium text-foreground group-hover:underline">
+              {row.title}
+              {variant === "expense" && row.kind && <ExpenseKindBadge kind={row.kind} />}
+            </p>
             <p className="mt-0.5 block max-w-full truncate text-xs text-muted-foreground group-hover:underline">
               {row.sub} · {row.mode}
             </p>
           </Link>
         ) : (
           <div className="min-w-0">
-            <p className="truncate text-sm font-medium text-foreground">{row.title}</p>
+            <p className="flex items-center gap-1.5 truncate text-sm font-medium text-foreground">
+              {row.title}
+              {variant === "expense" && row.kind && <ExpenseKindBadge kind={row.kind} />}
+            </p>
             <p className="mt-0.5 block max-w-full truncate text-xs text-muted-foreground">
               {row.sub} · {row.mode}
             </p>
@@ -200,7 +232,13 @@ export function TodayDaybook() {
             className="h-9 w-9 flex-shrink-0 p-1.5 text-muted-foreground hover:text-foreground"
             aria-label="Edit transaction"
             title="Edit transaction"
-            onClick={() => (variant === "income" ? setEditIncome(row.raw) : setEditExpense(row.raw))}
+            onClick={() => {
+              if (variant === "income") setEditIncome(row.raw);
+              else {
+                setKind(row.kind ?? "studio");
+                setEditExpense(row.raw);
+              }
+            }}
           >
             <Pencil className="h-4 w-4" />
           </Button>
@@ -232,7 +270,7 @@ export function TodayDaybook() {
           <Button size="sm" onClick={() => setAddIncome(true)}>
             <Plus className="mr-1.5 h-4 w-4" /> Income
           </Button>
-          <Button size="sm" variant="outline" onClick={() => setAddExpense(true)}>
+          <Button size="sm" variant="outline" onClick={() => { setKind("studio"); setAddExpense(true); }}>
             <Plus className="mr-1.5 h-4 w-4" /> Expense
           </Button>
           <Button size="sm" variant="ghost" asChild>
@@ -401,9 +439,10 @@ export function TodayDaybook() {
           initial={{ expense_date: today, payment_mode: "cash" }}
           open={addExpense}
           onOpenChange={setAddExpense}
+          header={kindHeader}
           extra={bankExtra}
           onSubmit={async (v) => {
-            await saveExpense.mutateAsync(withBank(v));
+            await saveExpense.mutateAsync(withExpenseKind(v));
             setAddExpense(false);
           }}
         />
@@ -417,9 +456,10 @@ export function TodayDaybook() {
           initial={editExpense}
           open={!!editExpense}
           onOpenChange={(v) => !v && setEditExpense(null)}
+          header={kindHeader}
           extra={bankExtra}
           onSubmit={async (v) => {
-            await saveExpense.mutateAsync({ ...withBank(v), id: editExpense.id });
+            await saveExpense.mutateAsync({ ...withExpenseKind(v), id: editExpense.id });
             setEditExpense(null);
           }}
         />

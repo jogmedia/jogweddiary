@@ -136,7 +136,8 @@ function ExpensesPage() {
   const total = rows.reduce((a, e) => a + Number(e.amount ?? 0), 0);
   const exportRows = rows.map((e) => ({
     Date: e.expense_date,
-    Project: e.projects?.project_name ?? "Studio (no project)",
+    Kind: kindOf(e as any) === "personal" ? "Personal / Home" : "Studio",
+    Project: e.projects?.project_name ?? (kindOf(e as any) === "personal" ? "Personal / Home" : "Studio (no project)"),
     Category: e.category,
     PaidTo: e.paid_to ?? "",
     Mode: e.payment_mode ?? "",

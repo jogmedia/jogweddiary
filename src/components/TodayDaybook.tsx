@@ -90,20 +90,24 @@ export function TodayDaybook() {
   ];
 
   const expenseFields: Field[] = [
-    {
-      name: "project_id",
-      label: "Project / Client (leave blank for Studio Overhead / General)",
-      type: "select",
-      options: projectOptions,
-      full: true,
-    },
+    ...(kind === "studio"
+      ? [
+          {
+            name: "project_id",
+            label: "Project / Client (leave blank for Studio Overhead / General)",
+            type: "select" as const,
+            options: projectOptions,
+            full: true,
+          },
+        ]
+      : []),
     {
       name: "category",
-      label: "Category",
+      label: kind === "personal" ? "Personal / Home sub-category" : "Category",
       type: "select",
       required: true,
-      options: categoryOptions,
-      onAddOption: addCategory,
+      options: kind === "personal" ? PERSONAL_CATEGORIES : categoryOptions,
+      onAddOption: kind === "personal" ? undefined : addCategory,
       addOptionTitle: "Add expense category",
       addOptionLabel: "Category name",
     },
@@ -123,6 +127,23 @@ export function TodayDaybook() {
     ...v,
     bank_account_id: needsBankAccount(v.payment_mode) ? (v.bank_account_id ?? null) : null,
   });
+
+  const withExpenseKind = (v: Record<string, any>) => ({
+    ...withBank(v),
+    expense_kind: kind,
+    project_id: kind === "personal" ? null : (v.project_id ?? null),
+  });
+
+  const kindHeader = (_values: Record<string, any>, set: (n: string, v: any) => void) => (
+    <ExpenseKindToggle
+      value={kind}
+      onChange={(k) => {
+        setKind(k);
+        set("expense_kind", k);
+        set("category", "");
+      }}
+    />
+  );
 
   const income: Row[] = useMemo(
     () =>

@@ -339,6 +339,28 @@ function DaybookPage() {
         ))}
       </div>
 
+      {/* Studio vs Personal filter for expenses */}
+      <div className="mt-4 grid grid-cols-3 gap-1 rounded-xl border border-border bg-card p-1">
+        {([
+          ["all", "All Expenses"],
+          ["studio", "🏢 Studio Only"],
+          ["personal", "🏠 Personal Only"],
+        ] as const).map(([key, label]) => (
+          <button
+            key={key}
+            type="button"
+            onClick={() => setKindFilter(key)}
+            aria-pressed={kindFilter === key}
+            className={cn(
+              "min-h-11 rounded-lg px-2 text-xs font-medium transition-colors",
+              kindFilter === key ? "bg-primary text-primary-foreground" : "text-muted-foreground",
+            )}
+          >
+            {label}
+          </button>
+        ))}
+      </div>
+
       <div className="mt-4 grid gap-4 lg:grid-cols-2">
         <div className={cn(tab === "expense" && "hidden lg:block")}>
           <Column
@@ -359,14 +381,20 @@ function DaybookPage() {
           <Column
             title="EXPENSES / OUTFLOW (ചിലവ്)"
             dot="🔴"
-            rows={outflow}
+            rows={shownOutflow}
             total={outTotal}
             totalLabel="Day's expenses"
             tone="destructive"
             empty="No expenses recorded for this day"
             addLabel="Add Expense"
-            onAdd={() => setAddExpense(true)}
-            onEdit={(r) => setEditExpense(r.raw)}
+            onAdd={() => {
+              setKind("studio");
+              setAddExpense(true);
+            }}
+            onEdit={(r) => {
+              setKind(r.kind ?? "studio");
+              setEditExpense(r.raw);
+            }}
             onDelete={(r) => confirmDelete(() => removeExpense.mutate(r.id))}
           />
         </div>

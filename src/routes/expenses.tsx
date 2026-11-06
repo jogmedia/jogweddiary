@@ -44,6 +44,8 @@ function ExpensesPage() {
   const remove = useRemove("project_expenses", "Expense");
   const [q, setQ] = useState("");
   const [editing, setEditing] = useState<Expense | null>(null);
+  const [kind, setKind] = useState<ExpenseKind>("studio");
+  const [kindFilter, setKindFilter] = useState<"all" | ExpenseKind>("all");
 
   const [from, setFrom] = useState("");
   const [to, setTo] = useState("");

@@ -4,6 +4,7 @@ import { cn } from "@/lib/utils";
 import { useBankAccounts, useExpenses, usePayments } from "@/lib/db";
 import { inr, todayISO } from "@/lib/format";
 import { fullMonthLabel } from "@/lib/month-finance";
+import { kindOf } from "@/lib/expenses";
 
 const OWNER_DRAW = "Owner Salary / Personal Draw";
 

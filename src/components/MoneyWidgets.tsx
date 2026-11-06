@@ -4,6 +4,7 @@ import { cn } from "@/lib/utils";
 import { useBankAccounts, useExpenses, usePayments } from "@/lib/db";
 import { inr, todayISO } from "@/lib/format";
 import { fullMonthLabel } from "@/lib/month-finance";
+import { kindOf } from "@/lib/expenses";
 
 const OWNER_DRAW = "Owner Salary / Personal Draw";
 
@@ -35,9 +36,14 @@ function useMoney(month = todayISO().slice(0, 7)) {
   const monthDraw = expenses
     .filter((e: any) => e.category === OWNER_DRAW && inMonth(e.expense_date))
     .reduce((a: number, e: any) => a + Number(e.amount ?? 0), 0);
-  // Business expenses only (owner draw is a withdrawal, not a cost).
+  const monthPersonal = expenses
+    .filter((e: any) => e.category !== OWNER_DRAW && kindOf(e) === "personal" && inMonth(e.expense_date))
+    .reduce((a: number, e: any) => a + Number(e.amount ?? 0), 0);
+  // Studio expenses only (owner draw is a withdrawal; personal / home spend never touches profit).
   const monthExpenses = expenses
-    .filter((e: any) => e.category !== OWNER_DRAW && inMonth(e.expense_date))
+    .filter(
+      (e: any) => e.category !== OWNER_DRAW && kindOf(e) !== "personal" && inMonth(e.expense_date),
+    )
     .reduce((a: number, e: any) => a + Number(e.amount ?? 0), 0);
 
   const monthProfit = monthIncome - monthExpenses;
@@ -48,7 +54,7 @@ function useMoney(month = todayISO().slice(0, 7)) {
     monthIncome,
     monthProfit,
     monthDraw,
-    retention: monthProfit - monthDraw,
+    retention: monthProfit - monthDraw - monthPersonal,
   };
 }
 

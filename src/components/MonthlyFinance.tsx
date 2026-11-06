@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { createPortal } from "react-dom";
-import { Printer, Download, IndianRupee, PiggyBank, TrendingUp, TrendingDown, Wallet } from "lucide-react";
+import { Printer, Download, IndianRupee, PiggyBank, TrendingUp, TrendingDown, Wallet, Home } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   Select,
@@ -65,8 +65,9 @@ function PrintableReport({ month, settings }: { month: string; settings: any }) 
   const label = fullMonthLabel(month);
   const summary: [string, number][] = [
     ["Total Income", f.totalIncome],
-    ["Business Expenses", f.businessExpenses],
-    ["Net Profit", f.netProfit],
+    ["Studio / Business Expenses", f.businessExpenses],
+    ["Net Profit (Studio Only)", f.netProfit],
+    ["Personal / Home Expenses", f.personalSpend],
     ["Owner Salary Drawn", f.ownerDraw],
     ["Net Retention", f.retention],
   ];
@@ -197,8 +198,9 @@ export function MonthlyFinanceCard({ month, onMonthChange }: { month: string; on
 
   const items = [
     { label: "Monthly income", value: f.totalIncome, icon: IndianRupee },
-    { label: "Monthly expenses", value: f.businessExpenses, icon: TrendingDown },
-    { label: "Net profit", value: f.netProfit, icon: TrendingUp },
+    { label: "Studio expenses", value: f.businessExpenses, icon: TrendingDown },
+    { label: "Net profit (studio only)", value: f.netProfit, icon: TrendingUp },
+    { label: "Personal / Home spend", value: f.personalSpend, icon: Home },
     { label: "Owner salary drawn", value: f.ownerDraw, icon: PiggyBank },
     { label: "Retention / surplus", value: f.retention, icon: Wallet },
   ];
@@ -250,6 +252,32 @@ export function MonthlyFinanceCard({ month, onMonthChange }: { month: string; on
       <p className="mt-2 text-[11px] text-muted-foreground">
         {fullMonthLabel(month)} · {f.paymentRows.length} payments · {f.expenseRows.length} expense entries
       </p>
+
+      {f.breakdown.length > 0 && (
+        <div className="mt-3">
+          <p className="mb-1.5 text-xs font-semibold text-muted-foreground">Spending by category</p>
+          <ul className="space-y-1.5">
+            {f.breakdown.slice(0, 8).map((b) => {
+              const max = f.breakdown[0]?.amount || 1;
+              return (
+                <li key={b.category} className="flex items-center gap-2 text-xs">
+                  <span className="w-40 shrink-0 truncate sm:w-56">{b.category}</span>
+                  <span className="h-2 min-w-0 flex-1 overflow-hidden rounded-full bg-muted">
+                    <span
+                      className="block h-full rounded-full bg-primary"
+                      style={{ width: `${Math.max(3, Math.round((b.amount / max) * 100))}%` }}
+                    />
+                  </span>
+                  <span className="shrink-0 tabular-nums text-muted-foreground">{inr(b.amount)}</span>
+                </li>
+              );
+            })}
+          </ul>
+          <p className="mt-1 text-[11px] text-muted-foreground">
+            Personal / Home living expenses are tracked separately and never deducted from studio profit.
+          </p>
+        </div>
+      )}
 
       {mounted &&
         createPortal(<PrintableReport month={month} settings={settings} />, document.body)}

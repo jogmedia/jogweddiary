@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useExpenses, useProjects, useRemove, useUpsert, type Expense } from "@/lib/db";
 import { fmtDate, inr, todayISO } from "@/lib/format";
+import { cn } from "@/lib/utils";
 import { exportCsv, exportExcel } from "@/lib/exporters";
 import { BankAccountField, needsBankAccount } from "@/components/BankAccountField";
 import { useExpenseCategories } from "@/lib/expense-categories";
